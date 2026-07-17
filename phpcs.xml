@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ruleset name="AdverTrieste">
+	<description>WordPress Coding Standards per il plugin AdverTrieste.</description>
+
+	<!-- Cosa analizzare. -->
+	<file>.</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/assets/dist/*</exclude-pattern>
+
+	<!-- Opzioni: solo PHP, output con colori e sorgente delle regole. -->
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="basepath" value="."/>
+
+	<!-- Target di compatibilità. -->
+	<config name="minimum_supported_wp_version" value="6.0"/>
+	<config name="testVersion" value="8.3-"/>
+
+	<!-- Standard di riferimento. -->
+	<rule ref="WordPress"/>
+	<rule ref="WordPress-Extra"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- Text domain del plugin. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="advertrieste"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Prefissi consentiti per global/hook/costanti. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="advtr"/>
+				<element value="ADVTR"/>
+				<element value="AdverTrieste"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

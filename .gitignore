@@ -1,0 +1,17 @@
+# Dipendenze
+/vendor/
+/node_modules/
+
+# Build asset (output generato da assets/src/)
+/assets/dist/
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+
+# Cache strumenti
+.phpcs.cache
+.phpunit.result.cache
