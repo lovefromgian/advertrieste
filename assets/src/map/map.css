@@ -1,0 +1,71 @@
+/**
+ * Stili della mappa pubblica AdverTrieste.
+ *
+ * @package AdverTrieste
+ */
+
+.advtr-map-wrap {
+	margin: 1em 0;
+}
+
+.advtr-map {
+	width: 100%;
+	min-height: 300px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+}
+
+.advtr-map-filtri {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.advtr-filtro-btn {
+	cursor: pointer;
+	border: 1px solid #c3c4c7;
+	background: #fff;
+	border-radius: 999px;
+	padding: 4px 12px;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.advtr-filtro-btn.attivo {
+	background: #1d2327;
+	color: #fff;
+	border-color: #1d2327;
+}
+
+/* Marker come pin/cerchio: nessuna dipendenza da immagini Leaflet. */
+.advtr-marker {
+	display: block;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 2px solid #fff;
+	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.3 );
+	background: #2271b1;
+}
+
+.advtr-marker.tipo-poi {
+	background: #3a7d44;
+}
+
+.advtr-marker.in-evidenza {
+	background: #d4a017;
+	width: 22px;
+	height: 22px;
+	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.4 ), 0 0 8px rgba( 212, 160, 23, 0.8 );
+}
+
+.advtr-popup-title {
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.advtr-popup-link {
+	display: inline-block;
+	margin-top: 4px;
+}

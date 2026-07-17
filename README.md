@@ -22,23 +22,41 @@ advertrieste/
 ├── includes/
 │   ├── class-autoloader.php  # autoloader AdverTrieste\ -> includes/ (file class-*.php)
 │   ├── class-activator.php   # attivazione/disattivazione (seeding termini, rewrite)
-│   ├── class-plugin.php      # singleton di avvio: registra CPT, tassonomie, meta
+│   ├── class-plugin.php      # singleton di avvio: registra CPT, tassonomie, meta, REST, mappa
 │   ├── cpt/                  # Custom Post Type e tassonomie (uno per file)
 │   │   ├── class-locale.php     # attività commerciale (pubblico)
 │   │   ├── class-poi.php        # punto d'interesse (pubblico)
 │   │   ├── class-evento.php     # evento (pubblico se pubblicato)
 │   │   ├── class-puntoqr.php    # espositore/QR — RISERVATO, non pubblico
 │   │   └── class-categoria.php  # tassonomia `categoria` (locale+poi) + seeding
-│   └── meta/                 # meta box e campi
-│       └── class-localemeta.php # meta del CPT `locale` (register + box + save)
-├── assets/src/               # sorgenti JS/CSS (mappa, dashboard, onboarding)
-│   └── admin/locale-meta.js  # media picker (logo + galleria) del meta box
+│   ├── meta/                 # meta box e campi
+│   │   └── class-localemeta.php # meta del CPT `locale` (register + box + save)
+│   ├── rest/                 # endpoint REST (namespace advertrieste/v1)
+│   │   └── class-markers.php    # GET /map/markers (bbox+zoom+categoria, mai punto_qr)
+│   └── frontend/             # front-end pubblico
+│       └── class-map.php        # shortcode [advtr_map] + enqueue Leaflet
+├── assets/
+│   ├── src/admin/locale-meta.js  # media picker (logo + galleria) del meta box
+│   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup
+│   ├── src/map/map.css           # stili mappa e marker
+│   └── vendor/leaflet/           # Leaflet 1.9.4 (bundle locale, no CDN)
 ├── templates/                # template front-end del plugin
-│   └── admin/locale-meta-box.php # markup del meta box "Dati locale"
+│   ├── admin/locale-meta-box.php # markup del meta box "Dati locale"
+│   └── map.php                   # contenitore mappa dello shortcode
 ├── docs/                     # specifiche, architettura, deploy
 ├── composer.json             # dev tooling (PHPCS + WPCS)
 └── phpcs.xml                 # regole WordPress Coding Standards
 ```
+
+## Mappa
+
+Inserire la mappa pubblica in una pagina con lo shortcode:
+
+```
+[advtr_map zoom="13" height="500"]
+```
+
+Attributi: `lat`, `lng` (centro, default Trieste), `zoom` (default 13), `height` (px, default 500). I marker sono caricati dall'endpoint `GET advertrieste/v1/map/markers` in base a bounding box, zoom e categoria; i `poi` compaiono a zoom basso, i `locale` a zoom alto. I `punto_qr` non sono MAI inclusi.
 
 ## Convenzioni
 

@@ -17,6 +17,8 @@ use AdverTrieste\Cpt\Evento;
 use AdverTrieste\Cpt\PuntoQr;
 use AdverTrieste\Cpt\Categoria;
 use AdverTrieste\Meta\LocaleMeta;
+use AdverTrieste\Rest\Markers;
+use AdverTrieste\Frontend\Map;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -83,6 +85,8 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
 
 		LocaleMeta::init();
+		Markers::init();
+		Map::init();
 	}
 
 	/**
