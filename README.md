@@ -21,14 +21,20 @@ advertrieste/
 ├── advertrieste.php          # bootstrap: header, costanti, autoloader, avvio
 ├── includes/
 │   ├── class-autoloader.php  # autoloader AdverTrieste\ -> includes/ (file class-*.php)
-│   ├── class-plugin.php      # singleton di avvio, registra i CPT su 'init'
-│   └── cpt/                  # Custom Post Type (uno per file)
-│       ├── class-locale.php     # attività commerciale (pubblico)
-│       ├── class-poi.php        # punto d'interesse (pubblico)
-│       ├── class-evento.php     # evento (pubblico se pubblicato)
-│       └── class-punto-qr.php   # espositore/QR — RISERVATO, non pubblico
+│   ├── class-activator.php   # attivazione/disattivazione (seeding termini, rewrite)
+│   ├── class-plugin.php      # singleton di avvio: registra CPT, tassonomie, meta
+│   ├── cpt/                  # Custom Post Type e tassonomie (uno per file)
+│   │   ├── class-locale.php     # attività commerciale (pubblico)
+│   │   ├── class-poi.php        # punto d'interesse (pubblico)
+│   │   ├── class-evento.php     # evento (pubblico se pubblicato)
+│   │   ├── class-puntoqr.php    # espositore/QR — RISERVATO, non pubblico
+│   │   └── class-categoria.php  # tassonomia `categoria` (locale+poi) + seeding
+│   └── meta/                 # meta box e campi
+│       └── class-localemeta.php # meta del CPT `locale` (register + box + save)
 ├── assets/src/               # sorgenti JS/CSS (mappa, dashboard, onboarding)
+│   └── admin/locale-meta.js  # media picker (logo + galleria) del meta box
 ├── templates/                # template front-end del plugin
+│   └── admin/locale-meta-box.php # markup del meta box "Dati locale"
 ├── docs/                     # specifiche, architettura, deploy
 ├── composer.json             # dev tooling (PHPCS + WPCS)
 └── phpcs.xml                 # regole WordPress Coding Standards

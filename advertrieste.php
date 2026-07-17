@@ -33,5 +33,9 @@ define( 'ADVTR_URL', plugin_dir_url( __FILE__ ) );
 require_once ADVTR_PATH . 'includes/class-autoloader.php';
 Autoloader::register();
 
+// Hook di attivazione / disattivazione.
+register_activation_hook( __FILE__, array( Activator::class, 'activate' ) );
+register_deactivation_hook( __FILE__, array( Activator::class, 'deactivate' ) );
+
 // Avvio del plugin.
 Plugin::instance()->boot();

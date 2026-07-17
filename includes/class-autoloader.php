@@ -7,7 +7,7 @@
  * Esempi:
  *   AdverTrieste\Plugin          -> includes/class-plugin.php
  *   AdverTrieste\Cpt\Locale      -> includes/cpt/class-locale.php
- *   AdverTrieste\Cpt\PuntoQr     -> includes/cpt/class-punto-qr.php
+ *   AdverTrieste\Cpt\PuntoQr     -> includes/cpt/class-puntoqr.php
  *
  * @package AdverTrieste
  */
@@ -43,41 +43,30 @@ class Autoloader {
 	/**
 	 * Risolve una classe del plugin nel percorso del file corrispondente.
 	 *
-	 * @param string $class Nome completo della classe (con namespace).
+	 * @param string $class_name Nome completo della classe (con namespace).
 	 * @return void
 	 */
-	public static function autoload( $class ) {
-		if ( 0 !== strpos( $class, self::PREFIX ) ) {
+	public static function autoload( $class_name ) {
+		if ( 0 !== strpos( $class_name, self::PREFIX ) ) {
 			return;
 		}
 
-		$relative = substr( $class, strlen( self::PREFIX ) );
+		$relative = substr( $class_name, strlen( self::PREFIX ) );
 		$parts    = explode( '\\', $relative );
-		$class    = array_pop( $parts );
+		$leaf     = array_pop( $parts );
 
 		$subdir = '';
 		if ( ! empty( $parts ) ) {
 			$subdir = strtolower( implode( '/', $parts ) ) . '/';
 		}
 
-		$file = 'class-' . self::hyphenate( $class ) . '.php';
+		// Convenzione WPCS: nome file = 'class-' + nome classe minuscolo.
+		// Es. AdverTrieste\Cpt\PuntoQr -> includes/cpt/class-puntoqr.php.
+		$file = 'class-' . strtolower( $leaf ) . '.php';
 		$path = ADVTR_PATH . 'includes/' . $subdir . $file;
 
 		if ( is_readable( $path ) ) {
 			require_once $path;
 		}
-	}
-
-	/**
-	 * Converte un nome di classe PascalCase nel formato con trattini minuscolo.
-	 *
-	 * Es. `PuntoQr` -> `punto-qr`, `Locale` -> `locale`.
-	 *
-	 * @param string $name Nome della classe (senza namespace).
-	 * @return string
-	 */
-	private static function hyphenate( $name ) {
-		$name = preg_replace( '/([a-z0-9])([A-Z])/', '$1-$2', $name );
-		return strtolower( $name );
 	}
 }

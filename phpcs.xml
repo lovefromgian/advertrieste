@@ -32,6 +32,11 @@
 		</properties>
 	</rule>
 
+	<!-- I file "index.php" sono guardie di directory (silence is golden): niente file comment. -->
+	<rule ref="Squiz.Commenting.FileComment">
+		<exclude-pattern>*/index.php</exclude-pattern>
+	</rule>
+
 	<!-- Prefissi consentiti per global/hook/costanti. -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>

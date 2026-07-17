@@ -15,6 +15,8 @@ use AdverTrieste\Cpt\Locale;
 use AdverTrieste\Cpt\Poi;
 use AdverTrieste\Cpt\Evento;
 use AdverTrieste\Cpt\PuntoQr;
+use AdverTrieste\Cpt\Categoria;
+use AdverTrieste\Meta\LocaleMeta;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,6 +48,15 @@ final class Plugin {
 	);
 
 	/**
+	 * Elenco delle classi tassonomia da registrare.
+	 *
+	 * @var string[]
+	 */
+	private const TAXONOMIES = array(
+		Categoria::class,
+	);
+
+	/**
 	 * Costruttore privato: usare instance().
 	 */
 	private function __construct() {}
@@ -69,6 +80,9 @@ final class Plugin {
 	 */
 	public function boot() {
 		add_action( 'init', array( $this, 'register_post_types' ) );
+		add_action( 'init', array( $this, 'register_taxonomies' ) );
+
+		LocaleMeta::init();
 	}
 
 	/**
@@ -79,6 +93,17 @@ final class Plugin {
 	public function register_post_types() {
 		foreach ( self::POST_TYPES as $cpt ) {
 			$cpt::register();
+		}
+	}
+
+	/**
+	 * Registra tutte le tassonomie del plugin.
+	 *
+	 * @return void
+	 */
+	public function register_taxonomies() {
+		foreach ( self::TAXONOMIES as $taxonomy ) {
+			$taxonomy::register();
 		}
 	}
 }

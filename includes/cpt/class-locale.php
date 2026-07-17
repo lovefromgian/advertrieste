@@ -65,7 +65,9 @@ class Locale {
 			'hierarchical'        => false,
 			'menu_icon'           => 'dashicons-store',
 			'menu_position'       => 20,
-			'supports'            => array( 'title', 'editor', 'thumbnail' ),
+			// 'custom-fields' abilita il container `meta` in REST: così i meta
+			// registrati con show_in_rest=true sono esposti, quelli riservati no.
+			'supports'            => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'locale' ),
 			'exclude_from_search' => false,
 		);
