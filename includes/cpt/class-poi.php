@@ -65,7 +65,8 @@ class Poi {
 			'hierarchical'        => false,
 			'menu_icon'           => 'dashicons-location',
 			'menu_position'       => 21,
-			'supports'            => array( 'title', 'editor', 'thumbnail' ),
+			// 'custom-fields' abilita il container `meta` in REST (coordinate, zoom).
+			'supports'            => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'poi' ),
 			'exclude_from_search' => false,
 		);

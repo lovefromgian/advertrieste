@@ -18,6 +18,7 @@ use AdverTrieste\Cpt\PuntoQr;
 use AdverTrieste\Cpt\Categoria;
 use AdverTrieste\Cpt\Offerta;
 use AdverTrieste\Meta\LocaleMeta;
+use AdverTrieste\Meta\PoiMeta;
 use AdverTrieste\Meta\PuntoQrMeta;
 use AdverTrieste\Meta\OffertaMeta;
 use AdverTrieste\Meta\EventoMeta;
@@ -101,6 +102,7 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
 
 		LocaleMeta::init();
+		PoiMeta::init();
 		PuntoQrMeta::init();
 		OffertaMeta::init();
 		EventoMeta::init();
