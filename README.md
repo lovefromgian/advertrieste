@@ -8,7 +8,9 @@ Plugin WordPress custom: directory su mappa di attività e luoghi del territorio
 
 ## Stato
 
-**Scaffold iniziale** (branch `feature/scaffold`). Nessuna funzionalità implementata: solo impalcatura, bootstrap, autoloader e scheletri dei Custom Post Type.
+**In sviluppo attivo.** Implementate e verificate: CPT (locale, poi, evento, punto_qr, offerta) + tassonomia categorie · mappa pubblica a due livelli di zoom · scheda attività completa (single locale) con tracking visite · area riservata + mappa QR protetta · statistiche + tracking · offerte & coupon con validazione esercente · eventi con workflow di revisione a doppia versione · scadenze & email automatiche (cron) · ruoli/capability custom.
+
+Da fare: onboarding "Cosa stai cercando?", percorso/routing, recensioni Google (◐), editing self-service front-end, coordinate POI, pagamenti WooCommerce, suite di test PHPUnit. Vedi `docs/specifiche-funzionali.md` per lo stato per-modulo.
 
 ## Requisiti
 
