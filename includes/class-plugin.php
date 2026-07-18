@@ -36,6 +36,7 @@ use AdverTrieste\Frontend\ReservedArea;
 use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
 use AdverTrieste\Frontend\Eventi as EventiView;
+use AdverTrieste\Payments\WooBridge;
 use AdverTrieste\Cron\Cron;
 
 // Guardia: nessun accesso diretto al file.
@@ -122,6 +123,7 @@ final class Plugin {
 		StatsDashboard::init();
 		OfferteView::init();
 		EventiView::init();
+		WooBridge::init();
 		Cron::init();
 	}
 
