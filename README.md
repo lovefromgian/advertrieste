@@ -30,6 +30,8 @@ advertrieste/
 │   │   ├── class-puntoqr.php    # espositore/QR — RISERVATO, non pubblico
 │   │   ├── class-offerta.php    # offerta/promozione a tempo (pubblico)
 │   │   └── class-categoria.php  # tassonomia `categoria` (locale+poi) + seeding
+│   ├── evento/               # workflow di revisione eventi
+│   │   └── class-workflow.php   # bozza→in_revisione→pubblicato, snapshot versione pubblica
 │   ├── coupon/               # coupon/riscatti
 │   │   └── class-coupon.php     # tabella advtr_coupon, riscatti, scadenza offerte
 │   ├── scadenze/             # scadenze schede
@@ -51,12 +53,14 @@ advertrieste/
 │   │   ├── class-qrmap.php      # GET /qr-map — RISERVATO (auth + advtr_view_qr_map)
 │   │   ├── class-track.php      # POST /locale/{id}/track (nonce + rate-limit)
 │   │   ├── class-stats.php      # GET /stats/{id} — owner/admin
-│   │   └── class-offerte.php    # GET /offerte + POST /offerta/{id}/redeem
+│   │   ├── class-offerte.php    # GET /offerte + POST /offerta/{id}/redeem
+│   │   └── class-eventi.php     # GET /eventi + /grandi-eventi + submit/approve
 │   └── frontend/             # front-end pubblico e riservato
 │       ├── class-map.php            # shortcode [advtr_map] + enqueue Leaflet
 │       ├── class-reservedarea.php   # shortcode [advtr_area_riservata] + mappa QR
 │       ├── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
-│       └── class-offerte.php        # shortcode [advtr_offerte] + [advtr_valida_coupon]
+│       ├── class-offerte.php        # shortcode [advtr_offerte] + [advtr_valida_coupon]
+│       └── class-eventi.php         # shortcode [advtr_grandi_eventi] + [advtr_eventi]
 ├── assets/
 │   ├── src/admin/locale-meta.js  # media picker (logo + galleria) del meta box
 │   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup + track
@@ -109,6 +113,17 @@ CPT `offerta` (collegato a un `locale` via `advtr_locale_id`) con finestra tempo
 - **Pubblico**: `GET advertrieste/v1/offerte[?locale={id}]` — solo offerte attive (finestra date + stato). Shortcode `[advtr_offerte]` con **countdown** live.
 - **Esercente**: `POST advertrieste/v1/offerta/{id}/redeem` — solo proprietario del locale collegato o admin (nonce + auth). Valida il codice, registra il riscatto e traccia l'evento `coupon` nelle statistiche. Shortcode `[advtr_valida_coupon]` (area riservata).
 - **Cron**: `advtr_expire_coupons` (giornaliero) marca scadute le offerte oltre la data di scadenza.
+
+## Eventi & workflow di revisione (§4)
+
+CPT `evento` **non pubblico** e **fuori dalla REST core**: il post WP è la versione *in lavorazione*; il pubblico vede solo lo snapshot approvato `advtr_versione_pubblica` (servito dagli endpoint/shortcode). Questo garantisce che le modifiche non ancora approvate non finiscano online.
+
+- **Workflow** (`Evento\Workflow`): `bozza → in_revisione → pubblicato`. `submit` passa in revisione; `approve` copia lo stato attuale nella versione pubblica. Salvare un evento già pubblicato lo riporta in bozza (le modifiche vanno ri-approvate).
+- **REST**: `GET /eventi` e `GET /grandi-eventi` (pubblici, solo versione approvata; i grandi eventi includono i locali collegati risolti); `POST /evento/{id}/submit` (autore o admin); `POST /evento/{id}/approve` (capability `advtr_approve_evento`).
+- **Bacheca**: meta box "Dati evento" (tipo, date, locali collegati) + "Workflow revisione" con pulsanti Invia/Approva.
+- **Front-end**: `[advtr_grandi_eventi]` (banner + countdown + locali aderenti) e `[advtr_eventi]` (elenco).
+
+> Grandi eventi: creati e approvati dall'admin. Eventi di organizzatori terzi: workflow di revisione obbligatorio. ⏸ Import da turismofvg.it resta IN SOSPESO.
 
 ## Scadenze & email (§3.1)
 

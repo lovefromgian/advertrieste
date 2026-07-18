@@ -20,15 +20,18 @@ use AdverTrieste\Cpt\Offerta;
 use AdverTrieste\Meta\LocaleMeta;
 use AdverTrieste\Meta\PuntoQrMeta;
 use AdverTrieste\Meta\OffertaMeta;
+use AdverTrieste\Meta\EventoMeta;
 use AdverTrieste\Rest\Markers;
 use AdverTrieste\Rest\QrMap;
 use AdverTrieste\Rest\Track;
 use AdverTrieste\Rest\Stats as StatsEndpoint;
 use AdverTrieste\Rest\Offerte as OfferteEndpoint;
+use AdverTrieste\Rest\Eventi as EventiEndpoint;
 use AdverTrieste\Frontend\Map;
 use AdverTrieste\Frontend\ReservedArea;
 use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
+use AdverTrieste\Frontend\Eventi as EventiView;
 use AdverTrieste\Cron\Cron;
 
 // Guardia: nessun accesso diretto al file.
@@ -99,15 +102,18 @@ final class Plugin {
 		LocaleMeta::init();
 		PuntoQrMeta::init();
 		OffertaMeta::init();
+		EventoMeta::init();
 		Markers::init();
 		QrMap::init();
 		Track::init();
 		StatsEndpoint::init();
 		OfferteEndpoint::init();
+		EventiEndpoint::init();
 		Map::init();
 		ReservedArea::init();
 		StatsDashboard::init();
 		OfferteView::init();
+		EventiView::init();
 		Cron::init();
 	}
 

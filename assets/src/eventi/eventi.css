@@ -1,0 +1,70 @@
+/**
+ * Stili degli eventi (grandi eventi + elenco).
+ *
+ * @package AdverTrieste
+ */
+
+.advtr-grandi-eventi,
+.advtr-eventi {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 16px;
+	margin: 1em 0;
+}
+
+.advtr-evento-card {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 14px 16px;
+	background: #fff;
+}
+
+.advtr-evento-card.grande {
+	border-color: #d4a017;
+	box-shadow: 0 0 0 1px rgba( 212, 160, 23, 0.35 );
+}
+
+.advtr-evento-img {
+	width: 100%;
+	height: auto;
+	border-radius: 6px;
+	margin-bottom: 8px;
+}
+
+.advtr-evento-titolo {
+	margin: 0 0 6px;
+}
+
+.advtr-evento-stato {
+	font-size: 13px;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.advtr-evento-stato.attesa {
+	color: #b32d2e;
+}
+
+.advtr-evento-stato.incorso {
+	color: #2a7d2e;
+}
+
+.advtr-evento-stato.concluso {
+	color: #787c82;
+}
+
+.advtr-evento-desc {
+	font-size: 14px;
+}
+
+.advtr-evento-locali-label {
+	margin-top: 8px;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.advtr-evento-locali {
+	margin: 4px 0 0;
+	padding-left: 18px;
+	font-size: 14px;
+}

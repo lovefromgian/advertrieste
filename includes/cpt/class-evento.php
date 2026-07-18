@@ -2,9 +2,13 @@
 /**
  * Custom Post Type `evento` — grande evento cittadino o evento di organizzatore terzo.
  *
- * Pubblico solo quando `pubblicato` (lo stato è gestito da un workflow di revisione
- * che verrà implementato in seguito: bozza → in_revisione → pubblicato). In questa
- * fase (scaffold) definisce solo gli argomenti di registrazione.
+ * !!! IMPORTANTE — modello a doppia versione !!!
+ * Il post WP è SEMPRE la versione "in lavorazione" (ciò che l'organizzatore
+ * modifica). Il pubblico non vede mai il post direttamente: vede solo lo snapshot
+ * `versione_pubblica` (l'ultima versione APPROVATA), servito da `Rest\Eventi` e
+ * dagli shortcode. Per questo il CPT è NON pubblico e NON esposto in REST core:
+ * evita che le modifiche non ancora approvate finiscano online.
+ * Workflow: bozza → in_revisione → pubblicato (vedi Evento\Workflow).
  *
  * @package AdverTrieste
  */
@@ -60,15 +64,21 @@ class Evento {
 
 		return array(
 			'labels'              => $labels,
-			'public'              => true,
-			'show_in_rest'        => true,
-			'has_archive'         => true,
+			// Controllato: gestibile in bacheca ma non esposto direttamente al
+			// pubblico né alla REST core (il pubblico vede solo versione_pubblica).
+			'public'              => false,
+			'show_ui'             => true,
+			'show_in_menu'        => true,
+			'show_in_rest'        => false,
+			'publicly_queryable'  => false,
+			'exclude_from_search' => true,
+			'has_archive'         => false,
 			'hierarchical'        => false,
 			'menu_icon'           => 'dashicons-calendar-alt',
 			'menu_position'       => 22,
 			'supports'            => array( 'title', 'editor', 'thumbnail' ),
-			'rewrite'             => array( 'slug' => 'eventi' ),
-			'exclude_from_search' => false,
+			'rewrite'             => false,
+			'query_var'           => false,
 		);
 	}
 }
