@@ -3,6 +3,8 @@
 Plugin WordPress custom: directory su mappa di attività e luoghi del territorio di Trieste — schede clienti, statistiche, offerte/coupon, eventi e area riservata.
 
 > Fonte di verità: `CLAUDE.md` (convenzioni), `docs/specifiche-funzionali.md` (requisiti e stato), `docs/architettura.md` (dati, REST, cron, sicurezza).
+>
+> **Manuale d'uso** (pagine, profili, accessi, shortcode): `docs/manuale-utilizzo.md`.
 
 ## Stato
 
