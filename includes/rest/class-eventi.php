@@ -113,6 +113,37 @@ class Eventi {
 	}
 
 	/**
+	 * Locali attualmente collegati a un grande evento in corso.
+	 *
+	 * Un grande evento è "in corso" se approvato e la data corrente è nella
+	 * finestra inizio–fine della versione pubblica.
+	 *
+	 * @return array<int,bool> Mappa locale_id => true.
+	 */
+	public static function locali_in_evento() {
+		$now = current_time( 'mysql' );
+		$out = array();
+		foreach ( self::approved_ids() as $id ) {
+			$v = Workflow::public_version( $id );
+			if ( ! $v || 'grande' !== ( $v['tipo_evento'] ?? '' ) ) {
+				continue;
+			}
+			$inizio = (string) ( $v['data_inizio'] ?? '' );
+			$fine   = (string) ( $v['data_fine'] ?? '' );
+			if ( $inizio && $now < $inizio ) {
+				continue;
+			}
+			if ( $fine && $now > $fine ) {
+				continue;
+			}
+			foreach ( (array) ( $v['locali_collegati'] ?? array() ) as $lid ) {
+				$out[ (int) $lid ] = true;
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * GET /eventi — eventi approvati (versione pubblica).
 	 *
 	 * @return WP_REST_Response

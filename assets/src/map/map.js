@@ -54,6 +54,9 @@
 				cls += ' in-evidenza';
 				size = 22;
 			}
+			if ( m.in_evento ) {
+				cls += ' in-evento';
+			}
 			return L.divIcon( {
 				className: '',
 				html: '<span class="' + cls + '"></span>',
@@ -74,6 +77,12 @@
 				badge.className = 'advtr-badge-novita';
 				badge.textContent = cfg.i18n.novita;
 				wrap.appendChild( badge );
+			}
+			if ( m.in_evento && cfg.i18n.inEvento ) {
+				var ev = document.createElement( 'span' );
+				ev.className = 'advtr-badge-evento';
+				ev.textContent = cfg.i18n.inEvento;
+				wrap.appendChild( ev );
 			}
 			if ( m.permalink ) {
 				var a = document.createElement( 'a' );

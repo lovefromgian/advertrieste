@@ -175,8 +175,9 @@ class Markers {
 			);
 		}
 
-		$query   = new WP_Query( $args );
-		$markers = array();
+		$query      = new WP_Query( $args );
+		$markers    = array();
+		$in_evento  = Eventi::locali_in_evento();
 
 		foreach ( $query->posts as $post ) {
 			$type     = $post->post_type;
@@ -188,7 +189,9 @@ class Markers {
 				continue;
 			}
 
-			$markers[] = self::format_marker( $post, $type, $zoom_min );
+			$marker               = self::format_marker( $post, $type, $zoom_min );
+			$marker['in_evento']  = isset( $in_evento[ $post->ID ] );
+			$markers[]            = $marker;
 		}
 
 		return new WP_REST_Response( $markers, 200 );

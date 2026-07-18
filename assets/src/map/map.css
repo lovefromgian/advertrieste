@@ -65,6 +65,24 @@
 	background: #8034eb;
 }
 
+/* Locale collegato a un grande evento in corso: anello dorato. */
+.advtr-marker.in-evento {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 5px #d4a017, 0 0 10px rgba( 212, 160, 23, 0.7 );
+}
+
+.advtr-badge-evento {
+	display: inline-block;
+	background: #b32d2e;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	padding: 1px 6px;
+	border-radius: 3px;
+	margin-left: 4px;
+}
+
 /* Area riservata. */
 .advtr-area-riservata {
 	margin: 1em 0;

@@ -130,6 +130,7 @@ class Map {
 					'caricamento' => __( 'Caricamento…', 'advertrieste' ),
 					'novita'      => __( 'Novità', 'advertrieste' ),
 					'indicazioni' => __( 'Indicazioni', 'advertrieste' ),
+					'inEvento'    => __( 'Evento in corso', 'advertrieste' ),
 				),
 			)
 		);
