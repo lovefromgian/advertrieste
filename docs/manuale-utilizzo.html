@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdverTrieste — Manuale d'uso</title>
+</head>
+<body>
+<style>
+	:root {
+		--paper: #f4f6f5;
+		--panel: #ffffff;
+		--panel-2: #eef1f0;
+		--ink: #16211f;
+		--ink-soft: #4a5654;
+		--ink-faint: #7c8785;
+		--line: #d9e0de;
+		--line-soft: #e6eae8;
+		--accent: #0e6b73;
+		--accent-deep: #0a4f57;
+		--accent-tint: #e2efef;
+		--gold: #b3831a;
+		--gold-tint: #f6ecd4;
+		--pub: #3f7d3a;
+		--pub-tint: #e6f0e3;
+		--cli: #0e6b73;
+		--cli-tint: #dcecec;
+		--org: #6b4aa0;
+		--org-tint: #ece4f5;
+		--adm: #8a6a14;
+		--adm-tint: #f2e9cf;
+		--crit: #b3452e;
+		--crit-tint: #f6e2dc;
+		--radius: 10px;
+		--font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+		--font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		--font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root {
+			--paper: #0e1615;
+			--panel: #16211f;
+			--panel-2: #1b2725;
+			--ink: #e8edeb;
+			--ink-soft: #a9b5b2;
+			--ink-faint: #7e8a87;
+			--line: #2a3a37;
+			--line-soft: #223230;
+			--accent: #46b6bf;
+			--accent-deep: #6fcbd2;
+			--accent-tint: #10302f;
+			--gold: #d9ab4e;
+			--gold-tint: #2c2513;
+			--pub: #7bbd6f;
+			--pub-tint: #17281a;
+			--cli: #46b6bf;
+			--cli-tint: #12302f;
+			--org: #b298e0;
+			--org-tint: #221a33;
+			--adm: #d9ab4e;
+			--adm-tint: #2a2413;
+			--crit: #e58a72;
+			--crit-tint: #331912;
+		}
+	}
+	:root[data-theme="dark"] {
+		--paper: #0e1615;
+		--panel: #16211f;
+		--panel-2: #1b2725;
+		--ink: #e8edeb;
+		--ink-soft: #a9b5b2;
+		--ink-faint: #7e8a87;
+		--line: #2a3a37;
+		--line-soft: #223230;
+		--accent: #46b6bf;
+		--accent-deep: #6fcbd2;
+		--accent-tint: #10302f;
+		--gold: #d9ab4e;
+		--gold-tint: #2c2513;
+		--pub: #7bbd6f;
+		--pub-tint: #17281a;
+		--cli: #46b6bf;
+		--cli-tint: #12302f;
+		--org: #b298e0;
+		--org-tint: #221a33;
+		--adm: #d9ab4e;
+		--adm-tint: #2a2413;
+		--crit: #e58a72;
+		--crit-tint: #331912;
+	}
+	:root[data-theme="light"] {
+		--paper: #f4f6f5;
+		--panel: #ffffff;
+		--panel-2: #eef1f0;
+		--ink: #16211f;
+		--ink-soft: #4a5654;
+		--ink-faint: #7c8785;
+		--line: #d9e0de;
+		--line-soft: #e6eae8;
+		--accent: #0e6b73;
+		--accent-deep: #0a4f57;
+		--accent-tint: #e2efef;
+		--gold: #b3831a;
+		--gold-tint: #f6ecd4;
+		--pub: #3f7d3a;
+		--pub-tint: #e6f0e3;
+		--cli: #0e6b73;
+		--cli-tint: #dcecec;
+		--org: #6b4aa0;
+		--org-tint: #ece4f5;
+		--adm: #8a6a14;
+		--adm-tint: #f2e9cf;
+		--crit: #b3452e;
+		--crit-tint: #f6e2dc;
+	}
+
+	* { box-sizing: border-box; }
+
+	body {
+		margin: 0;
+		background: var(--paper);
+		color: var(--ink);
+		font-family: var(--font-sans);
+		font-size: 16px;
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	.wrap {
+		max-width: 1160px;
+		margin: 0 auto;
+		padding: 0 24px 96px;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0;
+	}
+
+	/* Masthead */
+	.masthead {
+		border-bottom: 2px solid var(--ink);
+		padding: 40px 0 26px;
+		margin-bottom: 34px;
+	}
+	.kicker {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin: 0 0 14px;
+	}
+	.masthead h1 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: clamp(2.1rem, 5vw, 3.3rem);
+		line-height: 1.04;
+		letter-spacing: -0.01em;
+		margin: 0 0 12px;
+		text-wrap: balance;
+	}
+	.masthead p {
+		margin: 0;
+		max-width: 68ch;
+		color: var(--ink-soft);
+		font-size: 1.05rem;
+	}
+	.masthead .meta {
+		margin-top: 20px;
+		font-family: var(--font-mono);
+		font-size: 12.5px;
+		color: var(--ink-faint);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 20px;
+	}
+
+	/* Layout with sidebar */
+	.layout {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+	@media (min-width: 1000px) {
+		.layout { grid-template-columns: 232px 1fr; gap: 56px; }
+	}
+
+	nav.toc {
+		align-self: start;
+	}
+	@media (min-width: 1000px) {
+		nav.toc { position: sticky; top: 22px; }
+	}
+	nav.toc .toc-title {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--ink-faint);
+		margin: 0 0 12px;
+	}
+	nav.toc ol {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		counter-reset: toc;
+		border-left: 1px solid var(--line);
+	}
+	nav.toc li { margin: 0; }
+	nav.toc a {
+		counter-increment: toc;
+		display: block;
+		padding: 6px 0 6px 16px;
+		margin-left: -1px;
+		border-left: 2px solid transparent;
+		color: var(--ink-soft);
+		text-decoration: none;
+		font-size: 13.5px;
+		line-height: 1.35;
+	}
+	nav.toc a::before {
+		content: counter(toc, decimal-leading-zero) "  ";
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--ink-faint);
+	}
+	nav.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+
+	main { min-width: 0; }
+
+	section.doc {
+		margin-bottom: 52px;
+		scroll-margin-top: 20px;
+	}
+	section.doc > .sec-head {
+		display: flex;
+		align-items: baseline;
+		gap: 14px;
+		border-bottom: 1px solid var(--line);
+		padding-bottom: 10px;
+		margin-bottom: 22px;
+	}
+	.sec-num {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--accent);
+		font-weight: 600;
+	}
+	section.doc h2 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 1.72rem;
+		letter-spacing: -0.01em;
+		margin: 0;
+		text-wrap: balance;
+	}
+	section.doc h3 {
+		font-size: 1.12rem;
+		margin: 30px 0 10px;
+		letter-spacing: -0.005em;
+	}
+	p { max-width: 72ch; }
+	main p { color: var(--ink); }
+	.lead { color: var(--ink-soft); }
+	a { color: var(--accent); }
+
+	code, .token {
+		font-family: var(--font-mono);
+		font-size: 0.87em;
+		background: var(--panel-2);
+		border: 1px solid var(--line-soft);
+		border-radius: 5px;
+		padding: 1px 6px;
+		white-space: nowrap;
+	}
+	.token { color: var(--accent-deep); font-weight: 600; }
+	:root[data-theme="dark"] .token,
+	:root:not([data-theme="light"]) .token { color: var(--accent-deep); }
+
+	/* Chips / role tags */
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		padding: 2px 9px;
+		border-radius: 999px;
+		border: 1px solid transparent;
+		white-space: nowrap;
+		vertical-align: baseline;
+	}
+	.chip::before {
+		content: "";
+		width: 7px; height: 7px; border-radius: 50%;
+		background: currentColor;
+	}
+	.chip.pub { color: var(--pub); background: var(--pub-tint); border-color: color-mix(in srgb, var(--pub) 30%, transparent); }
+	.chip.cli { color: var(--cli); background: var(--cli-tint); border-color: color-mix(in srgb, var(--cli) 30%, transparent); }
+	.chip.org { color: var(--org); background: var(--org-tint); border-color: color-mix(in srgb, var(--org) 30%, transparent); }
+	.chip.adm { color: var(--adm); background: var(--adm-tint); border-color: color-mix(in srgb, var(--adm) 34%, transparent); }
+
+	.legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px 14px;
+		padding: 16px 18px;
+		background: var(--panel);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		margin: 4px 0 4px;
+	}
+	.legend .li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--ink-soft); flex: 1 1 210px; }
+	.legend .li b { color: var(--ink); font-weight: 600; }
+
+	/* Tables */
+	.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); margin: 18px 0; }
+	table { border-collapse: collapse; width: 100%; font-size: 13.7px; }
+	thead th {
+		background: var(--panel-2);
+		text-align: left;
+		font-weight: 600;
+		color: var(--ink);
+		padding: 11px 14px;
+		border-bottom: 1px solid var(--line);
+		white-space: nowrap;
+	}
+	tbody td { padding: 11px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: top; color: var(--ink-soft); }
+	tbody tr:last-child td { border-bottom: none; }
+	tbody td:first-child { color: var(--ink); }
+	td .token, td code { white-space: nowrap; }
+	.yes { color: var(--pub); font-weight: 700; }
+	.no { color: var(--ink-faint); }
+	.tab-num { font-variant-numeric: tabular-nums; }
+
+	/* Reference cards */
+	.cards { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 18px 0; }
+	@media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
+	.card {
+		background: var(--panel);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		padding: 16px 18px;
+		display: flex; flex-direction: column; gap: 8px;
+	}
+	.card .sc { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; color: var(--accent-deep); word-break: break-word; }
+	:root[data-theme="dark"] .card .sc, :root:not([data-theme="light"]) .card .sc { color: var(--accent-deep); }
+	.card .desc { font-size: 13.5px; color: var(--ink-soft); margin: 0; }
+	.card .where { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 2px; }
+	.card .params { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); line-height: 1.5; }
+
+	/* Steps */
+	ol.steps { counter-reset: step; list-style: none; margin: 18px 0; padding: 0; }
+	ol.steps > li {
+		counter-increment: step;
+		position: relative;
+		padding: 0 0 18px 46px;
+		border-left: 1px solid var(--line);
+		margin-left: 15px;
+	}
+	ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+	ol.steps > li::before {
+		content: counter(step);
+		position: absolute;
+		left: -15px; top: -2px;
+		width: 30px; height: 30px;
+		display: grid; place-items: center;
+		background: var(--accent); color: #fff;
+		font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+		border-radius: 50%;
+	}
+	ol.steps > li b { color: var(--ink); }
+	ol.steps > li .s-body { color: var(--ink-soft); font-size: 14.5px; }
+
+	/* Callouts */
+	.note, .warn, .crit-box {
+		border-radius: var(--radius);
+		padding: 14px 16px 14px 18px;
+		margin: 18px 0;
+		font-size: 14px;
+		border: 1px solid var(--line);
+		border-left-width: 4px;
+	}
+	.note { background: var(--accent-tint); border-color: color-mix(in srgb, var(--accent) 22%, transparent); border-left-color: var(--accent); }
+	.warn { background: var(--gold-tint); border-color: color-mix(in srgb, var(--gold) 30%, transparent); border-left-color: var(--gold); }
+	.crit-box { background: var(--crit-tint); border-color: color-mix(in srgb, var(--crit) 30%, transparent); border-left-color: var(--crit); }
+	.note b, .warn b, .crit-box b { color: var(--ink); }
+	.callout-label {
+		font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+		display: block; margin-bottom: 5px;
+	}
+	.note .callout-label { color: var(--accent-deep); }
+	:root[data-theme="dark"] .note .callout-label, :root:not([data-theme="light"]) .note .callout-label { color: var(--accent); }
+	.warn .callout-label { color: var(--gold); }
+	.crit-box .callout-label { color: var(--crit); }
+
+	ul.clean { padding-left: 20px; }
+	ul.clean li { margin: 5px 0; color: var(--ink-soft); }
+	ul.clean li b { color: var(--ink); }
+
+	.pathbar {
+		font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft);
+		background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 6px;
+		padding: 7px 11px; display: inline-block; margin: 4px 0;
+	}
+	.pathbar .sep { color: var(--ink-faint); padding: 0 4px; }
+
+	hr.soft { border: none; border-top: 1px solid var(--line-soft); margin: 30px 0; }
+
+	.footer {
+		margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line);
+		font-size: 13px; color: var(--ink-faint); font-family: var(--font-mono);
+	}
+	a:focus-visible, nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+</style>
+
+<div class="wrap">
+	<header class="masthead">
+		<p class="kicker">AdverTrieste · Manuale d'uso</p>
+		<h1>Gestire la piattaforma: pagine, profili e accessi</h1>
+		<p class="lead">Guida operativa alle funzionalità realizzate finora — mappa, area riservata, statistiche, offerte &amp; coupon, eventi con workflow di revisione, scadenze automatiche. Come costruire le pagine con gli shortcode, chi vede cosa, e come far entrare i vari profili.</p>
+		<div class="meta">
+			<span>Plugin: advertrieste</span>
+			<span>REST namespace: advertrieste/v1</span>
+			<span>Ambiente: WordPress + MAMP</span>
+		</div>
+	</header>
+
+	<div class="layout">
+		<nav class="toc" aria-label="Indice">
+			<p class="toc-title">Indice</p>
+			<ol>
+				<li><a href="#profili">I profili e cosa possono fare</a></li>
+				<li><a href="#pagine">Creare le pagine (shortcode)</a></li>
+				<li><a href="#contenuti">Gestire i contenuti in bacheca</a></li>
+				<li><a href="#accessi">Dare accesso ai profili</a></li>
+				<li><a href="#mappa">Mappa pubblica</a></li>
+				<li><a href="#riservata">Area riservata &amp; mappa QR</a></li>
+				<li><a href="#statistiche">Statistiche</a></li>
+				<li><a href="#offerte">Offerte &amp; coupon</a></li>
+				<li><a href="#eventi">Eventi &amp; workflow</a></li>
+				<li><a href="#automazioni">Automazioni (scadenze)</a></li>
+				<li><a href="#setup">Checklist di primo setup</a></li>
+				<li><a href="#stato">Stato attuale &amp; limiti</a></li>
+			</ol>
+		</nav>
+
+		<main>
+			<!-- 1 -->
+			<section class="doc" id="profili">
+				<div class="sec-head"><span class="sec-num">01</span><h2>I profili e cosa possono fare</h2></div>
+				<p class="lead">Ci sono quattro livelli di accesso. Il colore che vedi qui accanto a ciascuno viene riusato in tutto il manuale per indicare "chi può".</p>
+
+				<div class="legend" role="list">
+					<div class="li" role="listitem"><span class="chip pub">Pubblico</span><span>Chiunque, senza login. Vede mappa, schede, offerte attive, eventi pubblicati.</span></div>
+					<div class="li" role="listitem"><span class="chip cli">Cliente</span><span><b>cliente_locale</b> — l'attività commerciale. Vede l'area riservata, le proprie statistiche, valida i coupon.</span></div>
+					<div class="li" role="listitem"><span class="chip org">Organizzatore</span><span><b>organizzatore_evento</b> — chi propone eventi. Invia i propri eventi in revisione.</span></div>
+					<div class="li" role="listitem"><span class="chip adm">Admin</span><span><b>administrator</b> — controllo totale: crea contenuti, approva eventi, gestisce tutto.</span></div>
+				</div>
+
+				<h3>Chi ha quale permesso</h3>
+				<div class="tablewrap">
+					<table>
+						<thead>
+							<tr><th>Capability</th><th>A cosa serve</th><th>Pubblico</th><th>Cliente</th><th>Organizz.</th><th>Admin</th></tr>
+						</thead>
+						<tbody>
+							<tr><td><code>advtr_view_qr_map</code></td><td>Vedere la mappa riservata dei punti QR</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+							<tr><td><code>advtr_edit_own_locale</code></td><td>Gestire la propria scheda locale <span class="chip cli" style="font-size:10px">futuro</span></td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+							<tr><td><code>advtr_submit_evento</code></td><td>Inviare un evento in revisione</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+							<tr><td><code>advtr_approve_evento</code></td><td>Approvare e pubblicare un evento</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="note">
+					<span class="callout-label">Concetto chiave</span>
+					<b>Il "proprietario" di un contenuto è il suo Autore.</b> Le statistiche di un locale, e la validazione dei coupon di un'offerta, sono accessibili a chi risulta <b>Autore</b> di quel post (oltre che all'admin). Quando crei una scheda per un cliente, impostalo come Autore nel box "Autore" della pagina di modifica.
+				</div>
+			</section>
+
+			<!-- 2 -->
+			<section class="doc" id="pagine">
+				<div class="sec-head"><span class="sec-num">02</span><h2>Creare le pagine con gli shortcode</h2></div>
+				<p class="lead">Ogni funzionalità front-end si attiva inserendo uno <b>shortcode</b> nel contenuto di una Pagina WordPress. Non serve toccare il tema.</p>
+
+				<ol class="steps">
+					<li><b>Bacheca → Pagine → Aggiungi nuova.</b><div class="s-body">Dai un titolo (es. "Mappa", "Area clienti", "Eventi").</div></li>
+					<li><b>Inserisci lo shortcode nel corpo.</b><div class="s-body">Con l'editor a blocchi aggiungi un blocco <b>Shortcode</b> (o "Codice breve") e incolla il codice tra parentesi quadre. Con l'editor classico basta scriverlo nel testo.</div></li>
+					<li><b>Pubblica</b> la pagina.<div class="s-body">Aggiungila al menu del sito se serve (Aspetto → Menu).</div></li>
+				</ol>
+
+				<h3>Riferimento shortcode</h3>
+				<div class="cards">
+					<div class="card">
+						<span class="sc">[advtr_map]</span>
+						<p class="desc">Mappa pubblica interattiva con marker di locali e punti d'interesse, filtri per categoria e ricerca.</p>
+						<div class="params">lat, lng (centro), zoom, height (px)</div>
+						<div class="where"><span class="chip pub">Pubblico</span></div>
+					</div>
+					<div class="card">
+						<span class="sc">[advtr_area_riservata]</span>
+						<p class="desc">Area clienti: chiede il login; ai clienti mostra la dashboard con la mappa riservata dei punti QR.</p>
+						<div class="params">nessun parametro</div>
+						<div class="where"><span class="chip cli">Cliente</span><span class="chip adm">Admin</span></div>
+					</div>
+					<div class="card">
+						<span class="sc">[advtr_statistiche]</span>
+						<p class="desc">Dashboard statistiche di una scheda: visualizzazioni, click mappa, coupon, contatti + grafico.</p>
+						<div class="params">id (scheda; opzionale)</div>
+						<div class="where"><span class="chip cli">Proprietario</span><span class="chip adm">Admin</span></div>
+					</div>
+					<div class="card">
+						<span class="sc">[advtr_offerte]</span>
+						<p class="desc">Elenco delle offerte attive con countdown alla scadenza e codice coupon.</p>
+						<div class="params">locale (filtra per scheda; opzionale)</div>
+						<div class="where"><span class="chip pub">Pubblico</span></div>
+					</div>
+					<div class="card">
+						<span class="sc">[advtr_valida_coupon]</span>
+						<p class="desc">Form per l'esercente: seleziona l'offerta, inserisce il codice del cliente e lo valida sul posto.</p>
+						<div class="params">nessun parametro</div>
+						<div class="where"><span class="chip cli">Esercente</span><span class="chip adm">Admin</span></div>
+					</div>
+					<div class="card">
+						<span class="sc">[advtr_grandi_eventi]</span>
+						<p class="desc">Banner dei grandi eventi con countdown all'inizio e locali aderenti collegati.</p>
+						<div class="params">nessun parametro</div>
+						<div class="where"><span class="chip pub">Pubblico</span></div>
+					</div>
+					<div class="card">
+						<span class="sc">[advtr_eventi]</span>
+						<p class="desc">Elenco di tutti gli eventi approvati (versione pubblica), con stato e countdown.</p>
+						<div class="params">nessun parametro</div>
+						<div class="where"><span class="chip pub">Pubblico</span></div>
+					</div>
+				</div>
+				<div class="warn">
+					<span class="callout-label">Esempio con parametri</span>
+					Mappa centrata su Trieste, zoom 13, alta 600px:
+					<div class="pathbar" style="margin-top:8px">[advtr_map lat="45.6495" lng="13.7768" zoom="13" height="600"]</div>
+				</div>
+			</section>
+
+			<!-- 3 -->
+			<section class="doc" id="contenuti">
+				<div class="sec-head"><span class="sec-num">03</span><h2>Gestire i contenuti in bacheca</h2></div>
+				<p class="lead">Il plugin aggiunge nuove voci nel menu di WordPress. Ogni tipo di contenuto ha un suo pannello di modifica con i campi dedicati.</p>
+
+				<div class="tablewrap">
+					<table>
+						<thead>
+							<tr><th>Voce di menu</th><th>Cos'è</th><th>Visibilità pubblica</th><th>Campi principali</th></tr>
+						</thead>
+						<tbody>
+							<tr><td>Locali</td><td>Attività commerciale sulla mappa</td><td><span class="chip pub">Sì</span> — a zoom alto</td><td>coordinate, zoom min, validità, in evidenza, servizi, logo, galleria, categoria</td></tr>
+							<tr><td>Punti d'interesse</td><td>Museo, castello, monumento</td><td><span class="chip pub">Sì</span> — a zoom basso</td><td>titolo, descrizione, categoria (coordinate: in arrivo)</td></tr>
+							<tr><td>Offerte</td><td>Promozione a tempo con coupon</td><td><span class="chip pub">Sì</span> — se attiva</td><td>locale collegato, date, tipo coupon, codice</td></tr>
+							<tr><td>Eventi</td><td>Grande evento o evento di terzi</td><td>Solo versione approvata</td><td>tipo, date, locali collegati, workflow</td></tr>
+							<tr><td>Punti QR</td><td>Espositore/QR fisico</td><td><span class="chip adm" style="background:var(--crit-tint);color:var(--crit);border-color:transparent">Riservato</span></td><td>coordinate, stato (mai pubblico)</td></tr>
+							<tr><td>Categorie</td><td>Tassonomia condivisa</td><td>—</td><td>mangiare · bere · visitare · shopping · servizi (già create)</td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="note">
+					<span class="callout-label">Creare un locale — flusso tipico</span>
+					<b>Locali → Aggiungi nuovo</b> → titolo e descrizione (editor) → nel box <b>"Dati locale"</b> imposta latitudine/longitudine, zoom minimo, validità, logo e galleria → assegna una o più <b>Categorie</b> → nel box <b>"Autore"</b> scegli l'utente cliente proprietario → <b>Pubblica</b>. Comparirà subito sulla mappa.
+				</div>
+				<div class="crit-box">
+					<span class="callout-label">Sicurezza — Punti QR</span>
+					I <b>Punti QR</b> non sono mai visibili pubblicamente: le coordinate escono solo verso utenti autenticati con il permesso <code>advtr_view_qr_map</code>, tramite l'area riservata. Non inserirli in pagine pubbliche.
+				</div>
+			</section>
+
+			<!-- 4 -->
+			<section class="doc" id="accessi">
+				<div class="sec-head"><span class="sec-num">04</span><h2>Dare accesso ai profili</h2></div>
+				<p class="lead">I ruoli custom vengono creati automaticamente all'attivazione del plugin. Assegnarli è un'operazione standard di WordPress.</p>
+
+				<h3>Creare un utente cliente o organizzatore</h3>
+				<ol class="steps">
+					<li><b>Bacheca → Utenti → Aggiungi nuovo.</b><div class="s-body">Inserisci email e username dell'attività o dell'organizzatore.</div></li>
+					<li><b>Ruolo:</b> scegli <b>"Cliente (locale)"</b> oppure <b>"Organizzatore evento"</b>.<div class="s-body">Nel menu a tendina "Ruolo" trovi anche questi due, aggiunti dal plugin.</div></li>
+					<li><b>Collega i contenuti impostandolo come Autore.</b><div class="s-body">Apri la sua scheda locale (o la sua offerta/evento) e nel box "Autore" seleziona questo utente. È ciò che gli dà accesso alle proprie statistiche e alla validazione dei propri coupon.</div></li>
+					<li><b>L'utente accede da <span class="token">/wp-login.php</span>.</b><div class="s-body">Le pagine con <span class="token">[advtr_area_riservata]</span> reindirizzano automaticamente al login chi non è autenticato, e riportano alla pagina dopo l'accesso.</div></li>
+				</ol>
+
+				<div class="tablewrap">
+					<table>
+						<thead>
+							<tr><th>Come entra / cosa vede</th><th>Pubblico</th><th>Cliente</th><th>Organizz.</th><th>Admin</th></tr>
+						</thead>
+						<tbody>
+							<tr><td>Accesso</td><td class="no">senza login</td><td>wp-login</td><td>wp-login</td><td>wp-login</td></tr>
+							<tr><td>Bacheca WordPress</td><td class="no">—</td><td class="no">limitata</td><td class="no">limitata</td><td class="yes">completa</td></tr>
+							<tr><td>Mappa &amp; schede pubbliche</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+							<tr><td>Area riservata / mappa QR</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+							<tr><td>Statistiche (proprie schede)</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">tutte</td></tr>
+							<tr><td>Validare coupon (proprie offerte)</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">tutte</td></tr>
+							<tr><td>Inviare eventi in revisione</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+							<tr><td>Approvare / pubblicare eventi</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="warn">
+					<span class="callout-label">Stato attuale</span>
+					La <b>modifica autonoma dei contenuti dal front-end</b> (cliente che edita la propria scheda, organizzatore che crea il proprio evento) non è ancora attiva: oggi i contenuti si creano e gestiscono dalla bacheca, a cura dell'admin, che imposta l'Autore corretto. Vedi <a href="#stato">Stato attuale &amp; limiti</a>.
+				</div>
+			</section>
+
+			<!-- 5 -->
+			<section class="doc" id="mappa">
+				<div class="sec-head"><span class="sec-num">05</span><h2>Mappa pubblica</h2></div>
+				<p class="lead">Mappa Leaflet + OpenStreetMap con due livelli di zoom: da lontano compaiono i <b>punti d'interesse</b>, avvicinandosi compaiono le <b>attività commerciali</b>.</p>
+				<ul class="clean">
+					<li><b>Pagina:</b> inserisci <span class="token">[advtr_map]</span>.</li>
+					<li><b>Marker:</b> blu per i locali, verde per i POI, <span style="color:var(--gold);font-weight:600">dorato</span> per i locali "in evidenza". Le schede nuove mostrano un badge "Novità" finché non superano la soglia di visite.</li>
+					<li><b>Filtri:</b> barra categorie (mangiare, bere, visitare, shopping, servizi) sopra la mappa.</li>
+					<li><b>Cosa determina la visibilità:</b> il campo <b>Zoom minimo</b> nella scheda del locale/POI. I Punti QR non compaiono mai.</li>
+				</ul>
+				<div class="note">
+					<span class="callout-label">Dati serviti da</span>
+					<span class="token">GET advertrieste/v1/map/markers</span> — pubblico, filtra per area visibile, zoom e categoria.
+				</div>
+			</section>
+
+			<!-- 6 -->
+			<section class="doc" id="riservata">
+				<div class="sec-head"><span class="sec-num">06</span><h2>Area riservata &amp; mappa QR</h2></div>
+				<p class="lead">Una pagina protetta dove i clienti vedono la rete di espositori e QR code — leva commerciale per mostrare la capillarità.</p>
+				<ol class="steps">
+					<li><b>Crea una pagina</b> con <span class="token">[advtr_area_riservata]</span>.</li>
+					<li><b>Chi non è loggato</b> vede l'invito ad accedere; <b>chi è loggato ma non è cliente</b> vede un avviso.</li>
+					<li><b>Il cliente (o l'admin)</b> vede la dashboard con la <b>mappa dei punti QR</b>.</li>
+				</ol>
+				<div class="crit-box">
+					<span class="callout-label">Protezione lato server</span>
+					Le coordinate dei QR arrivano solo dall'endpoint autenticato <span class="token">GET advertrieste/v1/qr-map</span>, che risponde <b>401</b> a chi non è loggato e <b>403</b> a chi non ha il permesso. Nessun dato riservato è incorporato nella pagina.
+				</div>
+				<div class="warn">
+					<span class="callout-label">Decisione da confermare</span>
+					Oggi ogni cliente con permesso vede <b>l'intera rete</b> di punti QR. Se preferisci "ciascuno vede solo i propri" o "solo admin", si cambia in un punto — fammelo sapere.
+				</div>
+			</section>
+
+			<!-- 7 -->
+			<section class="doc" id="statistiche">
+				<div class="sec-head"><span class="sec-num">07</span><h2>Statistiche</h2></div>
+				<p class="lead">Ogni scheda locale registra eventi (visualizzazioni, click sulla mappa, coupon riscattati, click sui contatti) e li mostra in una dashboard.</p>
+				<ul class="clean">
+					<li><b>Pagina dashboard:</b> <span class="token">[advtr_statistiche]</span> (nell'area clienti). Un cliente vede solo le proprie schede; l'admin può indicare una scheda con <span class="token">id="123"</span>.</li>
+					<li><b>Cosa mostra:</b> quattro contatori + un grafico a barre dell'andamento visite (30 giorni).</li>
+					<li><b>Badge "Novità":</b> sotto le <b>20 visite</b> la scheda mostra "Novità" invece del numero reale — niente conteggi gonfiati.</li>
+					<li><b>Come si popolano:</b> la mappa registra un <i>click mappa</i> all'apertura del popup; le visite alla scheda si registreranno dalla pagina scheda (in arrivo); i coupon vengono contati alla validazione.</li>
+				</ul>
+				<div class="note">
+					<span class="callout-label">Endpoint</span>
+					Scrittura <span class="token">POST /locale/{id}/track</span> (protetto, con limite anti-abuso) · Lettura <span class="token">GET /stats/{id}</span> (solo proprietario/admin).
+				</div>
+			</section>
+
+			<!-- 8 -->
+			<section class="doc" id="offerte">
+				<div class="sec-head"><span class="sec-num">08</span><h2>Offerte &amp; coupon</h2></div>
+				<p class="lead">Promozioni a tempo con countdown, e coupon validabili dall'esercente sul posto.</p>
+
+				<h3>Creare un'offerta</h3>
+				<ol class="steps">
+					<li><b>Offerte → Aggiungi nuova.</b><div class="s-body">Titolo e descrizione dell'offerta nell'editor.</div></li>
+					<li><b>Box "Dati offerta":</b> collega il <b>locale</b>, imposta <b>inizio</b> e <b>scadenza</b>, scegli <b>tipo coupon</b> (codice o QR) e il <b>codice</b>.<div class="s-body">Il codice è ciò che il cliente presenta all'esercente.</div></li>
+					<li><b>Pubblica.</b><div class="s-body">Comparirà nella pagina con <span class="token">[advtr_offerte]</span> finché è nella finestra di validità, con il countdown.</div></li>
+				</ol>
+
+				<h3>Validare un coupon (esercente)</h3>
+				<ol class="steps">
+					<li><b>Pagina riservata</b> con <span class="token">[advtr_valida_coupon]</span>.</li>
+					<li>L'esercente <b>seleziona l'offerta</b> e <b>inserisce il codice</b> mostrato dal cliente.</li>
+					<li>Il sistema verifica codice e validità, <b>registra il riscatto</b> e lo conteggia nelle statistiche del locale.</li>
+				</ol>
+				<div class="warn">
+					<span class="callout-label">Automatico</span>
+					Un job giornaliero (<code>advtr_expire_coupons</code>) marca come scadute le offerte oltre la data di scadenza: spariscono dall'elenco pubblico da sole.
+				</div>
+			</section>
+
+			<!-- 9 -->
+			<section class="doc" id="eventi">
+				<div class="sec-head"><span class="sec-num">09</span><h2>Eventi &amp; workflow di revisione</h2></div>
+				<p class="lead">Gli eventi hanno un modello a <b>doppia versione</b>: il pubblico vede sempre l'ultima versione <b>approvata</b>, mentre le modifiche restano in lavorazione finché un admin non le approva.</p>
+
+				<div class="legend" style="margin-bottom:18px">
+					<div class="li"><span class="chip" style="color:var(--ink-faint);background:var(--panel-2)">Bozza</span><span>In lavorazione, invisibile al pubblico.</span></div>
+					<div class="li"><span class="chip" style="color:var(--gold);background:var(--gold-tint);border-color:transparent">In revisione</span><span>Inviato, in attesa dell'admin.</span></div>
+					<div class="li"><span class="chip pub">Pubblicato</span><span>Approvato: visibile al pubblico.</span></div>
+				</div>
+
+				<h3>Grande evento (curato dall'admin)</h3>
+				<ol class="steps">
+					<li><b>Eventi → Aggiungi nuovo</b> → tipo <b>"Grande evento"</b>, date, <b>locali collegati</b> (bar/negozi aderenti), immagine.</li>
+					<li><b>Salva</b>, poi nel box <b>"Workflow revisione"</b> premi <b>"Approva e pubblica"</b>.</li>
+					<li>Compare in <span class="token">[advtr_grandi_eventi]</span> con countdown e locali aderenti.</li>
+				</ol>
+
+				<h3>Evento di un organizzatore terzo</h3>
+				<ol class="steps">
+					<li>L'organizzatore (o l'admin per suo conto) compila l'evento e preme <b>"Invia in revisione"</b>.</li>
+					<li>L'admin controlla e preme <b>"Approva e pubblica"</b>: solo ora va online.</li>
+					<li><b>Modifiche successive:</b> quando l'evento pubblicato viene modificato torna in <b>bozza</b>; il pubblico continua a vedere la versione approvata precedente finché non si ri-approva.</li>
+				</ol>
+				<div class="note">
+					<span class="callout-label">Perché non si vede il post direttamente</span>
+					Il tipo "Evento" è volutamente <b>non pubblico</b>: il pubblico riceve solo lo snapshot approvato via <span class="token">GET /eventi</span> e <span class="token">/grandi-eventi</span>. Così una bozza non finisce mai online per errore.
+				</div>
+			</section>
+
+			<!-- 10 -->
+			<section class="doc" id="automazioni">
+				<div class="sec-head"><span class="sec-num">10</span><h2>Automazioni (scadenze &amp; email)</h2></div>
+				<p class="lead">Due job giornalieri (WP-Cron) girano da soli, senza intervento.</p>
+				<div class="tablewrap">
+					<table>
+						<thead><tr><th>Job</th><th>Frequenza</th><th>Cosa fa</th></tr></thead>
+						<tbody>
+							<tr><td><code>advtr_check_scadenze</code></td><td>giornaliero</td><td>Invia email di avviso a admin + cliente a <b>30/15/7 giorni</b> dalla scadenza della scheda; <b>sospende</b> le schede scadute (spariscono dalla mappa); spegne l'evidenza scaduta.</td></tr>
+							<tr><td><code>advtr_expire_coupons</code></td><td>giornaliero</td><td>Marca come scadute le offerte oltre la data di scadenza.</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="note">
+					<span class="callout-label">Nota su WP-Cron</span>
+					WP-Cron si attiva al traffico del sito. Su un sito poco visitato conviene, in produzione, collegare un cron di sistema reale. Le soglie di avviso (30/15/7) sono personalizzabili via filtro <code>advtr_scadenza_soglie</code>.
+				</div>
+			</section>
+
+			<!-- 11 -->
+			<section class="doc" id="setup">
+				<div class="sec-head"><span class="sec-num">11</span><h2>Checklist di primo setup</h2></div>
+				<p class="lead">Il percorso minimo per avere il sito operativo dalla parte pubblica e da quella clienti.</p>
+				<ol class="steps">
+					<li><b>Categorie</b> — già create (mangiare, bere, visitare, shopping, servizi). Verifica in <b>Categorie</b>.</li>
+					<li><b>Primi contenuti</b> — crea qualche <b>Locale</b> con coordinate e categoria, e qualche <b>Punto d'interesse</b>.</li>
+					<li><b>Pagina Mappa</b> — nuova pagina con <span class="token">[advtr_map]</span>, aggiungila al menu.</li>
+					<li><b>Utenti clienti</b> — crea gli utenti <b>Cliente (locale)</b> e impostali come Autore delle rispettive schede.</li>
+					<li><b>Area riservata</b> — pagina con <span class="token">[advtr_area_riservata]</span> (mappa QR) e, se vuoi, una pagina con <span class="token">[advtr_statistiche]</span> e una con <span class="token">[advtr_valida_coupon]</span>.</li>
+					<li><b>Offerte ed eventi</b> — crea le prime offerte; per gli eventi ricorda il passaggio di <b>approvazione</b>. Pubblica le pagine <span class="token">[advtr_offerte]</span>, <span class="token">[advtr_grandi_eventi]</span>, <span class="token">[advtr_eventi]</span>.</li>
+				</ol>
+			</section>
+
+			<!-- 12 -->
+			<section class="doc" id="stato">
+				<div class="sec-head"><span class="sec-num">12</span><h2>Stato attuale &amp; limiti</h2></div>
+				<p class="lead">Cosa è pronto e cosa è ancora in lavorazione, per evitare fraintendimenti.</p>
+				<ul class="clean">
+					<li><b>Pronto:</b> mappa pubblica, schede locali con tutti i campi, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo, scadenze + email automatiche.</li>
+					<li><b>In lavorazione:</b> <b>editing self-service dal front-end</b> (oggi i contenuti si gestiscono dalla bacheca a cura dell'admin; i ruoli cliente/organizzatore hanno accesso in <i>lettura/consumo</i> alle pagine riservate). Coordinate per i Punti d'interesse. Pagina/scheda singola del locale (che registrerà le visite).</li>
+					<li><b>Non integrato:</b> pagamenti WooCommerce (abbonamenti/rinnovi) — richiede l'installazione di WooCommerce + Subscriptions.</li>
+					<li><b>In sospeso:</b> import automatico eventi da fonti esterne (turismofvg.it) — subordinato a permesso.</li>
+					<li><b>Da confermare:</b> visibilità della mappa QR (tutti i clienti vedono l'intera rete / solo i propri / solo admin).</li>
+				</ul>
+				<div class="footer">
+					AdverTrieste — manuale operativo · funzionalità confermate ✅ implementate a oggi · le voci "in lavorazione/da confermare" sono scelte aperte, non problemi.
+				</div>
+			</section>
+		</main>
+	</div>
+</div>
+<button id="advtr-theme" type="button" aria-label="Cambia tema chiaro/scuro"
+	style="position:fixed;top:14px;right:14px;z-index:50;font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08)">◐ Tema</button>
+<script>
+(function () {
+	var btn = document.getElementById('advtr-theme');
+	var root = document.documentElement;
+	function current() {
+		return root.getAttribute('data-theme') ||
+			(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+	}
+	btn.addEventListener('click', function () {
+		root.setAttribute('data-theme', current() === 'dark' ? 'light' : 'dark');
+	});
+})();
+</script>
+</body>
+</html>
