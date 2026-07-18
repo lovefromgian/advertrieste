@@ -49,6 +49,7 @@ advertrieste/
 │   │   └── class-access.php     # helper: can_view_qr_map(), is_cliente()
 │   ├── meta/                 # meta box e campi
 │   │   ├── class-localemeta.php # meta del CPT `locale` (register + box + save)
+│   │   ├── class-poimeta.php    # meta del CPT `poi` (coordinate, zoom, tipo)
 │   │   └── class-puntoqrmeta.php # meta del CPT `punto_qr` (coordinate + stato)
 │   ├── stats/                # statistiche per scheda
 │   │   └── class-stats.php      # tabella advtr_stats, record eventi, query, soglia
