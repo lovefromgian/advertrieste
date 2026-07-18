@@ -129,6 +129,7 @@ class Map {
 					'apri'        => __( 'Apri scheda', 'advertrieste' ),
 					'caricamento' => __( 'Caricamento…', 'advertrieste' ),
 					'novita'      => __( 'Novità', 'advertrieste' ),
+					'indicazioni' => __( 'Indicazioni', 'advertrieste' ),
 				),
 			)
 		);

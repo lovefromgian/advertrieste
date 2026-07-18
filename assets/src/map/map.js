@@ -74,6 +74,15 @@
 				a.textContent = cfg.i18n.apri;
 				wrap.appendChild( a );
 			}
+			if ( typeof m.lat === 'number' && typeof m.lng === 'number' && cfg.i18n.indicazioni ) {
+				var dir = document.createElement( 'a' );
+				dir.className = 'advtr-popup-link advtr-popup-dir';
+				dir.href = 'https://www.google.com/maps/dir/?api=1&destination=' + m.lat + ',' + m.lng;
+				dir.target = '_blank';
+				dir.rel = 'noopener';
+				dir.textContent = cfg.i18n.indicazioni;
+				wrap.appendChild( dir );
+			}
 			return wrap;
 		}
 

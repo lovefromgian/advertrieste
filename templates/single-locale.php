@@ -34,7 +34,9 @@ while ( have_posts() ) :
 	$advtr_terms    = get_the_terms( $advtr_id, 'categoria' );
 	$advtr_in_evid  = (bool) get_post_meta( $advtr_id, 'advtr_in_evidenza', true );
 	$advtr_novita   = \AdverTrieste\Stats\Stats::is_novita( $advtr_id );
-	$advtr_has_geo  = ( '' !== get_post_meta( $advtr_id, 'advtr_lat', true ) && '' !== get_post_meta( $advtr_id, 'advtr_lng', true ) );
+	$advtr_lat      = get_post_meta( $advtr_id, 'advtr_lat', true );
+	$advtr_lng      = get_post_meta( $advtr_id, 'advtr_lng', true );
+	$advtr_has_geo  = ( '' !== $advtr_lat && '' !== $advtr_lng );
 	$advtr_sito_host = $advtr_sito ? wp_parse_url( $advtr_sito, PHP_URL_HOST ) : '';
 	$advtr_sito_label = $advtr_sito_host ? $advtr_sito_host : $advtr_sito;
 	?>
@@ -139,6 +141,10 @@ while ( have_posts() ) :
 				<section class="advtr-scheda-box">
 					<h2><?php esc_html_e( 'Dove siamo', 'advertrieste' ); ?></h2>
 					<div id="advtr-scheda-map" class="advtr-scheda-map" data-advtr-scheda-map="1"></div>
+					<a class="advtr-indicazioni" target="_blank" rel="noopener"
+						href="<?php echo esc_url( 'https://www.google.com/maps/dir/?api=1&destination=' . rawurlencode( $advtr_lat . ',' . $advtr_lng ) ); ?>">
+						<?php esc_html_e( 'Ottieni indicazioni', 'advertrieste' ); ?>
+					</a>
 				</section>
 			<?php endif; ?>
 		</aside>
