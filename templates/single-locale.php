@@ -96,6 +96,8 @@ while ( have_posts() ) :
 				</section>
 			<?php endif; ?>
 
+			<section class="advtr-scheda-sez advtr-recensioni-sez" data-advtr-reviews="1" hidden></section>
+
 			<?php if ( '' !== $advtr_orari ) : ?>
 				<section class="advtr-scheda-sez">
 					<h2><?php esc_html_e( 'Orari', 'advertrieste' ); ?></h2>

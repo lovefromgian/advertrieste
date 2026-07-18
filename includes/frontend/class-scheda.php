@@ -81,11 +81,17 @@ class Scheda {
 			self::HANDLE,
 			'advtrScheda',
 			array(
-				'id'        => $post_id,
-				'trackBase' => rest_url( Markers::NAMESPACE . '/locale/' ),
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
-				'lat'       => $lat,
-				'lng'       => $lng,
+				'id'         => $post_id,
+				'trackBase'  => rest_url( Markers::NAMESPACE . '/locale/' ),
+				'reviewsUrl' => rest_url( Markers::NAMESPACE . '/locale/' . $post_id . '/reviews' ),
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'lat'        => $lat,
+				'lng'        => $lng,
+				'i18n'       => array(
+					'recensioni' => __( 'Recensioni', 'advertrieste' ),
+					'su'         => __( 'su', 'advertrieste' ),
+					'basato'     => __( 'recensioni', 'advertrieste' ),
+				),
 			)
 		);
 	}

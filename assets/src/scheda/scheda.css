@@ -121,6 +121,15 @@
 	border-bottom: 1px solid #eef1f1;
 }
 
+.advtr-rev-media { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.advtr-rev-stelle { color: #e0a800; letter-spacing: 1px; }
+.advtr-rev-media-num { font-size: 14px; color: #50575e; }
+.advtr-rev { padding: 12px 0; border-top: 1px solid #eef1f1; }
+.advtr-rev-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.advtr-rev-autore { font-weight: 600; }
+.advtr-rev-quando { font-size: 12px; color: #787c82; margin: 2px 0 4px; }
+.advtr-rev-testo { margin: 4px 0 0; font-size: 14px; }
+
 .advtr-scheda-side { display: flex; flex-direction: column; gap: 20px; }
 .advtr-scheda-box {
 	border: 1px solid #dcdcde;
