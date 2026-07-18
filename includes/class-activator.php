@@ -13,6 +13,7 @@
 namespace AdverTrieste;
 
 use AdverTrieste\Cpt\Categoria;
+use AdverTrieste\Access\Roles;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,6 +37,9 @@ class Activator {
 		Plugin::instance()->register_taxonomies();
 
 		Categoria::seed_terms();
+
+		// Ruoli e capability dell'area riservata.
+		Roles::install();
 
 		flush_rewrite_rules();
 	}

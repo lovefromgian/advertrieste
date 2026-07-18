@@ -17,8 +17,11 @@ use AdverTrieste\Cpt\Evento;
 use AdverTrieste\Cpt\PuntoQr;
 use AdverTrieste\Cpt\Categoria;
 use AdverTrieste\Meta\LocaleMeta;
+use AdverTrieste\Meta\PuntoQrMeta;
 use AdverTrieste\Rest\Markers;
+use AdverTrieste\Rest\QrMap;
 use AdverTrieste\Frontend\Map;
+use AdverTrieste\Frontend\ReservedArea;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -85,8 +88,11 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
 
 		LocaleMeta::init();
+		PuntoQrMeta::init();
 		Markers::init();
+		QrMap::init();
 		Map::init();
+		ReservedArea::init();
 	}
 
 	/**

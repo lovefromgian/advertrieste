@@ -60,6 +60,24 @@
 	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.4 ), 0 0 8px rgba( 212, 160, 23, 0.8 );
 }
 
+/* Marker della mappa QR riservata. */
+.advtr-marker.tipo-qr {
+	background: #8034eb;
+}
+
+/* Area riservata. */
+.advtr-area-riservata {
+	margin: 1em 0;
+}
+
+.advtr-area-riservata .advtr-benvenuto {
+	font-weight: 600;
+}
+
+.advtr-qr-section {
+	margin-top: 1em;
+}
+
 .advtr-popup-title {
 	font-weight: 600;
 	margin-bottom: 4px;

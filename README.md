@@ -29,20 +29,28 @@ advertrieste/
 │   │   ├── class-evento.php     # evento (pubblico se pubblicato)
 │   │   ├── class-puntoqr.php    # espositore/QR — RISERVATO, non pubblico
 │   │   └── class-categoria.php  # tassonomia `categoria` (locale+poi) + seeding
+│   ├── access/               # ruoli, capability e controlli di accesso
+│   │   ├── class-roles.php      # ruoli cliente_locale/organizzatore_evento + capability
+│   │   └── class-access.php     # helper: can_view_qr_map(), is_cliente()
 │   ├── meta/                 # meta box e campi
-│   │   └── class-localemeta.php # meta del CPT `locale` (register + box + save)
+│   │   ├── class-localemeta.php # meta del CPT `locale` (register + box + save)
+│   │   └── class-puntoqrmeta.php # meta del CPT `punto_qr` (coordinate + stato)
 │   ├── rest/                 # endpoint REST (namespace advertrieste/v1)
-│   │   └── class-markers.php    # GET /map/markers (bbox+zoom+categoria, mai punto_qr)
-│   └── frontend/             # front-end pubblico
-│       └── class-map.php        # shortcode [advtr_map] + enqueue Leaflet
+│   │   ├── class-markers.php    # GET /map/markers (bbox+zoom+categoria, mai punto_qr)
+│   │   └── class-qrmap.php      # GET /qr-map — RISERVATO (auth + advtr_view_qr_map)
+│   └── frontend/             # front-end pubblico e riservato
+│       ├── class-map.php          # shortcode [advtr_map] + enqueue Leaflet
+│       └── class-reservedarea.php # shortcode [advtr_area_riservata] + mappa QR
 ├── assets/
 │   ├── src/admin/locale-meta.js  # media picker (logo + galleria) del meta box
 │   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup
 │   ├── src/map/map.css           # stili mappa e marker
+│   ├── src/qr-map/qr-map.js      # mappa QR riservata (fetch autenticato con nonce)
 │   └── vendor/leaflet/           # Leaflet 1.9.4 (bundle locale, no CDN)
 ├── templates/                # template front-end del plugin
 │   ├── admin/locale-meta-box.php # markup del meta box "Dati locale"
-│   └── map.php                   # contenitore mappa dello shortcode
+│   ├── map.php                   # contenitore mappa dello shortcode
+│   └── area-riservata.php        # dashboard area riservata + mappa QR
 ├── docs/                     # specifiche, architettura, deploy
 ├── composer.json             # dev tooling (PHPCS + WPCS)
 └── phpcs.xml                 # regole WordPress Coding Standards
@@ -57,6 +65,14 @@ Inserire la mappa pubblica in una pagina con lo shortcode:
 ```
 
 Attributi: `lat`, `lng` (centro, default Trieste), `zoom` (default 13), `height` (px, default 500). I marker sono caricati dall'endpoint `GET advertrieste/v1/map/markers` in base a bounding box, zoom e categoria; i `poi` compaiono a zoom basso, i `locale` a zoom alto. I `punto_qr` non sono MAI inclusi.
+
+## Area riservata & ruoli
+
+Ruoli custom (installati all'attivazione): `cliente_locale`, `organizzatore_evento`. Capability: `advtr_view_qr_map`, `advtr_edit_own_locale`, `advtr_submit_evento`, `advtr_approve_evento` (tutte assegnate anche all'amministratore).
+
+Shortcode `[advtr_area_riservata]`: gate lato server (non loggato → invito al login; autenticato non-cliente → avviso; cliente con `advtr_view_qr_map` → dashboard + **mappa dei punti QR**). Le coordinate dei `punto_qr` sono servite SOLO dall'endpoint autenticato `GET advertrieste/v1/qr-map` (permission: autenticato + `advtr_view_qr_map`); non compaiono mai nell'endpoint pubblico né nella pagina.
+
+> Visibilità mappa QR: attualmente ogni cliente con capability vede l'intera rete (decisione da confermare — vedi specifiche §2.5).
 
 ## Convenzioni
 
