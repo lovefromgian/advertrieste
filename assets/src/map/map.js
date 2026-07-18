@@ -37,7 +37,15 @@
 		} ).addTo( map );
 
 		var layer = L.layerGroup().addTo( map );
+
+		// Categoria pre-selezionata dall'ingresso guidato (?categoria=slug).
 		var categoriaAttiva = '';
+		try {
+			var fromUrl = new URLSearchParams( window.location.search ).get( 'categoria' );
+			if ( fromUrl && cfg.categorie && cfg.categorie.some( function ( c ) { return c.slug === fromUrl; } ) ) {
+				categoriaAttiva = fromUrl;
+			}
+		} catch ( e ) {}
 
 		function markerIcon( m ) {
 			var cls = 'advtr-marker tipo-' + m.type;
