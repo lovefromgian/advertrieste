@@ -42,6 +42,10 @@ advertrieste/
 │   │   └── class-scadenze.php   # avvisi 30/15/7gg, sospensione, spegni evidenza
 │   ├── email/                # invio email
 │   │   └── class-mailer.php     # wrapper wp_mail (HTML)
+│   ├── reviews/              # recensioni Google (§1.5)
+│   │   └── class-reviews.php    # fetch Places + cache transient, interruttore
+│   ├── payments/             # pagamenti (§2.6)
+│   │   └── class-woobridge.php  # bridge WooCommerce (inerte senza WC), rinnovo validità
 │   ├── cron/                 # job pianificati (WP-Cron)
 │   │   └── class-cron.php       # advtr_expire_coupons + advtr_check_scadenze (giornalieri)
 │   ├── access/               # ruoli, capability e controlli di accesso
@@ -59,9 +63,11 @@ advertrieste/
 │   │   ├── class-track.php      # POST /locale/{id}/track (nonce + rate-limit)
 │   │   ├── class-stats.php      # GET /stats/{id} — owner/admin
 │   │   ├── class-offerte.php    # GET /offerte + POST /offerta/{id}/redeem
-│   │   └── class-eventi.php     # GET /eventi + /grandi-eventi + submit/approve
+│   │   ├── class-eventi.php     # GET /eventi + /grandi-eventi + submit/approve
+│   │   └── class-reviews.php    # GET /locale/{id}/reviews (recensioni Google)
 │   └── frontend/             # front-end pubblico e riservato
 │       ├── class-map.php            # shortcode [advtr_map] + enqueue Leaflet
+│       ├── class-onboarding.php     # shortcode [advtr_onboarding] (ingresso guidato)
 │       ├── class-reservedarea.php   # shortcode [advtr_area_riservata] + mappa QR
 │       ├── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
 │       ├── class-offerte.php        # shortcode [advtr_offerte] + [advtr_valida_coupon]
@@ -80,10 +86,13 @@ advertrieste/
 │   ├── map.php                   # contenitore mappa dello shortcode
 │   ├── area-riservata.php        # dashboard area riservata + mappa QR
 │   └── statistiche.php           # dashboard statistiche
-├── docs/                     # specifiche, architettura, deploy
-├── composer.json             # dev tooling (PHPCS + WPCS)
+├── docs/                     # specifiche, architettura, deploy, manuale
+├── tests/                    # suite di integrazione (WP-CLI) — vedi tests/README.md
+├── composer.json             # dev tooling (PHPCS + WPCS) + script test:integration
 └── phpcs.xml                 # regole WordPress Coding Standards
 ```
+
+> Altri shortcode/feature: `[advtr_onboarding]` (ingresso guidato §1.1), scheda attività completa su `/locale/{slug}/` (§1.3, con indicazioni §1.4 e recensioni §1.5), evidenziazione dei locali durante i grandi eventi (§4.1), editing self-service in bacheca per clienti/organizzatori (§2.1/3.2/4.3), bridge WooCommerce (§2.6). Dettagli d'uso nel **manuale** (`docs/manuale-utilizzo.md`).
 
 ## Mappa
 

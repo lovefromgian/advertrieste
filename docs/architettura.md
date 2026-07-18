@@ -62,7 +62,7 @@ Plugin WordPress custom (`advertrieste`) che registra Custom Post Type, meta, en
 ## 4. Front-end
 - **Mappa** (`assets/src/map/`): Leaflet; carica marker via `/map/markers` su `moveend`/`zoomend`; icone distinte per categoria + marker dorato "in evidenza"; cluster opzionale.
 - **Onboarding** (`assets/src/onboarding/`): schermata "Cosa stai cercando?" → imposta filtro categoria e centra la mappa.
-- **Dashboard cliente** (`assets/src/dashboard/`): grafici da `/stats/{id}`. Libreria grafici **[DA DEFINIRE: Chart.js consigliato]**.
+- **Dashboard cliente** (`assets/src/stats/`): grafici da `/stats/{id}`. Libreria grafici: **nessuna** — grafico a barre in **SVG puro** (deciso, per non aggiungere dipendenze).
 - **Mappa QR** (`assets/src/qr-map/`): montata solo in area riservata; dati da `/qr-map` (autenticato).
 
 ## 5. Job cron (WP-Cron)

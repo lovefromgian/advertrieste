@@ -5,19 +5,19 @@ Piattaforma WordPress: directory su mappa di attività e luoghi del territorio d
 > Prima di implementare una feature, leggi la sua scheda in `@docs/specifiche-funzionali.md`. Non dare per scontato lo stato: alcune funzioni sono CONFERMATE, altre CONDIZIONATE o IN SOSPESO (vedi sotto).
 
 ## Stato del progetto
-- Fase: **[DA DEFINIRE: greenfield / in corso]**
-- WordPress **[versione]**, PHP **[8.x DA CONFERMARE]**, tema **[nome tema / "custom"]**
-- Tutto il codice di progetto vive in un plugin custom: `wp-content/plugins/advertrieste/` **[confermare nome slug]**
+- Fase: **in corso** — branch consolidato `main`. Quasi tutte le funzionalità ✅/◐ implementate (vedi `README.md` → Stato).
+- WordPress ≥ 6.0, **PHP 8.3** (target), slug plugin: **`advertrieste`** (confermato).
+- Ambiente: **MAMP** locale. Tutto il codice vive in `wp-content/plugins/advertrieste/`.
 
 ## Comandi
-> YOU MUST usare i comandi reali del progetto, non assumerli. Completa questa sezione col setup effettivo.
-- Ambiente locale: **[DA DEFINIRE: wp-env / Local / Docker / DDEV]**
-- Avvio: `[es. wp-env start]`
-- Lint PHP: `[es. composer lint / phpcs --standard=WordPress]`
-- Lint JS/CSS: `[es. npm run lint]`
-- Build asset: `[es. npm run build]` — sorgenti in `assets/src/`, output in `assets/dist/`
-- Test: `[es. composer test / vendor/bin/phpunit]`
-- **IMPORTANT**: dopo ogni modifica a PHP esegui il lint PHPCS (standard WordPress) prima di considerare il task concluso.
+Ambiente MAMP (WP-CLI non nel PATH: usare la PHP di MAMP + `wp-cli.phar`).
+- PHP di MAMP: `/Applications/MAMP/bin/php/php8.3.28/bin/php`
+- Lint PHP (sintassi): `php -l <file>`
+- **Lint PHPCS** (WordPress Coding Standards): `composer lint` (= `vendor/bin/phpcs`); autofix: `composer lint:fix`
+- Suite di integrazione: `wp eval-file tests/integration/run.php` (o `composer test:integration`) — vedi `tests/README.md`
+- Attivazione: `wp plugin activate advertrieste` (riattivare dopo modifiche a capability/rewrite)
+- **Niente build asset**: JS/CSS in `assets/src/` sono serviti direttamente (nessun bundler); Leaflet è in `assets/vendor/`.
+- **IMPORTANT**: dopo ogni modifica a PHP esegui `composer lint` (PHPCS) prima di considerare il task concluso.
 
 ## Stack & vincoli tecnici
 - **CMS**: WordPress + plugin custom. NON creare temi/pagine hardcoded fuori dalle API di WP.
@@ -85,5 +85,6 @@ advertrieste/
 
 ## Documenti di riferimento (carica quando serve)
 - @docs/specifiche-funzionali.md — cosa fa ogni modulo e il suo stato (fonte di verità sui requisiti)
-- @docs/architettura.md — [DA CREARE: schema dati dettagliato, endpoint REST, flussi]
-- @docs/deploy.md — [DA CREARE: hosting, ambienti, procedura di rilascio]
+- @docs/architettura.md — schema dati, endpoint REST, cron, sicurezza
+- @docs/deploy.md — ambienti, requisiti, segreti, attivazione, rilascio
+- @docs/manuale-utilizzo.md — manuale d'uso (pagine, profili, accessi, shortcode)
