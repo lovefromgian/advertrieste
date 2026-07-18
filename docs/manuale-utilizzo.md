@@ -20,7 +20,7 @@ Quattro livelli di accesso:
 | Capability | A cosa serve | Pubblico | Cliente | Organizz. | Admin |
 |---|---|:--:|:--:|:--:|:--:|
 | `advtr_view_qr_map` | Vedere la mappa riservata dei punti QR | — | ✓ | — | ✓ |
-| `advtr_edit_own_locale` | Gestire la propria scheda locale *(uso futuro)* | — | ✓ | — | ✓ |
+| `advtr_edit_own_locale` | Gestire la propria scheda locale in bacheca | — | ✓ | — | ✓ |
 | `advtr_submit_evento` | Inviare un evento in revisione | — | — | ✓ | ✓ |
 | `advtr_approve_evento` | Approvare e pubblicare un evento | — | — | — | ✓ |
 
@@ -64,7 +64,7 @@ Il plugin aggiunge nuove voci nel menu di WordPress.
 | Voce di menu | Cos'è | Visibilità pubblica | Campi principali |
 |---|---|---|---|
 | **Locali** | Attività commerciale sulla mappa | Sì — a zoom alto | coordinate, zoom min, validità, in evidenza, servizi, logo, galleria, categoria |
-| **Punti d'interesse** | Museo, castello, monumento | Sì — a zoom basso | titolo, descrizione, categoria *(coordinate: in arrivo)* |
+| **Punti d'interesse** | Museo, castello, monumento | Sì — a zoom basso | coordinate, zoom min, tipo, descrizione, categoria |
 | **Offerte** | Promozione a tempo con coupon | Sì — se attiva | locale collegato, date, tipo coupon, codice |
 | **Eventi** | Grande evento o evento di terzi | Solo versione approvata | tipo, date, locali collegati, workflow |
 | **Punti QR** | Espositore/QR fisico | **Riservato (mai pubblico)** | coordinate, stato |
@@ -116,7 +116,28 @@ Mappa Leaflet + OpenStreetMap con due livelli di zoom: da lontano compaiono i **
 
 ---
 
-## 6. Area riservata & mappa QR
+## 6. Scheda attività (pagina del locale)
+
+Ogni **locale pubblicato** ha una pagina dedicata all'indirizzo `/locale/{slug}/`. Non serve alcuno shortcode: viene generata automaticamente. Ci si arriva dal link **"Apri scheda"** nel popup della mappa, oppure con l'URL diretto.
+
+**Cosa mostra:**
+
+- **Logo, titolo, categorie** e i badge "In evidenza" / "Novità".
+- **Descrizione** (l'editor della scheda), **servizi** ed eventuale **galleria** foto.
+- **Contatti** (indirizzo, telefono, email, sito) e **orari**.
+- **Mini-mappa** della posizione con il pulsante **"Ottieni indicazioni"** (apre l'app mappe con il percorso).
+- **Recensioni Google** con voto medio — solo se attive (chiave `ADVTR_GOOGLE_PLACES_KEY` in `wp-config.php` e `Place ID` compilato) — più il pulsante "Scrivi una recensione".
+
+**Automatismi:**
+
+- Registra una **visita** a ogni apertura: alimenta il contatore visite e fa uscire la scheda dalla fase "Novità" oltre la soglia.
+- Traccia i **click sui contatti** (telefono/email/sito), che finiscono nelle statistiche.
+
+**Per una scheda ricca:** compila i campi nel box **"Dati locale"** (logo, galleria, servizi, contatti, orari) e — per le recensioni — il **Google Place ID**. Più campi compili, più completa sarà la pagina pubblica.
+
+---
+
+## 7. Area riservata & mappa QR
 
 Una pagina protetta dove i clienti vedono la rete di espositori e QR code.
 
@@ -130,7 +151,7 @@ Una pagina protetta dove i clienti vedono la rete di espositori e QR code.
 
 ---
 
-## 7. Statistiche
+## 8. Statistiche
 
 Ogni scheda locale registra eventi (visualizzazioni, click sulla mappa, coupon riscattati, click sui contatti) e li mostra in una dashboard.
 
@@ -142,7 +163,7 @@ Ogni scheda locale registra eventi (visualizzazioni, click sulla mappa, coupon r
 
 ---
 
-## 8. Offerte & coupon
+## 9. Offerte & coupon
 
 Promozioni a tempo con countdown, e coupon validabili dall'esercente sul posto.
 
@@ -162,7 +183,7 @@ Promozioni a tempo con countdown, e coupon validabili dall'esercente sul posto.
 
 ---
 
-## 9. Eventi & workflow di revisione
+## 10. Eventi & workflow di revisione
 
 Gli eventi hanno un modello a **doppia versione**: il pubblico vede sempre l'ultima versione **approvata**, mentre le modifiche restano in lavorazione finché un admin non le approva.
 
@@ -184,7 +205,7 @@ Stati: **Bozza** (in lavorazione, invisibile) → **In revisione** (inviato, in 
 
 ---
 
-## 10. Automazioni (scadenze & email)
+## 11. Automazioni (scadenze & email)
 
 Due job giornalieri (WP-Cron) girano da soli.
 
@@ -197,7 +218,7 @@ Due job giornalieri (WP-Cron) girano da soli.
 
 ---
 
-## 11. Checklist di primo setup
+## 12. Checklist di primo setup
 
 1. **Categorie** — già create (mangiare, bere, visitare, shopping, servizi). Verifica in *Categorie*.
 2. **Primi contenuti** — crea qualche **Locale** con coordinate e categoria, e qualche **Punto d'interesse**.
@@ -208,7 +229,7 @@ Due job giornalieri (WP-Cron) girano da soli.
 
 ---
 
-## 12. Stato attuale & limiti
+## 13. Stato attuale & limiti
 
 - **Pronto:** mappa pubblica + ingresso guidato, schede locali complete (con mini-mappa, indicazioni, recensioni), Punti d'interesse posizionabili, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo + evidenziazione locali durante i grandi eventi, scadenze + email automatiche, **editing self-service** per clienti e organizzatori (bacheca scoped).
 - **Condizionato:** recensioni Google (§1.5) attive solo con chiave `ADVTR_GOOGLE_PLACES_KEY` in `wp-config.php` (+ tetto di spesa lato Google). Pagamenti WooCommerce (§2.6): il bridge di rinnovo validità è pronto ma richiede WooCommerce + Subscriptions installati per funzionare.

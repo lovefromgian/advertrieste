@@ -436,6 +436,7 @@
 				<li><a href="#contenuti">Gestire i contenuti in bacheca</a></li>
 				<li><a href="#accessi">Dare accesso ai profili</a></li>
 				<li><a href="#mappa">Mappa pubblica</a></li>
+				<li><a href="#scheda">Scheda attività</a></li>
 				<li><a href="#riservata">Area riservata &amp; mappa QR</a></li>
 				<li><a href="#statistiche">Statistiche</a></li>
 				<li><a href="#offerte">Offerte &amp; coupon</a></li>
@@ -467,7 +468,7 @@
 						</thead>
 						<tbody>
 							<tr><td><code>advtr_view_qr_map</code></td><td>Vedere la mappa riservata dei punti QR</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
-							<tr><td><code>advtr_edit_own_locale</code></td><td>Gestire la propria scheda locale <span class="chip cli" style="font-size:10px">futuro</span></td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+							<tr><td><code>advtr_edit_own_locale</code></td><td>Gestire la propria scheda locale in bacheca</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
 							<tr><td><code>advtr_submit_evento</code></td><td>Inviare un evento in revisione</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
 							<tr><td><code>advtr_approve_evento</code></td><td>Approvare e pubblicare un evento</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
 						</tbody>
@@ -560,7 +561,7 @@
 						</thead>
 						<tbody>
 							<tr><td>Locali</td><td>Attività commerciale sulla mappa</td><td><span class="chip pub">Sì</span> — a zoom alto</td><td>coordinate, zoom min, validità, in evidenza, servizi, logo, galleria, categoria</td></tr>
-							<tr><td>Punti d'interesse</td><td>Museo, castello, monumento</td><td><span class="chip pub">Sì</span> — a zoom basso</td><td>titolo, descrizione, categoria (coordinate: in arrivo)</td></tr>
+							<tr><td>Punti d'interesse</td><td>Museo, castello, monumento</td><td><span class="chip pub">Sì</span> — a zoom basso</td><td>coordinate, zoom min, tipo, descrizione, categoria</td></tr>
 							<tr><td>Offerte</td><td>Promozione a tempo con coupon</td><td><span class="chip pub">Sì</span> — se attiva</td><td>locale collegato, date, tipo coupon, codice</td></tr>
 							<tr><td>Eventi</td><td>Grande evento o evento di terzi</td><td>Solo versione approvata</td><td>tipo, date, locali collegati, workflow</td></tr>
 							<tr><td>Punti QR</td><td>Espositore/QR fisico</td><td><span class="chip adm" style="background:var(--crit-tint);color:var(--crit);border-color:transparent">Riservato</span></td><td>coordinate, stato (mai pubblico)</td></tr>
@@ -631,9 +632,28 @@
 				</div>
 			</section>
 
+			<!-- scheda -->
+			<section class="doc" id="scheda">
+				<div class="sec-head"><span class="sec-num">06</span><h2>Scheda attività (pagina del locale)</h2></div>
+				<p class="lead">Ogni <b>locale pubblicato</b> ha una pagina dedicata all'indirizzo <span class="token">/locale/{slug}/</span>, generata automaticamente — nessuno shortcode. Ci si arriva dal link "Apri scheda" nel popup della mappa, o con l'URL diretto.</p>
+				<h3>Cosa mostra</h3>
+				<ul class="clean">
+					<li><b>Logo, titolo, categorie</b> e i badge "In evidenza" / "Novità".</li>
+					<li><b>Descrizione</b>, elenco <b>servizi</b> ed eventuale <b>galleria</b> foto.</li>
+					<li><b>Contatti</b> (indirizzo, telefono, email, sito) e <b>orari</b>.</li>
+					<li><b>Mini-mappa</b> della posizione con il pulsante <b>"Ottieni indicazioni"</b>, che apre l'app mappe con il percorso.</li>
+					<li><b>Recensioni Google</b> con voto medio — solo se attive (chiave <code>ADVTR_GOOGLE_PLACES_KEY</code> e <span class="token">Place ID</span> compilato) — più il pulsante "Scrivi una recensione".</li>
+				</ul>
+				<div class="note">
+					<span class="callout-label">Automatico</span>
+					La scheda registra una <b>visita</b> a ogni apertura (alimenta il contatore visite e fa uscire la scheda dalla fase "Novità" oltre la soglia) e traccia i <b>click sui contatti</b>, che finiscono nelle statistiche.
+				</div>
+				<p>Per una scheda ricca, compila i campi nel box <b>"Dati locale"</b> (logo, galleria, servizi, contatti, orari) e — per le recensioni — il <b>Google Place ID</b>. Più campi compili, più completa è la pagina pubblica.</p>
+			</section>
+
 			<!-- 6 -->
 			<section class="doc" id="riservata">
-				<div class="sec-head"><span class="sec-num">06</span><h2>Area riservata &amp; mappa QR</h2></div>
+				<div class="sec-head"><span class="sec-num">07</span><h2>Area riservata &amp; mappa QR</h2></div>
 				<p class="lead">Una pagina protetta dove i clienti vedono la rete di espositori e QR code — leva commerciale per mostrare la capillarità.</p>
 				<ol class="steps">
 					<li><b>Crea una pagina</b> con <span class="token">[advtr_area_riservata]</span>.</li>
@@ -652,7 +672,7 @@
 
 			<!-- 7 -->
 			<section class="doc" id="statistiche">
-				<div class="sec-head"><span class="sec-num">07</span><h2>Statistiche</h2></div>
+				<div class="sec-head"><span class="sec-num">08</span><h2>Statistiche</h2></div>
 				<p class="lead">Ogni scheda locale registra eventi (visualizzazioni, click sulla mappa, coupon riscattati, click sui contatti) e li mostra in una dashboard.</p>
 				<ul class="clean">
 					<li><b>Pagina dashboard:</b> <span class="token">[advtr_statistiche]</span> (nell'area clienti). Un cliente vede solo le proprie schede; l'admin può indicare una scheda con <span class="token">id="123"</span>.</li>
@@ -668,7 +688,7 @@
 
 			<!-- 8 -->
 			<section class="doc" id="offerte">
-				<div class="sec-head"><span class="sec-num">08</span><h2>Offerte &amp; coupon</h2></div>
+				<div class="sec-head"><span class="sec-num">09</span><h2>Offerte &amp; coupon</h2></div>
 				<p class="lead">Promozioni a tempo con countdown, e coupon validabili dall'esercente sul posto.</p>
 
 				<h3>Creare un'offerta</h3>
@@ -692,7 +712,7 @@
 
 			<!-- 9 -->
 			<section class="doc" id="eventi">
-				<div class="sec-head"><span class="sec-num">09</span><h2>Eventi &amp; workflow di revisione</h2></div>
+				<div class="sec-head"><span class="sec-num">10</span><h2>Eventi &amp; workflow di revisione</h2></div>
 				<p class="lead">Gli eventi hanno un modello a <b>doppia versione</b>: il pubblico vede sempre l'ultima versione <b>approvata</b>, mentre le modifiche restano in lavorazione finché un admin non le approva.</p>
 
 				<div class="legend" style="margin-bottom:18px">
@@ -722,7 +742,7 @@
 
 			<!-- 10 -->
 			<section class="doc" id="automazioni">
-				<div class="sec-head"><span class="sec-num">10</span><h2>Automazioni (scadenze &amp; email)</h2></div>
+				<div class="sec-head"><span class="sec-num">11</span><h2>Automazioni (scadenze &amp; email)</h2></div>
 				<p class="lead">Due job giornalieri (WP-Cron) girano da soli, senza intervento.</p>
 				<div class="tablewrap">
 					<table>
@@ -741,7 +761,7 @@
 
 			<!-- 11 -->
 			<section class="doc" id="setup">
-				<div class="sec-head"><span class="sec-num">11</span><h2>Checklist di primo setup</h2></div>
+				<div class="sec-head"><span class="sec-num">12</span><h2>Checklist di primo setup</h2></div>
 				<p class="lead">Il percorso minimo per avere il sito operativo dalla parte pubblica e da quella clienti.</p>
 				<ol class="steps">
 					<li><b>Categorie</b> — già create (mangiare, bere, visitare, shopping, servizi). Verifica in <b>Categorie</b>.</li>
@@ -755,7 +775,7 @@
 
 			<!-- 12 -->
 			<section class="doc" id="stato">
-				<div class="sec-head"><span class="sec-num">12</span><h2>Stato attuale &amp; limiti</h2></div>
+				<div class="sec-head"><span class="sec-num">13</span><h2>Stato attuale &amp; limiti</h2></div>
 				<p class="lead">Cosa è pronto e cosa è ancora in lavorazione, per evitare fraintendimenti.</p>
 				<ul class="clean">
 					<li><b>Pronto:</b> mappa pubblica + ingresso guidato, schede locali complete (mini-mappa, indicazioni, recensioni), Punti d'interesse posizionabili, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo + locali evidenziati durante i grandi eventi, scadenze + email automatiche, <b>editing self-service</b> per clienti e organizzatori (bacheca scoped).</li>
@@ -776,13 +796,8 @@
 (function () {
 	var btn = document.getElementById('advtr-theme');
 	var root = document.documentElement;
-	function current() {
-		return root.getAttribute('data-theme') ||
-			(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-	}
-	btn.addEventListener('click', function () {
-		root.setAttribute('data-theme', current() === 'dark' ? 'light' : 'dark');
-	});
+	function current() { return root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+	btn.addEventListener('click', function () { root.setAttribute('data-theme', current() === 'dark' ? 'light' : 'dark'); });
 })();
 </script>
 </body>
