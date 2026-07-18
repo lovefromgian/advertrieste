@@ -67,9 +67,13 @@ class Locale {
 			'menu_position'       => 20,
 			// 'custom-fields' abilita il container `meta` in REST: così i meta
 			// registrati con show_in_rest=true sono esposti, quelli riservati no.
-			'supports'            => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
+			// 'author' abilita la gestione per proprietario (cliente_locale).
+			'supports'            => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'author' ),
 			'rewrite'             => array( 'slug' => 'locale' ),
 			'exclude_from_search' => false,
+			// Capability custom: il cliente gestisce solo le proprie schede.
+			'capability_type'     => array( 'advtr_locale', 'advtr_locali' ),
+			'map_meta_cap'        => true,
 		);
 	}
 }

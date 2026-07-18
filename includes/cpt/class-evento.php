@@ -76,9 +76,13 @@ class Evento {
 			'hierarchical'        => false,
 			'menu_icon'           => 'dashicons-calendar-alt',
 			'menu_position'       => 22,
-			'supports'            => array( 'title', 'editor', 'thumbnail' ),
+			// 'author' abilita la gestione per proprietario (organizzatore_evento).
+			'supports'            => array( 'title', 'editor', 'thumbnail', 'author' ),
 			'rewrite'             => false,
 			'query_var'           => false,
+			// Capability custom: l'organizzatore gestisce solo i propri eventi.
+			'capability_type'     => array( 'advtr_evento', 'advtr_eventi' ),
+			'map_meta_cap'        => true,
 		);
 	}
 }

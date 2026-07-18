@@ -65,6 +65,41 @@ class Roles {
 	const CAP_APPROVE_EVENTO = 'advtr_approve_evento';
 
 	/**
+	 * Plurale delle capability del CPT `locale` (capability_type).
+	 *
+	 * @var string
+	 */
+	const LOCALE_PLURAL = 'advtr_locali';
+
+	/**
+	 * Plurale delle capability del CPT `evento` (capability_type).
+	 *
+	 * @var string
+	 */
+	const EVENTO_PLURAL = 'advtr_eventi';
+
+	/**
+	 * Genera l'elenco completo delle capability primitive per un CPT.
+	 *
+	 * @param string $plural Plurale del capability_type.
+	 * @return string[]
+	 */
+	public static function cpt_capabilities( $plural ) {
+		return array(
+			"edit_{$plural}",
+			"edit_others_{$plural}",
+			"edit_published_{$plural}",
+			"edit_private_{$plural}",
+			"publish_{$plural}",
+			"read_private_{$plural}",
+			"delete_{$plural}",
+			"delete_others_{$plural}",
+			"delete_published_{$plural}",
+			"delete_private_{$plural}",
+		);
+	}
+
+	/**
 	 * Tutte le capability custom del plugin.
 	 *
 	 * @return string[]
@@ -84,33 +119,40 @@ class Roles {
 	 * @return void
 	 */
 	public static function install() {
-		// Ruolo cliente_locale.
-		self::ensure_role(
-			self::CLIENTE,
-			__( 'Cliente (locale)', 'advertrieste' ),
-			array(
-				'read'                    => true,
-				'upload_files'            => true,
-				self::CAP_VIEW_QR_MAP     => true,
-				self::CAP_EDIT_OWN_LOCALE => true,
-			)
+		// Ruolo cliente_locale: gestisce le PROPRIE schede locale in bacheca.
+		$cliente_caps = array(
+			'read'                                  => true,
+			'upload_files'                          => true,
+			self::CAP_VIEW_QR_MAP                   => true,
+			self::CAP_EDIT_OWN_LOCALE               => true,
+			'edit_' . self::LOCALE_PLURAL           => true,
+			'edit_published_' . self::LOCALE_PLURAL => true,
+			'delete_' . self::LOCALE_PLURAL         => true,
 		);
+		self::ensure_role( self::CLIENTE, __( 'Cliente (locale)', 'advertrieste' ), $cliente_caps );
 
-		// Ruolo organizzatore_evento.
-		self::ensure_role(
-			self::ORGANIZZATORE,
-			__( 'Organizzatore evento', 'advertrieste' ),
-			array(
-				'read'                  => true,
-				'upload_files'          => true,
-				self::CAP_SUBMIT_EVENTO => true,
-			)
+		// Ruolo organizzatore_evento: crea/gestisce i PROPRI eventi in bacheca.
+		$org_caps = array(
+			'read'                                    => true,
+			'upload_files'                            => true,
+			self::CAP_SUBMIT_EVENTO                   => true,
+			'edit_' . self::EVENTO_PLURAL             => true,
+			'edit_published_' . self::EVENTO_PLURAL   => true,
+			'publish_' . self::EVENTO_PLURAL          => true,
+			'delete_' . self::EVENTO_PLURAL           => true,
+			'delete_published_' . self::EVENTO_PLURAL => true,
 		);
+		self::ensure_role( self::ORGANIZZATORE, __( 'Organizzatore evento', 'advertrieste' ), $org_caps );
 
-		// L'amministratore riceve tutte le capability custom.
+		// L'amministratore riceve tutte le capability custom + tutte quelle dei CPT.
 		$admin = get_role( 'administrator' );
 		if ( $admin ) {
-			foreach ( self::all_caps() as $cap ) {
+			$admin_caps = array_merge(
+				self::all_caps(),
+				self::cpt_capabilities( self::LOCALE_PLURAL ),
+				self::cpt_capabilities( self::EVENTO_PLURAL )
+			);
+			foreach ( $admin_caps as $cap ) {
 				$admin->add_cap( $cap );
 			}
 		}
@@ -127,7 +169,12 @@ class Roles {
 
 		$admin = get_role( 'administrator' );
 		if ( $admin ) {
-			foreach ( self::all_caps() as $cap ) {
+			$admin_caps = array_merge(
+				self::all_caps(),
+				self::cpt_capabilities( self::LOCALE_PLURAL ),
+				self::cpt_capabilities( self::EVENTO_PLURAL )
+			);
+			foreach ( $admin_caps as $cap ) {
 				$admin->remove_cap( $cap );
 			}
 		}
