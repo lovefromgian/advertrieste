@@ -7,6 +7,8 @@
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/assets/dist/*</exclude-pattern>
+	<!-- Script di test/integrazione: convenzioni CLI (echo, exit, var_export). -->
+	<exclude-pattern>*/tests/*</exclude-pattern>
 
 	<!-- Opzioni: solo PHP, output con colori e sorgente delle regole. -->
 	<arg name="extensions" value="php"/>

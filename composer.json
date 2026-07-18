@@ -19,6 +19,7 @@
 	},
 	"scripts": {
 		"lint": "phpcs",
-		"lint:fix": "phpcbf"
+		"lint:fix": "phpcbf",
+		"test:integration": "wp eval-file tests/integration/run.php"
 	}
 }
