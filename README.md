@@ -32,8 +32,12 @@ advertrieste/
 │   │   └── class-categoria.php  # tassonomia `categoria` (locale+poi) + seeding
 │   ├── coupon/               # coupon/riscatti
 │   │   └── class-coupon.php     # tabella advtr_coupon, riscatti, scadenza offerte
+│   ├── scadenze/             # scadenze schede
+│   │   └── class-scadenze.php   # avvisi 30/15/7gg, sospensione, spegni evidenza
+│   ├── email/                # invio email
+│   │   └── class-mailer.php     # wrapper wp_mail (HTML)
 │   ├── cron/                 # job pianificati (WP-Cron)
-│   │   └── class-cron.php       # advtr_expire_coupons (giornaliero)
+│   │   └── class-cron.php       # advtr_expire_coupons + advtr_check_scadenze (giornalieri)
 │   ├── access/               # ruoli, capability e controlli di accesso
 │   │   ├── class-roles.php      # ruoli cliente_locale/organizzatore_evento + capability
 │   │   └── class-access.php     # helper: can_view_qr_map(), is_cliente()
@@ -105,6 +109,15 @@ CPT `offerta` (collegato a un `locale` via `advtr_locale_id`) con finestra tempo
 - **Pubblico**: `GET advertrieste/v1/offerte[?locale={id}]` — solo offerte attive (finestra date + stato). Shortcode `[advtr_offerte]` con **countdown** live.
 - **Esercente**: `POST advertrieste/v1/offerta/{id}/redeem` — solo proprietario del locale collegato o admin (nonce + auth). Valida il codice, registra il riscatto e traccia l'evento `coupon` nelle statistiche. Shortcode `[advtr_valida_coupon]` (area riservata).
 - **Cron**: `advtr_expire_coupons` (giornaliero) marca scadute le offerte oltre la data di scadenza.
+
+## Scadenze & email (§3.1)
+
+Cron `advtr_check_scadenze` (giornaliero, `Scadenze\Scadenze`): per ogni `locale` con `advtr_data_fine`:
+- **Avvisi email** a admin + cliente alle soglie **30/15/7 gg** (filtrabili con `advtr_scadenza_soglie`), una sola volta per soglia (marca la soglia notificata e quelle superiori).
+- **Sospensione automatica** alla scadenza: la scheda passa in bozza (`draft`, sparisce dalla mappa) + email di notifica.
+- **Spegnimento "in evidenza"** scaduto.
+
+Email via `Email\Mailer` (wrapper HTML su `wp_mail`). Lo scheduling è idempotente e auto-riparante (`Cron\Cron`).
 
 ## Convenzioni
 
