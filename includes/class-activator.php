@@ -14,6 +14,7 @@ namespace AdverTrieste;
 
 use AdverTrieste\Cpt\Categoria;
 use AdverTrieste\Access\Roles;
+use AdverTrieste\Stats\Stats;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,6 +41,9 @@ class Activator {
 
 		// Ruoli e capability dell'area riservata.
 		Roles::install();
+
+		// Tabella delle statistiche.
+		Stats::install_table();
 
 		flush_rewrite_rules();
 	}

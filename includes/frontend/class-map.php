@@ -119,6 +119,8 @@ class Map {
 			'advtrMap',
 			array(
 				'endpoint'  => rest_url( Markers::NAMESPACE . '/map/markers' ),
+				'trackBase' => rest_url( Markers::NAMESPACE . '/locale/' ),
+				'nonce'     => wp_create_nonce( 'wp_rest' ),
 				'center'    => array( (float) $atts['lat'], (float) $atts['lng'] ),
 				'zoom'      => (int) $atts['zoom'],
 				'categorie' => self::categorie_list(),
@@ -126,6 +128,7 @@ class Map {
 					'tutte'       => __( 'Tutte', 'advertrieste' ),
 					'apri'        => __( 'Apri scheda', 'advertrieste' ),
 					'caricamento' => __( 'Caricamento…', 'advertrieste' ),
+					'novita'      => __( 'Novità', 'advertrieste' ),
 				),
 			)
 		);

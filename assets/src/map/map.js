@@ -61,6 +61,12 @@
 			title.className = 'advtr-popup-title';
 			title.textContent = m.title;
 			wrap.appendChild( title );
+			if ( m.novita ) {
+				var badge = document.createElement( 'span' );
+				badge.className = 'advtr-badge-novita';
+				badge.textContent = cfg.i18n.novita;
+				wrap.appendChild( badge );
+			}
 			if ( m.permalink ) {
 				var a = document.createElement( 'a' );
 				a.className = 'advtr-popup-link';
@@ -69,6 +75,21 @@
 				wrap.appendChild( a );
 			}
 			return wrap;
+		}
+
+		function trackMapClick( m ) {
+			if ( m.type !== 'locale' || ! cfg.trackBase || ! cfg.nonce ) {
+				return;
+			}
+			window.fetch( cfg.trackBase + m.id + '/track', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': cfg.nonce
+				},
+				credentials: 'same-origin',
+				body: JSON.stringify( { tipo: 'map_click' } )
+			} ).catch( function () {} );
 		}
 
 		function loadMarkers() {
@@ -96,6 +117,9 @@
 					}
 					var marker = L.marker( [ m.lat, m.lng ], { icon: markerIcon( m ) } );
 					marker.bindPopup( popupHtml( m ) );
+					marker.on( 'popupopen', function () {
+						trackMapClick( m );
+					} );
 					marker.addTo( layer );
 				} );
 			} ).catch( function () {

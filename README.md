@@ -35,22 +35,30 @@ advertrieste/
 │   ├── meta/                 # meta box e campi
 │   │   ├── class-localemeta.php # meta del CPT `locale` (register + box + save)
 │   │   └── class-puntoqrmeta.php # meta del CPT `punto_qr` (coordinate + stato)
+│   ├── stats/                # statistiche per scheda
+│   │   └── class-stats.php      # tabella advtr_stats, record eventi, query, soglia
 │   ├── rest/                 # endpoint REST (namespace advertrieste/v1)
 │   │   ├── class-markers.php    # GET /map/markers (bbox+zoom+categoria, mai punto_qr)
-│   │   └── class-qrmap.php      # GET /qr-map — RISERVATO (auth + advtr_view_qr_map)
+│   │   ├── class-qrmap.php      # GET /qr-map — RISERVATO (auth + advtr_view_qr_map)
+│   │   ├── class-track.php      # POST /locale/{id}/track (nonce + rate-limit)
+│   │   └── class-stats.php      # GET /stats/{id} — owner/admin
 │   └── frontend/             # front-end pubblico e riservato
-│       ├── class-map.php          # shortcode [advtr_map] + enqueue Leaflet
-│       └── class-reservedarea.php # shortcode [advtr_area_riservata] + mappa QR
+│       ├── class-map.php            # shortcode [advtr_map] + enqueue Leaflet
+│       ├── class-reservedarea.php   # shortcode [advtr_area_riservata] + mappa QR
+│       └── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
 ├── assets/
 │   ├── src/admin/locale-meta.js  # media picker (logo + galleria) del meta box
-│   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup
-│   ├── src/map/map.css           # stili mappa e marker
+│   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup + track
+│   ├── src/map/map.css           # stili mappa, marker, badge
 │   ├── src/qr-map/qr-map.js      # mappa QR riservata (fetch autenticato con nonce)
+│   ├── src/stats/stats.js        # dashboard: stat tiles + grafico a barre SVG
+│   ├── src/stats/stats.css       # stili dashboard
 │   └── vendor/leaflet/           # Leaflet 1.9.4 (bundle locale, no CDN)
 ├── templates/                # template front-end del plugin
 │   ├── admin/locale-meta-box.php # markup del meta box "Dati locale"
 │   ├── map.php                   # contenitore mappa dello shortcode
-│   └── area-riservata.php        # dashboard area riservata + mappa QR
+│   ├── area-riservata.php        # dashboard area riservata + mappa QR
+│   └── statistiche.php           # dashboard statistiche
 ├── docs/                     # specifiche, architettura, deploy
 ├── composer.json             # dev tooling (PHPCS + WPCS)
 └── phpcs.xml                 # regole WordPress Coding Standards
@@ -73,6 +81,15 @@ Ruoli custom (installati all'attivazione): `cliente_locale`, `organizzatore_even
 Shortcode `[advtr_area_riservata]`: gate lato server (non loggato → invito al login; autenticato non-cliente → avviso; cliente con `advtr_view_qr_map` → dashboard + **mappa dei punti QR**). Le coordinate dei `punto_qr` sono servite SOLO dall'endpoint autenticato `GET advertrieste/v1/qr-map` (permission: autenticato + `advtr_view_qr_map`); non compaiono mai nell'endpoint pubblico né nella pagina.
 
 > Visibilità mappa QR: attualmente ogni cliente con capability vede l'intera rete (decisione da confermare — vedi specifiche §2.5).
+
+## Statistiche
+
+Tabella `{prefix}advtr_stats` (creata all'attivazione) con eventi `view`, `map_click`, `coupon`, `contact`.
+
+- **Scrittura**: `POST advertrieste/v1/locale/{id}/track` — pubblica, protetta da nonce REST + rate-limit (60s per IP/scheda/tipo, così non si gonfiano i conteggi). La mappa pubblica traccia `map_click` all'apertura del popup.
+- **Lettura**: `GET advertrieste/v1/stats/{id}` — solo proprietario della scheda o admin.
+- **Dashboard**: shortcode `[advtr_statistiche]` (nell'area riservata o in una pagina) — stat tiles + grafico a barre (SVG, senza librerie). Attributo `id` opzionale.
+- **Soglia "Novità" (§1.6)**: sotto `Stats::SOGLIA_VISITE` (20) la scheda è "Novità" (badge sulla mappa) e non mostra il conteggio reale.
 
 ## Convenzioni
 

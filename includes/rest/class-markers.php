@@ -22,6 +22,7 @@ namespace AdverTrieste\Rest;
 use AdverTrieste\Cpt\Locale;
 use AdverTrieste\Cpt\Poi;
 use AdverTrieste\Cpt\Categoria;
+use AdverTrieste\Stats\Stats;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Query;
@@ -215,6 +216,8 @@ class Markers {
 			'lng'         => (float) get_post_meta( $post->ID, 'advtr_lng', true ),
 			'categoria'   => is_array( $terms ) ? $terms : array(),
 			'in_evidenza' => ( Locale::POST_TYPE === $type ) ? self::is_in_evidenza( $post->ID ) : false,
+			// Badge "Novità" finché la scheda non supera la soglia visite (§1.6).
+			'novita'      => ( Locale::POST_TYPE === $type ) ? Stats::is_novita( $post->ID ) : false,
 			'zoom_min'    => $zoom_min,
 			'permalink'   => get_permalink( $post ),
 			'logo'        => $logo_url ? $logo_url : '',

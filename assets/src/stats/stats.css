@@ -1,0 +1,71 @@
+/**
+ * Stili della dashboard statistiche.
+ *
+ * @package AdverTrieste
+ */
+
+.advtr-stats {
+	margin: 1em 0;
+}
+
+.advtr-stats-selettore label {
+	font-weight: 600;
+	margin-right: 6px;
+}
+
+.advtr-stats-novita {
+	display: inline-block;
+	background: #fff4d6;
+	color: #7a5c00;
+	border: 1px solid #e6c65a;
+	border-radius: 4px;
+	padding: 4px 10px;
+	font-size: 13px;
+}
+
+.advtr-stat-tiles {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 12px;
+	margin: 12px 0;
+}
+
+.advtr-stat-tile {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 14px 16px;
+	background: #fff;
+}
+
+.advtr-stat-value {
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1.1;
+	color: #1d2327;
+}
+
+.advtr-stat-label {
+	margin-top: 4px;
+	font-size: 13px;
+	color: #50575e;
+}
+
+.advtr-stats-sub {
+	margin: 12px 0 6px;
+}
+
+.advtr-barchart {
+	width: 100%;
+	height: 120px;
+	display: block;
+	background: #f6f7f7;
+	border-radius: 6px;
+}
+
+.advtr-bar {
+	fill: #2271b1;
+}
+
+.advtr-bar:hover {
+	fill: #135e96;
+}

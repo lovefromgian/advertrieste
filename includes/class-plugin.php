@@ -20,8 +20,11 @@ use AdverTrieste\Meta\LocaleMeta;
 use AdverTrieste\Meta\PuntoQrMeta;
 use AdverTrieste\Rest\Markers;
 use AdverTrieste\Rest\QrMap;
+use AdverTrieste\Rest\Track;
+use AdverTrieste\Rest\Stats as StatsEndpoint;
 use AdverTrieste\Frontend\Map;
 use AdverTrieste\Frontend\ReservedArea;
+use AdverTrieste\Frontend\StatsDashboard;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -91,8 +94,11 @@ final class Plugin {
 		PuntoQrMeta::init();
 		Markers::init();
 		QrMap::init();
+		Track::init();
+		StatsEndpoint::init();
 		Map::init();
 		ReservedArea::init();
+		StatsDashboard::init();
 	}
 
 	/**
