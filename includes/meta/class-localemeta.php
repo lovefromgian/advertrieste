@@ -102,6 +102,26 @@ class LocaleMeta {
 				'type' => 'string_list',
 				'rest' => false,
 			),
+			'telefono'                => array(
+				'type' => 'text',
+				'rest' => false,
+			),
+			'email'                   => array(
+				'type' => 'email',
+				'rest' => false,
+			),
+			'sito'                    => array(
+				'type' => 'url',
+				'rest' => false,
+			),
+			'indirizzo'               => array(
+				'type' => 'text',
+				'rest' => false,
+			),
+			'orari'                   => array(
+				'type' => 'textarea',
+				'rest' => false,
+			),
 			'place_id'                => array(
 				'type' => 'text',
 				'rest' => false,
@@ -206,6 +226,12 @@ class LocaleMeta {
 				};
 			case 'attachment':
 				return 'absint';
+			case 'email':
+				return 'sanitize_email';
+			case 'url':
+				return 'esc_url_raw';
+			case 'textarea':
+				return 'sanitize_textarea_field';
 			case 'text':
 			default:
 				return 'sanitize_text_field';
@@ -269,6 +295,11 @@ class LocaleMeta {
 		$evidenza_fine     = $get( 'evidenza_fine' );
 		$evidenza_priorita = $get( 'evidenza_priorita' );
 		$servizi           = $get( 'servizi' );
+		$telefono          = $get( 'telefono' );
+		$email             = $get( 'email' );
+		$sito              = $get( 'sito' );
+		$indirizzo         = $get( 'indirizzo' );
+		$orari             = $get( 'orari' );
 		$place_id          = $get( 'place_id' );
 		$logo_id           = (int) $get( 'logo_id' );
 		$galleria_ids      = $get( 'galleria_ids' );
@@ -314,6 +345,10 @@ class LocaleMeta {
 			'evidenza_inizio'   => 'date',
 			'evidenza_fine'     => 'date',
 			'evidenza_priorita' => 'integer',
+			'telefono'          => 'text',
+			'email'             => 'email',
+			'sito'              => 'url',
+			'indirizzo'         => 'text',
 			'place_id'          => 'text',
 			'logo_id'           => 'attachment',
 		);
@@ -340,6 +375,10 @@ class LocaleMeta {
 		$galleria_raw = isset( $_POST['advtr_galleria_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['advtr_galleria_ids'] ) ) : '';
 		$galleria     = array_values( array_filter( array_map( 'absint', explode( ',', $galleria_raw ) ) ) );
 		self::update_or_delete( $post_id, 'galleria_ids', $galleria );
+
+		// Orari (textarea multiriga).
+		$orari = isset( $_POST['advtr_orari'] ) ? sanitize_textarea_field( wp_unslash( $_POST['advtr_orari'] ) ) : '';
+		self::update_or_delete( $post_id, 'orari', $orari );
 	}
 
 	/**

@@ -1,0 +1,168 @@
+/**
+ * Stili della scheda attività (single locale).
+ *
+ * @package AdverTrieste
+ */
+
+.advtr-scheda-wrap {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 28px;
+	max-width: 1080px;
+	margin: 2rem auto;
+	padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+	.advtr-scheda-wrap {
+		grid-template-columns: 1fr 320px;
+		align-items: start;
+	}
+}
+
+.advtr-scheda-head {
+	display: flex;
+	gap: 18px;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.advtr-scheda-logo {
+	width: 88px;
+	height: 88px;
+	object-fit: cover;
+	border-radius: 12px;
+	border: 1px solid #dcdcde;
+	flex: none;
+}
+
+.advtr-scheda-titolo {
+	margin: 0 0 8px;
+	line-height: 1.15;
+}
+
+.advtr-scheda-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.advtr-badge {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	padding: 2px 8px;
+	border-radius: 4px;
+	color: #fff;
+}
+
+.advtr-badge-evid { background: #d4a017; }
+.advtr-badge-nov { background: #2271b1; }
+
+.advtr-cat {
+	font-size: 12px;
+	padding: 2px 9px;
+	border-radius: 999px;
+	background: #eef3f3;
+	color: #2a5c60;
+	border: 1px solid #d6e2e2;
+}
+
+.advtr-scheda-sez { margin: 24px 0; }
+.advtr-scheda-sez h2,
+.advtr-scheda-box h2 {
+	font-size: 1.15rem;
+	margin: 0 0 10px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid #e4e8e8;
+}
+
+.advtr-servizi {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.advtr-servizi li {
+	background: #f2f5f5;
+	border: 1px solid #e0e7e7;
+	border-radius: 6px;
+	padding: 4px 12px;
+	font-size: 14px;
+}
+
+.advtr-galleria {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 10px;
+}
+.advtr-galleria a { display: block; overflow: hidden; border-radius: 8px; }
+.advtr-galleria img {
+	width: 100%;
+	height: 120px;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.2s ease;
+}
+.advtr-galleria a:hover img { transform: scale(1.04); }
+
+.advtr-orari {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+}
+.advtr-orari li {
+	padding: 4px 0;
+	border-bottom: 1px solid #eef1f1;
+}
+
+.advtr-scheda-side { display: flex; flex-direction: column; gap: 20px; }
+.advtr-scheda-box {
+	border: 1px solid #dcdcde;
+	border-radius: 12px;
+	padding: 16px 18px;
+	background: #fff;
+}
+
+.advtr-contatti {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.advtr-contatti li { display: flex; flex-direction: column; gap: 1px; font-size: 14px; }
+.advtr-c-label {
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #6a7574;
+}
+.advtr-contact-link { word-break: break-word; }
+
+.advtr-recensione {
+	display: inline-block;
+	margin-top: 14px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.advtr-scheda-map {
+	width: 100%;
+	height: 220px;
+	border-radius: 8px;
+	border: 1px solid #dcdcde;
+}
+
+@media (prefers-color-scheme: dark) {
+	.advtr-scheda-logo, .advtr-scheda-box, .advtr-scheda-map { border-color: #33403f; }
+	.advtr-scheda-box { background: #16211f; }
+	.advtr-cat { background: #17302f; color: #8fc7c9; border-color: #24413f; }
+	.advtr-servizi li { background: #182524; border-color: #2a3a38; }
+}

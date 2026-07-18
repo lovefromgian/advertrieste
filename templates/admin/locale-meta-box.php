@@ -80,6 +80,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div class="advtr-field">
+		<label for="advtr_telefono"><?php esc_html_e( 'Telefono', 'advertrieste' ); ?></label>
+		<input type="text" id="advtr_telefono" name="advtr_telefono" value="<?php echo esc_attr( $telefono ); ?>" />
+	</div>
+	<div class="advtr-field">
+		<label for="advtr_email"><?php esc_html_e( 'Email', 'advertrieste' ); ?></label>
+		<input type="email" id="advtr_email" name="advtr_email" value="<?php echo esc_attr( $email ); ?>" />
+	</div>
+
+	<div class="advtr-field">
+		<label for="advtr_sito"><?php esc_html_e( 'Sito web', 'advertrieste' ); ?></label>
+		<input type="url" id="advtr_sito" name="advtr_sito" value="<?php echo esc_attr( $sito ); ?>" placeholder="https://" />
+	</div>
+	<div class="advtr-field">
+		<label for="advtr_indirizzo"><?php esc_html_e( 'Indirizzo', 'advertrieste' ); ?></label>
+		<input type="text" id="advtr_indirizzo" name="advtr_indirizzo" value="<?php echo esc_attr( $indirizzo ); ?>" />
+	</div>
+
+	<div class="advtr-field full">
+		<label for="advtr_orari"><?php esc_html_e( 'Orari (uno per riga)', 'advertrieste' ); ?></label>
+		<textarea id="advtr_orari" name="advtr_orari" rows="4" placeholder="<?php esc_attr_e( 'Lun–Ven 9:00–18:00', 'advertrieste' ); ?>"><?php echo esc_textarea( $orari ); ?></textarea>
+	</div>
+
+	<div class="advtr-field">
 		<label><?php esc_html_e( 'Logo', 'advertrieste' ); ?></label>
 		<div class="advtr-media-preview" id="advtr_logo_preview">
 			<?php if ( $logo_url ) : ?>

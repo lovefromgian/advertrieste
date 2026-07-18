@@ -60,7 +60,8 @@ advertrieste/
 │       ├── class-reservedarea.php   # shortcode [advtr_area_riservata] + mappa QR
 │       ├── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
 │       ├── class-offerte.php        # shortcode [advtr_offerte] + [advtr_valida_coupon]
-│       └── class-eventi.php         # shortcode [advtr_grandi_eventi] + [advtr_eventi]
+│       ├── class-eventi.php         # shortcode [advtr_grandi_eventi] + [advtr_eventi]
+│       └── class-scheda.php         # scheda attività (single locale) + tracking visita
 ├── assets/
 │   ├── src/admin/locale-meta.js  # media picker (logo + galleria) del meta box
 │   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup + track
@@ -113,6 +114,13 @@ CPT `offerta` (collegato a un `locale` via `advtr_locale_id`) con finestra tempo
 - **Pubblico**: `GET advertrieste/v1/offerte[?locale={id}]` — solo offerte attive (finestra date + stato). Shortcode `[advtr_offerte]` con **countdown** live.
 - **Esercente**: `POST advertrieste/v1/offerta/{id}/redeem` — solo proprietario del locale collegato o admin (nonce + auth). Valida il codice, registra il riscatto e traccia l'evento `coupon` nelle statistiche. Shortcode `[advtr_valida_coupon]` (area riservata).
 - **Cron**: `advtr_expire_coupons` (giornaliero) marca scadute le offerte oltre la data di scadenza.
+
+## Scheda attività (§1.3)
+
+Ogni `locale` pubblicato ha una **pagina singola** ricca (`Frontend\Scheda` sostituisce il template single del tema con `templates/single-locale.php`): logo, descrizione, servizi, galleria, contatti (telefono/email/sito/indirizzo), orari, mini-mappa Leaflet e pulsante "Scrivi recensione" (se è impostato `place_id`).
+
+- Al caricamento registra una **visita** (`view`) via `POST /locale/{id}/track` — chiude il tracking del contatore visite (§1.6). Traccia anche i click sui contatti (`contact`).
+- I campi contatti/orari sono nuovi meta del `locale` (`advtr_telefono`, `advtr_email`, `advtr_sito`, `advtr_indirizzo`, `advtr_orari`), gestiti dal meta box "Dati locale".
 
 ## Eventi & workflow di revisione (§4)
 

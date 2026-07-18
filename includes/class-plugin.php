@@ -28,6 +28,7 @@ use AdverTrieste\Rest\Stats as StatsEndpoint;
 use AdverTrieste\Rest\Offerte as OfferteEndpoint;
 use AdverTrieste\Rest\Eventi as EventiEndpoint;
 use AdverTrieste\Frontend\Map;
+use AdverTrieste\Frontend\Scheda;
 use AdverTrieste\Frontend\ReservedArea;
 use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
@@ -110,6 +111,7 @@ final class Plugin {
 		OfferteEndpoint::init();
 		EventiEndpoint::init();
 		Map::init();
+		Scheda::init();
 		ReservedArea::init();
 		StatsDashboard::init();
 		OfferteView::init();
