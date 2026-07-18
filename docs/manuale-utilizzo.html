@@ -499,6 +499,12 @@
 						<div class="where"><span class="chip pub">Pubblico</span></div>
 					</div>
 					<div class="card">
+						<span class="sc">[advtr_onboarding]</span>
+						<p class="desc">Ingresso guidato "Cosa stai cercando?": schede d'intenzione che aprono la mappa già filtrata per categoria.</p>
+						<div class="params">map (URL pagina mappa), titolo</div>
+						<div class="where"><span class="chip pub">Pubblico</span></div>
+					</div>
+					<div class="card">
 						<span class="sc">[advtr_area_riservata]</span>
 						<p class="desc">Area clienti: chiede il login; ai clienti mostra la dashboard con la mappa riservata dei punti QR.</p>
 						<div class="params">nessun parametro</div>
@@ -593,7 +599,7 @@
 						</thead>
 						<tbody>
 							<tr><td>Accesso</td><td class="no">senza login</td><td>wp-login</td><td>wp-login</td><td>wp-login</td></tr>
-							<tr><td>Bacheca WordPress</td><td class="no">—</td><td class="no">limitata</td><td class="no">limitata</td><td class="yes">completa</td></tr>
+							<tr><td>Bacheca WordPress</td><td class="no">—</td><td class="yes">solo le proprie schede</td><td class="yes">solo i propri eventi</td><td class="yes">completa</td></tr>
 							<tr><td>Mappa &amp; schede pubbliche</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
 							<tr><td>Area riservata / mappa QR</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
 							<tr><td>Statistiche (proprie schede)</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">tutte</td></tr>
@@ -603,9 +609,9 @@
 						</tbody>
 					</table>
 				</div>
-				<div class="warn">
-					<span class="callout-label">Stato attuale</span>
-					La <b>modifica autonoma dei contenuti dal front-end</b> (cliente che edita la propria scheda, organizzatore che crea il proprio evento) non è ancora attiva: oggi i contenuti si creano e gestiscono dalla bacheca, a cura dell'admin, che imposta l'Autore corretto. Vedi <a href="#stato">Stato attuale &amp; limiti</a>.
+				<div class="note">
+					<span class="callout-label">Self-service</span>
+					Cliente e organizzatore gestiscono i <b>propri</b> contenuti dalla bacheca: un cliente vede e modifica solo le proprie schede locale; un organizzatore crea e modifica solo i propri eventi (e li invia in revisione). L'admin mantiene l'accesso completo e approva gli eventi. Sono il <b>ruolo</b> e l'<b>Autore</b> del contenuto a determinare cosa ciascuno può gestire.
 				</div>
 			</section>
 
@@ -752,9 +758,8 @@
 				<div class="sec-head"><span class="sec-num">12</span><h2>Stato attuale &amp; limiti</h2></div>
 				<p class="lead">Cosa è pronto e cosa è ancora in lavorazione, per evitare fraintendimenti.</p>
 				<ul class="clean">
-					<li><b>Pronto:</b> mappa pubblica, schede locali con tutti i campi, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo, scadenze + email automatiche.</li>
-					<li><b>In lavorazione:</b> <b>editing self-service dal front-end</b> (oggi i contenuti si gestiscono dalla bacheca a cura dell'admin; i ruoli cliente/organizzatore hanno accesso in <i>lettura/consumo</i> alle pagine riservate). Coordinate per i Punti d'interesse. Pagina/scheda singola del locale (che registrerà le visite).</li>
-					<li><b>Non integrato:</b> pagamenti WooCommerce (abbonamenti/rinnovi) — richiede l'installazione di WooCommerce + Subscriptions.</li>
+					<li><b>Pronto:</b> mappa pubblica + ingresso guidato, schede locali complete (mini-mappa, indicazioni, recensioni), Punti d'interesse posizionabili, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo + locali evidenziati durante i grandi eventi, scadenze + email automatiche, <b>editing self-service</b> per clienti e organizzatori (bacheca scoped).</li>
+					<li><b>Condizionato:</b> recensioni Google (attive solo con chiave <code>ADVTR_GOOGLE_PLACES_KEY</code> in wp-config + tetto di spesa); pagamenti WooCommerce — il bridge di rinnovo validità è pronto ma richiede WooCommerce + Subscriptions installati.</li>
 					<li><b>In sospeso:</b> import automatico eventi da fonti esterne (turismofvg.it) — subordinato a permesso.</li>
 					<li><b>Da confermare:</b> visibilità della mappa QR (tutti i clienti vedono l'intera rete / solo i propri / solo admin).</li>
 				</ul>

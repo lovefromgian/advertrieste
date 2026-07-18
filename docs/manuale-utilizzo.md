@@ -41,6 +41,7 @@ Ogni funzionalità front-end si attiva inserendo uno **shortcode** nel contenuto
 | Shortcode | Cosa fa | Parametri | Chi lo usa |
 |---|---|---|---|
 | `[advtr_map]` | Mappa pubblica con marker, filtri categoria, ricerca | `lat`, `lng`, `zoom`, `height` | Pubblico |
+| `[advtr_onboarding]` | Ingresso guidato "Cosa stai cercando?" con schede d'intenzione | `map` (URL mappa), `titolo` | Pubblico |
 | `[advtr_area_riservata]` | Area clienti: login gate + mappa riservata dei punti QR | — | Cliente, Admin |
 | `[advtr_statistiche]` | Dashboard statistiche di una scheda (contatori + grafico) | `id` (opzionale) | Proprietario, Admin |
 | `[advtr_offerte]` | Elenco offerte attive con countdown e codice | `locale` (opzionale) | Pubblico |
@@ -91,7 +92,7 @@ I ruoli custom vengono creati automaticamente all'attivazione del plugin.
 | Come entra / cosa vede | Pubblico | Cliente | Organizz. | Admin |
 |---|:--:|:--:|:--:|:--:|
 | Accesso | senza login | wp-login | wp-login | wp-login |
-| Bacheca WordPress | — | limitata | limitata | completa |
+| Bacheca WordPress | — | solo le proprie schede | solo i propri eventi | completa |
 | Mappa & schede pubbliche | ✓ | ✓ | ✓ | ✓ |
 | Area riservata / mappa QR | — | ✓ | — | ✓ |
 | Statistiche (proprie schede) | — | ✓ | — | tutte |
@@ -99,7 +100,7 @@ I ruoli custom vengono creati automaticamente all'attivazione del plugin.
 | Inviare eventi in revisione | — | — | ✓ | ✓ |
 | Approvare / pubblicare eventi | — | — | — | ✓ |
 
-> **Stato attuale.** La modifica autonoma dei contenuti dal front-end (cliente che edita la propria scheda, organizzatore che crea il proprio evento) non è ancora attiva: oggi i contenuti si creano e gestiscono dalla bacheca, a cura dell'admin, che imposta l'Autore corretto. Vedi §12.
+> **Self-service.** Cliente e organizzatore gestiscono i **propri** contenuti direttamente dalla bacheca: un cliente vede e modifica solo le proprie schede locale; un organizzatore crea e modifica solo i propri eventi (e li invia in revisione). L'admin mantiene l'accesso completo e approva gli eventi. È il ruolo (impostato in Utenti) + l'Autore del contenuto a determinare cosa ciascuno può gestire.
 
 ---
 
@@ -209,9 +210,8 @@ Due job giornalieri (WP-Cron) girano da soli.
 
 ## 12. Stato attuale & limiti
 
-- **Pronto:** mappa pubblica, schede locali complete, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo, scadenze + email automatiche.
-- **In lavorazione:** editing self-service dal front-end (oggi i contenuti si gestiscono dalla bacheca a cura dell'admin; i ruoli cliente/organizzatore hanno accesso in lettura/consumo alle pagine riservate). Coordinate per i Punti d'interesse. Pagina/scheda singola del locale (che registrerà le visite).
-- **Non integrato:** pagamenti WooCommerce (abbonamenti/rinnovi) — richiede l'installazione di WooCommerce + Subscriptions.
+- **Pronto:** mappa pubblica + ingresso guidato, schede locali complete (con mini-mappa, indicazioni, recensioni), Punti d'interesse posizionabili, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo + evidenziazione locali durante i grandi eventi, scadenze + email automatiche, **editing self-service** per clienti e organizzatori (bacheca scoped).
+- **Condizionato:** recensioni Google (§1.5) attive solo con chiave `ADVTR_GOOGLE_PLACES_KEY` in `wp-config.php` (+ tetto di spesa lato Google). Pagamenti WooCommerce (§2.6): il bridge di rinnovo validità è pronto ma richiede WooCommerce + Subscriptions installati per funzionare.
 - **In sospeso:** import automatico eventi da fonti esterne (turismofvg.it) — subordinato a permesso.
 - **Da confermare:** visibilità della mappa QR (tutti i clienti / solo i propri / solo admin).
 
