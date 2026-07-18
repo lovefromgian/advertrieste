@@ -1,0 +1,70 @@
+/**
+ * Stili di offerte e validazione coupon.
+ *
+ * @package AdverTrieste
+ */
+
+.advtr-offerte {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 16px;
+	margin: 1em 0;
+}
+
+.advtr-offerta-card {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 14px 16px;
+	background: #fff;
+}
+
+.advtr-offerta-titolo {
+	margin: 0 0 4px;
+}
+
+.advtr-offerta-locale {
+	font-size: 13px;
+	color: #50575e;
+	margin-bottom: 8px;
+}
+
+.advtr-offerta-desc {
+	font-size: 14px;
+	margin-bottom: 8px;
+}
+
+.advtr-offerta-codice code {
+	background: #f0f0f1;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+}
+
+.advtr-offerta-countdown {
+	margin-top: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #b32d2e;
+}
+
+.advtr-valida {
+	max-width: 420px;
+	margin: 1em 0;
+}
+
+.advtr-valida select,
+.advtr-valida input[type="text"] {
+	width: 100%;
+}
+
+.advtr-valida-esito {
+	font-weight: 600;
+}
+
+.advtr-valida-esito.advtr-ok {
+	color: #2a7d2e;
+}
+
+.advtr-valida-esito.advtr-ko {
+	color: #b32d2e;
+}

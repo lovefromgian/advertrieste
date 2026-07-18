@@ -15,6 +15,8 @@ namespace AdverTrieste;
 use AdverTrieste\Cpt\Categoria;
 use AdverTrieste\Access\Roles;
 use AdverTrieste\Stats\Stats;
+use AdverTrieste\Coupon\Coupon;
+use AdverTrieste\Cron\Cron;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,8 +44,12 @@ class Activator {
 		// Ruoli e capability dell'area riservata.
 		Roles::install();
 
-		// Tabella delle statistiche.
+		// Tabelle custom.
 		Stats::install_table();
+		Coupon::install_table();
+
+		// Job pianificati.
+		Cron::schedule();
 
 		flush_rewrite_rules();
 	}
@@ -54,6 +60,7 @@ class Activator {
 	 * @return void
 	 */
 	public static function deactivate() {
+		Cron::unschedule();
 		flush_rewrite_rules();
 	}
 }

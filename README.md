@@ -28,7 +28,12 @@ advertrieste/
 │   │   ├── class-poi.php        # punto d'interesse (pubblico)
 │   │   ├── class-evento.php     # evento (pubblico se pubblicato)
 │   │   ├── class-puntoqr.php    # espositore/QR — RISERVATO, non pubblico
+│   │   ├── class-offerta.php    # offerta/promozione a tempo (pubblico)
 │   │   └── class-categoria.php  # tassonomia `categoria` (locale+poi) + seeding
+│   ├── coupon/               # coupon/riscatti
+│   │   └── class-coupon.php     # tabella advtr_coupon, riscatti, scadenza offerte
+│   ├── cron/                 # job pianificati (WP-Cron)
+│   │   └── class-cron.php       # advtr_expire_coupons (giornaliero)
 │   ├── access/               # ruoli, capability e controlli di accesso
 │   │   ├── class-roles.php      # ruoli cliente_locale/organizzatore_evento + capability
 │   │   └── class-access.php     # helper: can_view_qr_map(), is_cliente()
@@ -41,11 +46,13 @@ advertrieste/
 │   │   ├── class-markers.php    # GET /map/markers (bbox+zoom+categoria, mai punto_qr)
 │   │   ├── class-qrmap.php      # GET /qr-map — RISERVATO (auth + advtr_view_qr_map)
 │   │   ├── class-track.php      # POST /locale/{id}/track (nonce + rate-limit)
-│   │   └── class-stats.php      # GET /stats/{id} — owner/admin
+│   │   ├── class-stats.php      # GET /stats/{id} — owner/admin
+│   │   └── class-offerte.php    # GET /offerte + POST /offerta/{id}/redeem
 │   └── frontend/             # front-end pubblico e riservato
 │       ├── class-map.php            # shortcode [advtr_map] + enqueue Leaflet
 │       ├── class-reservedarea.php   # shortcode [advtr_area_riservata] + mappa QR
-│       └── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
+│       ├── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
+│       └── class-offerte.php        # shortcode [advtr_offerte] + [advtr_valida_coupon]
 ├── assets/
 │   ├── src/admin/locale-meta.js  # media picker (logo + galleria) del meta box
 │   ├── src/map/map.js            # mappa Leaflet: fetch marker + filtri + popup + track
@@ -90,6 +97,14 @@ Tabella `{prefix}advtr_stats` (creata all'attivazione) con eventi `view`, `map_c
 - **Lettura**: `GET advertrieste/v1/stats/{id}` — solo proprietario della scheda o admin.
 - **Dashboard**: shortcode `[advtr_statistiche]` (nell'area riservata o in una pagina) — stat tiles + grafico a barre (SVG, senza librerie). Attributo `id` opzionale.
 - **Soglia "Novità" (§1.6)**: sotto `Stats::SOGLIA_VISITE` (20) la scheda è "Novità" (badge sulla mappa) e non mostra il conteggio reale.
+
+## Offerte & coupon
+
+CPT `offerta` (collegato a un `locale` via `advtr_locale_id`) con finestra temporale, tipo coupon (codice/QR) e codice. Tabella `{prefix}advtr_coupon` per i riscatti.
+
+- **Pubblico**: `GET advertrieste/v1/offerte[?locale={id}]` — solo offerte attive (finestra date + stato). Shortcode `[advtr_offerte]` con **countdown** live.
+- **Esercente**: `POST advertrieste/v1/offerta/{id}/redeem` — solo proprietario del locale collegato o admin (nonce + auth). Valida il codice, registra il riscatto e traccia l'evento `coupon` nelle statistiche. Shortcode `[advtr_valida_coupon]` (area riservata).
+- **Cron**: `advtr_expire_coupons` (giornaliero) marca scadute le offerte oltre la data di scadenza.
 
 ## Convenzioni
 

@@ -16,15 +16,20 @@ use AdverTrieste\Cpt\Poi;
 use AdverTrieste\Cpt\Evento;
 use AdverTrieste\Cpt\PuntoQr;
 use AdverTrieste\Cpt\Categoria;
+use AdverTrieste\Cpt\Offerta;
 use AdverTrieste\Meta\LocaleMeta;
 use AdverTrieste\Meta\PuntoQrMeta;
+use AdverTrieste\Meta\OffertaMeta;
 use AdverTrieste\Rest\Markers;
 use AdverTrieste\Rest\QrMap;
 use AdverTrieste\Rest\Track;
 use AdverTrieste\Rest\Stats as StatsEndpoint;
+use AdverTrieste\Rest\Offerte as OfferteEndpoint;
 use AdverTrieste\Frontend\Map;
 use AdverTrieste\Frontend\ReservedArea;
 use AdverTrieste\Frontend\StatsDashboard;
+use AdverTrieste\Frontend\Offerte as OfferteView;
+use AdverTrieste\Cron\Cron;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -53,6 +58,7 @@ final class Plugin {
 		Poi::class,
 		Evento::class,
 		PuntoQr::class,
+		Offerta::class,
 	);
 
 	/**
@@ -92,13 +98,17 @@ final class Plugin {
 
 		LocaleMeta::init();
 		PuntoQrMeta::init();
+		OffertaMeta::init();
 		Markers::init();
 		QrMap::init();
 		Track::init();
 		StatsEndpoint::init();
+		OfferteEndpoint::init();
 		Map::init();
 		ReservedArea::init();
 		StatsDashboard::init();
+		OfferteView::init();
+		Cron::init();
 	}
 
 	/**
