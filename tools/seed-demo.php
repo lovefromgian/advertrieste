@@ -36,10 +36,20 @@ const ADVTR_DEMO_META = '_advtr_demo_key';
 /** Opzione con il backup dell'impostazione di pagina iniziale. */
 const ADVTR_DEMO_BACKUP = 'advtr_demo_front_backup';
 
-/** Login dell'utente cliente dimostrativo. */
-const ADVTR_DEMO_USER = 'demo_cliente';
+/**
+ * Clienti dimostrativi: login => nome visualizzato.
+ *
+ * Più di uno di proposito: con un solo cliente proprietario di tutte le schede
+ * l'isolamento fra clienti non è osservabile (ognuno vedrebbe comunque tutto,
+ * perché tutto è suo).
+ */
+const ADVTR_DEMO_USERS = array(
+	'demo_cliente'  => 'Caffè Demo (cliente 1)',
+	'demo_cliente2' => 'Ristorazione Demo (cliente 2)',
+	'demo_cliente3' => 'Negozi Demo (cliente 3)',
+);
 
-/** Password dell'utente dimostrativo (solo ambienti locali). */
+/** Password degli utenti dimostrativi (solo ambienti locali). */
 const ADVTR_DEMO_PASS = 'demo1234';
 
 /**
@@ -134,12 +144,16 @@ if ( 'pulisci' === $modo ) {
 	}
 	printf( "  %d contenuti eliminati\n", count( $ids ) );
 
-	$user = get_user_by( 'login', ADVTR_DEMO_USER );
-	if ( $user ) {
-		require_once ABSPATH . 'wp-admin/includes/user.php';
-		wp_delete_user( $user->ID );
-		echo "  utente demo eliminato\n";
+	require_once ABSPATH . 'wp-admin/includes/user.php';
+	$rimossi = 0;
+	foreach ( array_keys( ADVTR_DEMO_USERS ) as $login ) {
+		$utente = get_user_by( 'login', $login );
+		if ( $utente ) {
+			wp_delete_user( $utente->ID );
+			++$rimossi;
+		}
 	}
+	printf( "  %d utenti demo eliminati\n", $rimossi );
 
 	delete_transient( EventiRest::CACHE_LOCALI_IN_EVENTO );
 	flush_rewrite_rules();
@@ -158,25 +172,43 @@ Categoria::seed_terms();
 
 /* -- Utente cliente dimostrativo ------------------------------------- */
 
-$user = get_user_by( 'login', ADVTR_DEMO_USER );
-if ( $user ) {
-	$demo_user = $user->ID;
-} else {
-	$demo_user = wp_insert_user(
+$clienti = array();
+foreach ( ADVTR_DEMO_USERS as $login => $nome ) {
+	$esistente = get_user_by( 'login', $login );
+	if ( $esistente ) {
+		$clienti[ $login ] = $esistente->ID;
+		continue;
+	}
+	$nuovo_uid = wp_insert_user(
 		array(
-			'user_login'   => ADVTR_DEMO_USER,
+			'user_login'   => $login,
 			'user_pass'    => ADVTR_DEMO_PASS,
-			'user_email'   => 'demo_cliente@advertrieste.local',
-			'display_name' => 'Cliente Demo',
+			'user_email'   => $login . '@advertrieste.local',
+			'display_name' => $nome,
 			'role'         => Roles::CLIENTE,
 		)
 	);
-	if ( is_wp_error( $demo_user ) ) {
-		echo "  ! utente demo non creato: " . $demo_user->get_error_message() . "\n";
-		$demo_user = 0;
+	if ( is_wp_error( $nuovo_uid ) ) {
+		echo '  ! utente ' . $login . ' non creato: ' . $nuovo_uid->get_error_message() . "\n";
+		continue;
 	}
+	$clienti[ $login ] = $nuovo_uid;
 }
-printf( "  utente cliente: %s / %s\n", ADVTR_DEMO_USER, ADVTR_DEMO_PASS );
+printf( "  %d clienti demo (password: %s)\n", count( $clienti ), ADVTR_DEMO_PASS );
+
+/**
+ * ID del cliente proprietario, con ripiego sull'utente corrente.
+ *
+ * @param array<string,int> $clienti Mappa login => ID.
+ * @param string            $login   Login del proprietario.
+ * @return int
+ */
+function advtr_demo_owner( $clienti, $login ) {
+	if ( ! empty( $clienti[ $login ] ) ) {
+		return (int) $clienti[ $login ];
+	}
+	return get_current_user_id() ? get_current_user_id() : 1;
+}
 
 $oggi    = current_time( 'Y-m-d' );
 $fra_uno = wp_date( 'Y-m-d', time() + YEAR_IN_SECONDS );
@@ -403,6 +435,21 @@ $locali = array(
 	),
 );
 
+// Proprietario di ciascuna scheda: distribuite fra i clienti demo così che
+// l'isolamento fra account sia visibile entrando in bacheca.
+$proprietari = array(
+	'loc-san-marco'       => 'demo_cliente',
+	'loc-eppinger'        => 'demo_cliente',
+	'loc-tommaseo'        => 'demo_cliente',
+	'loc-da-pepi'         => 'demo_cliente2',
+	'loc-bomboniera'      => 'demo_cliente2',
+	'loc-osteria-marino'  => 'demo_cliente2',
+	'loc-bottega-pane'    => 'demo_cliente2',
+	'loc-minerva'         => 'demo_cliente3',
+	'loc-farmacia'        => 'demo_cliente3',
+	'loc-barcolana-sport' => 'demo_cliente3',
+);
+
 $locale_ids = array();
 foreach ( $locali as $l ) {
 	$meta = array(
@@ -436,7 +483,7 @@ foreach ( $locali as $l ) {
 			'post_status'  => 'publish',
 			'post_title'   => $l['title'],
 			'post_content' => $l['desc'],
-			'post_author'  => $demo_user ? $demo_user : 1,
+			'post_author'  => advtr_demo_owner( $clienti, $proprietari[ $l['key'] ] ?? '' ),
 		),
 		$meta,
 		$l['cat']
@@ -467,7 +514,7 @@ if ( ! empty( $locale_ids['loc-san-marco'] ) ) {
 			'post_status'  => 'publish',
 			'post_title'   => 'Caffè + putizza a 5 €',
 			'post_content' => 'Presenta il codice al banco: un caffè e una fetta di putizza a cinque euro, tutti i giorni fino alle 11.',
-			'post_author'  => $demo_user ? $demo_user : 1,
+			'post_author'  => advtr_demo_owner( $clienti, 'demo_cliente' ),
 		),
 		array(
 			'advtr_locale_id'      => $locale_ids['loc-san-marco'],
@@ -616,5 +663,19 @@ printf( "  Area clienti           %s\n", get_permalink( $page_ids['page-area'] )
 printf( "  Statistiche            %s\n", get_permalink( $page_ids['page-stats'] ) );
 printf( "  Valida coupon          %s\n", get_permalink( $page_ids['page-valida'] ) );
 printf( "  Eventi                 %s\n", get_permalink( $page_ids['page-eventi'] ) );
-printf( "\n  Login cliente: %s / %s  (%s)\n", ADVTR_DEMO_USER, ADVTR_DEMO_PASS, wp_login_url() );
+printf( "\n  Login clienti (%s), da %s:\n", ADVTR_DEMO_PASS, wp_login_url() );
+foreach ( ADVTR_DEMO_USERS as $login => $nome ) {
+	$quante = count(
+		get_posts(
+			array(
+				'post_type'      => 'locale',
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'author'         => advtr_demo_owner( $clienti, $login ),
+			)
+		)
+	);
+	printf( "    %-14s %d schede — %s\n", $login, $quante, $nome );
+}
 echo "\nPer rimuovere tutto:\n  wp eval-file wp-content/plugins/advertrieste/tools/seed-demo.php pulisci\n";
