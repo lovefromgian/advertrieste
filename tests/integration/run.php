@@ -19,6 +19,7 @@ use AdverTrieste\Evento\Workflow;
 use AdverTrieste\Stats\Stats;
 use AdverTrieste\Coupon\Coupon;
 use AdverTrieste\Scadenze\Scadenze;
+use AdverTrieste\Rest\Eventi as EventiRest;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	fwrite( STDERR, "Eseguire con WP-CLI (wp eval-file).\n" );
@@ -188,10 +189,53 @@ wp_set_current_user( $admin );
 advtr_ok( current_user_can( 'edit_post', $loc_altrui ), 'admin edita qualsiasi locale' );
 
 /* ------------------------------------------------------------------ */
+echo "\n# 6. Tipi tracciabili pubblicamente\n";
+// `coupon` è la metrica di ritorno commerciale mostrata al cliente: può nascere
+// solo dalla validazione autenticata dell'esercente, mai da /track pubblico.
+wp_set_current_user( 0 );
+$nonce         = wp_create_nonce( 'wp_rest' );
+$coupon_prima  = Stats::totals_by_type( $loc )['coupon'];
+list( $s )     = advtr_req( 'POST', "/advertrieste/v1/locale/{$loc}/track", array( 'tipo' => 'coupon' ), $nonce );
+advtr_eq( 400, $s, '/track con tipo coupon → 400 (non tracciabile pubblicamente)' );
+advtr_eq( $coupon_prima, Stats::totals_by_type( $loc )['coupon'], 'nessun coupon registrato dall\'endpoint pubblico' );
+list( $s ) = advtr_req( 'POST', "/advertrieste/v1/locale/{$loc}/track", array( 'tipo' => 'contact' ), $nonce );
+advtr_eq( 200, $s, '/track con tipo contact → 200 (tipo pubblico ammesso)' );
+
+/* ------------------------------------------------------------------ */
+echo "\n# 7. Fuso orario della serie statistica\n";
+// Le righe sono scritte con current_time() (fuso del sito): la finestra della
+// serie deve usare lo stesso fuso. Guardia di regressione sul confine di
+// mezzanotte — con una finestra calcolata in UTC l'ultimo giorno slitta.
+$oggi  = wp_date( 'Y-m-d' );
+$serie = Stats::daily_series( $loc, 'view', 7 );
+advtr_eq( 7, count( $serie ), 'serie giornaliera: 7 giorni richiesti, 7 restituiti' );
+advtr_eq( $oggi, (string) array_key_last( $serie ), 'ultimo giorno della serie = oggi nel fuso del sito' );
+advtr_ok( isset( $serie[ $oggi ] ) && $serie[ $oggi ] >= 1, 'le visite di oggi cadono nel giorno corrente' );
+
+/* ------------------------------------------------------------------ */
+echo "\n# 8. Cache dei locali in evento\n";
+$grande = wp_insert_post( array( 'post_type' => 'evento', 'post_status' => 'publish', 'post_title' => 'Barcolana', 'post_author' => $admin ) );
+update_post_meta( $grande, 'advtr_tipo_evento', 'grande' );
+update_post_meta( $grande, 'advtr_locali_collegati', array( $loc ) );
+update_post_meta( $grande, 'advtr_data_inizio', wp_date( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) );
+update_post_meta( $grande, 'advtr_data_fine', wp_date( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS ) );
+
+Workflow::approve( $grande );
+advtr_ok( false === get_transient( EventiRest::CACHE_LOCALI_IN_EVENTO ), 'approvazione evento → cache invalidata' );
+
+$in_evento = EventiRest::locali_in_evento();
+advtr_ok( isset( $in_evento[ $loc ] ), 'locale collegato a un grande evento in corso risulta evidenziato' );
+advtr_ok( is_array( get_transient( EventiRest::CACHE_LOCALI_IN_EVENTO ) ), 'risultato memorizzato in cache' );
+
+wp_update_post( array( 'ID' => $grande, 'post_title' => 'Barcolana 2' ) );
+advtr_ok( false === get_transient( EventiRest::CACHE_LOCALI_IN_EVENTO ), 'modifica evento → cache invalidata' );
+
+/* ------------------------------------------------------------------ */
 // Pulizia.
-foreach ( array( $qr, $ev, $loc, $off, $scaduto, $loc_altrui ) as $pid ) {
+foreach ( array( $qr, $ev, $loc, $off, $scaduto, $loc_altrui, $grande ) as $pid ) {
 	wp_delete_post( $pid, true );
 }
+delete_transient( EventiRest::CACHE_LOCALI_IN_EVENTO );
 foreach ( array( $cli, $sub, $org ) as $uid ) {
 	wp_delete_user( $uid );
 }

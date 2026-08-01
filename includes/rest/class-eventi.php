@@ -34,12 +34,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Eventi {
 
 	/**
-	 * Aggancia la registrazione delle route.
+	 * Transient con la mappa dei locali coinvolti in un grande evento in corso.
+	 *
+	 * @var string
+	 */
+	const CACHE_LOCALI_IN_EVENTO = 'advtr_locali_in_evento';
+
+	/**
+	 * Durata della cache dei locali in evento.
+	 *
+	 * Breve di proposito: il risultato dipende dall'ora corrente (finestra
+	 * inizio–fine dell'evento), quindi la scadenza limita il ritardo con cui un
+	 * evento entra o esce dalla finestra. Le modifiche ai contenuti invalidano
+	 * comunque la cache subito (vedi `flush_locali_in_evento`).
+	 *
+	 * @var int
+	 */
+	const CACHE_TTL = 10 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Aggancia la registrazione delle route e l'invalidazione della cache.
 	 *
 	 * @return void
 	 */
 	public static function init() {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+
+		// Invalidazione della cache dei locali in evento: cambio di contenuto,
+		// cancellazione o transizione di workflow.
+		add_action( 'save_post_' . Evento::POST_TYPE, array( __CLASS__, 'flush_locali_in_evento' ) );
+		add_action( 'deleted_post', array( __CLASS__, 'flush_locali_in_evento_se_evento' ), 10, 2 );
+		add_action( 'advtr_evento_workflow_cambiato', array( __CLASS__, 'flush_locali_in_evento' ) );
+	}
+
+	/**
+	 * Svuota la cache dei locali in evento.
+	 *
+	 * @return void
+	 */
+	public static function flush_locali_in_evento() {
+		delete_transient( self::CACHE_LOCALI_IN_EVENTO );
+	}
+
+	/**
+	 * Svuota la cache solo se il post eliminato era un evento.
+	 *
+	 * @param int           $post_id ID del post eliminato.
+	 * @param \WP_Post|null $post    Post eliminato, se passato dall'hook.
+	 * @return void
+	 */
+	public static function flush_locali_in_evento_se_evento( $post_id, $post = null ) {
+		$type = ( $post instanceof \WP_Post ) ? $post->post_type : get_post_type( $post_id );
+		if ( Evento::POST_TYPE === $type ) {
+			self::flush_locali_in_evento();
+		}
 	}
 
 	/**
@@ -118,9 +166,18 @@ class Eventi {
 	 * Un grande evento è "in corso" se approvato e la data corrente è nella
 	 * finestra inizio–fine della versione pubblica.
 	 *
+	 * Cachata: viene interrogata a ogni richiesta di `/map/markers`, cioè a ogni
+	 * pan/zoom della mappa pubblica, e sotto scorre una query su tutti gli eventi
+	 * approvati più una lettura meta per ciascuno.
+	 *
 	 * @return array<int,bool> Mappa locale_id => true.
 	 */
 	public static function locali_in_evento() {
+		$cached = get_transient( self::CACHE_LOCALI_IN_EVENTO );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		$now = current_time( 'mysql' );
 		$out = array();
 		foreach ( self::approved_ids() as $id ) {
@@ -140,6 +197,8 @@ class Eventi {
 				$out[ (int) $lid ] = true;
 			}
 		}
+
+		set_transient( self::CACHE_LOCALI_IN_EVENTO, $out, self::CACHE_TTL );
 		return $out;
 	}
 

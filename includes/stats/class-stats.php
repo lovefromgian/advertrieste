@@ -43,6 +43,18 @@ class Stats {
 	const TIPI = array( 'view', 'map_click', 'coupon', 'contact' );
 
 	/**
+	 * Tipi registrabili dall'endpoint pubblico `/locale/{id}/track`.
+	 *
+	 * !!! SICUREZZA: `coupon` è ESCLUSO di proposito. È la metrica mostrata al
+	 * cliente come prova di ritorno commerciale e deve poter nascere solo da una
+	 * validazione autenticata (`POST /offerta/{id}/redeem`), mai da una chiamata
+	 * pubblica che chiunque può replicare.
+	 *
+	 * @var string[]
+	 */
+	const TIPI_PUBBLICI = array( 'view', 'map_click', 'contact' );
+
+	/**
 	 * Soglia di visite oltre la quale si mostra il conteggio reale (§1.6).
 	 *
 	 * @var int
@@ -173,8 +185,12 @@ class Stats {
 			return array();
 		}
 
-		$days  = max( 1, min( 365, (int) $days ) );
-		$from  = gmdate( 'Y-m-d', time() - ( $days - 1 ) * DAY_IN_SECONDS );
+		$days = max( 1, min( 365, (int) $days ) );
+
+		// Le righe sono scritte con current_time('mysql'), cioè nel fuso del sito:
+		// la finestra va calcolata nello stesso fuso (wp_date), non in UTC, altrimenti
+		// gli eventi a cavallo di mezzanotte finiscono nel giorno sbagliato.
+		$from  = wp_date( 'Y-m-d', time() - ( $days - 1 ) * DAY_IN_SECONDS );
 		$table = self::table();
 
 		global $wpdb;
@@ -188,10 +204,11 @@ class Stats {
 			OBJECT_K
 		);
 
-		// Riempie tutti i giorni della finestra, anche quelli a zero.
+		// Riempie tutti i giorni della finestra, anche quelli a zero (fuso del sito,
+		// coerente con le date restituite da DATE(created_at)).
 		$series = array();
 		for ( $i = 0; $i < $days; $i++ ) {
-			$day            = gmdate( 'Y-m-d', time() - ( $days - 1 - $i ) * DAY_IN_SECONDS );
+			$day            = wp_date( 'Y-m-d', time() - ( $days - 1 - $i ) * DAY_IN_SECONDS );
 			$series[ $day ] = isset( $rows[ $day ] ) ? (int) $rows[ $day ]->n : 0;
 		}
 		return $series;

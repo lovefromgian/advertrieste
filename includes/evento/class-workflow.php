@@ -54,6 +54,17 @@ class Workflow {
 	 */
 	public static function set_stato( $post_id, $stato ) {
 		update_post_meta( $post_id, self::META_STATO, $stato );
+
+		/**
+		 * Segnala una transizione di workflow su un evento.
+		 *
+		 * Usata per invalidare le cache che dipendono dagli eventi approvati
+		 * (es. i locali evidenziati sulla mappa durante i grandi eventi).
+		 *
+		 * @param int    $post_id ID dell'evento.
+		 * @param string $stato   Nuovo stato del workflow.
+		 */
+		do_action( 'advtr_evento_workflow_cambiato', $post_id, $stato );
 	}
 
 	/**

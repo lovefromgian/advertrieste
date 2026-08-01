@@ -2,10 +2,15 @@
 /**
  * Endpoint REST `POST advertrieste/v1/locale/{id}/track`.
  *
- * Registra un evento statistico pubblico (view/map_click/coupon/contact) per una
- * scheda `locale`. Protezioni: nonce REST + rate-limit per IP/scheda/tipo, così
- * da evitare conteggi gonfiati (specifiche §1.6). Valida che la scheda esista,
- * sia un `locale` pubblicato e che il tipo sia ammesso.
+ * Registra un evento statistico pubblico (view/map_click/contact) per una scheda
+ * `locale`. Protezioni: nonce REST + rate-limit per IP/scheda/tipo, così da
+ * evitare conteggi gonfiati (specifiche §1.6). Valida che la scheda esista, sia
+ * un `locale` pubblicato e che il tipo sia fra quelli pubblici.
+ *
+ * !!! SICUREZZA: il tipo `coupon` NON è accettabile da qui (vedi
+ * `Stats::TIPI_PUBBLICI`): è la metrica di ritorno commerciale mostrata al
+ * cliente e può nascere solo dalla validazione autenticata dell'esercente
+ * (`POST /offerta/{id}/redeem`).
  *
  * @package AdverTrieste
  */
@@ -65,7 +70,9 @@ class Track {
 					'tipo' => array(
 						'required'          => true,
 						'type'              => 'string',
-						'enum'              => Stats::TIPI,
+						// Solo i tipi pubblici: `coupon` nasce dalla validazione
+						// autenticata dell'esercente, non da qui.
+						'enum'              => Stats::TIPI_PUBBLICI,
 						'sanitize_callback' => 'sanitize_key',
 					),
 					'meta' => array(
@@ -109,6 +116,16 @@ class Track {
 		$post_id = absint( $request->get_param( 'id' ) );
 		$tipo    = $request->get_param( 'tipo' );
 		$meta    = (string) $request->get_param( 'meta' );
+
+		// Difesa in profondità: il tipo è già vincolato dallo schema (enum), ma lo
+		// ricontrolliamo qui perché `coupon` non deve mai entrare da questa via.
+		if ( ! in_array( $tipo, Stats::TIPI_PUBBLICI, true ) ) {
+			return new WP_Error(
+				'advtr_track_tipo_non_ammesso',
+				__( 'Tipo di evento non tracciabile pubblicamente.', 'advertrieste' ),
+				array( 'status' => 400 )
+			);
+		}
 
 		$post = get_post( $post_id );
 		if ( ! $post || Locale::POST_TYPE !== $post->post_type || 'publish' !== $post->post_status ) {
