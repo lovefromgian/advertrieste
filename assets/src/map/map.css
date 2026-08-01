@@ -26,6 +26,9 @@
 	cursor: pointer;
 	border: 1px solid #c3c4c7;
 	background: #fff;
+	/* Esplicito: senza, su un tema con testo chiaro l'etichetta sparisce
+	   (bianco su bianco) perché il colore viene ereditato dal tema. */
+	color: #1d2327;
 	border-radius: 999px;
 	padding: 4px 12px;
 	font-size: 14px;
