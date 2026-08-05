@@ -89,6 +89,10 @@ class Pubblico {
 		if ( is_admin() ) {
 			return false;
 		}
+		// La console amministratore ha un guscio proprio.
+		if ( Pagina::pagina_con_shortcode( array( 'advtr_console_admin' ) ) ) {
+			return false;
+		}
 		// Scheda attività e punto d'interesse sono CPT, non pagine con shortcode.
 		if ( is_singular( array( Locale::POST_TYPE, Poi::POST_TYPE ) ) ) {
 			return true;

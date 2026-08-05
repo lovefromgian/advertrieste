@@ -586,6 +586,12 @@ $pagine = array(
 		'content' => '[advtr_statistiche]',
 	),
 	array(
+		'key'     => 'page-console',
+		'title'   => 'Console',
+		'slug'    => 'console',
+		'content' => '[advtr_console_admin]',
+	),
+	array(
 		'key'     => 'page-valida',
 		'title'   => 'Valida coupon',
 		'slug'    => 'valida-coupon',

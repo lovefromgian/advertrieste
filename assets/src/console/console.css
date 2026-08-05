@@ -840,3 +840,119 @@ body.advtr-console-pagina {
 		padding: 24px 20px;
 	}
 }
+
+/* ── Elenchi tabellari ───────────────────────────────────────────── */
+
+.ac-cerca {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+
+.ac-cerca input[type="search"] {
+	flex: 1 1 220px;
+	min-width: 0;
+	padding: 9px 14px;
+	border: 1px solid var(--ac-bordo);
+	border-radius: 999px;
+	background: var(--ac-carta);
+	color: var(--ac-testo);
+	font: inherit;
+	font-size: 14px;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.ac-cerca-azzera {
+	font-size: 13px;
+	color: var(--ac-tenue);
+	text-decoration: none;
+}
+
+.ac-tabella-scorri {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	background: var(--ac-carta);
+	border: 1px solid var(--ac-bordo);
+	border-radius: var(--ac-raggio);
+}
+
+.ac-tabella {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+}
+
+.ac-tabella th,
+.ac-tabella td {
+	padding: 12px 14px;
+	text-align: left;
+	vertical-align: middle;
+	border-bottom: 1px solid var(--ac-bordo);
+}
+
+.ac-tabella tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.ac-tabella tbody tr:hover {
+	background: var(--ac-carta-tenue);
+}
+
+.ac-tabella th {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--ac-tenue);
+	background: var(--ac-carta-tenue);
+	white-space: nowrap;
+}
+
+.ac-tabella code {
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: var(--ac-fondo);
+	font-size: 12px;
+}
+
+.ac-cella-tenue {
+	color: var(--ac-tenue);
+	font-size: 12px;
+}
+
+/* Le azioni stanno su una riga sola: a capo diventano una colonna
+   disordinata di bottoni di larghezze diverse. */
+
+.ac-azioni-cella {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	white-space: nowrap;
+}
+
+.ac-azione-form {
+	margin: 0;
+	display: inline;
+}
+
+.ac-azioni-cella .ac-btn {
+	padding: 6px 12px;
+	font-size: 12px;
+}
+
+@media (max-width: 700px) {
+
+	.ac-tabella {
+		min-width: 720px;
+	}
+
+	.ac-tabella-scorri {
+		margin: 0 -16px;
+		border-radius: 0;
+		border-left: 0;
+		border-right: 0;
+	}
+}

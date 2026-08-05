@@ -37,6 +37,7 @@ use AdverTrieste\Frontend\ReservedArea;
 use AdverTrieste\Frontend\ClientArea;
 use AdverTrieste\Frontend\Home;
 use AdverTrieste\Frontend\Pubblico;
+use AdverTrieste\Admin\AdminConsole;
 use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
 use AdverTrieste\Frontend\Eventi as EventiView;
@@ -131,6 +132,7 @@ final class Plugin {
 		ClientArea::init();
 		Home::init();
 		Pubblico::init();
+		AdminConsole::init();
 		AdminLock::init();
 		StatsDashboard::init();
 		OfferteView::init();
