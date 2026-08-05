@@ -43,6 +43,38 @@ class Console {
 	}
 
 	/**
+	 * Registra in anticipo tutti gli asset del plugin usati dalla console.
+	 *
+	 * Serve perché la console compone il proprio contenuto PRIMA di `wp_head()`,
+	 * mentre le registrazioni sono agganciate a `wp_enqueue_scripts`, che scatta
+	 * DENTRO `wp_head()`. `wp_enqueue_*` sopporta l'inversione (la coda si
+	 * risolve alla stampa), ma `wp_localize_script()` no: su un handle non ancora
+	 * registrato scarta i dati **senza segnalare nulla**, e lo script si ritrova
+	 * senza configurazione — è così che la mappa dei punti QR restava vuota.
+	 *
+	 * Le funzioni di registrazione sono idempotenti: richiamarle qui non crea
+	 * doppioni quando `wp_enqueue_scripts` scatterà davvero.
+	 *
+	 * @return void
+	 */
+	public static function registra_asset_plugin() {
+		$registrar = array(
+			array( __CLASS__, 'registra_asset' ),
+			array( '\AdverTrieste\Frontend\Map', 'register_assets' ),
+			array( '\AdverTrieste\Frontend\ReservedArea', 'register_assets' ),
+			array( '\AdverTrieste\Frontend\StatsDashboard', 'register_assets' ),
+			array( '\AdverTrieste\Frontend\Offerte', 'register_assets' ),
+			array( '\AdverTrieste\Frontend\ClientArea', 'registra_asset' ),
+		);
+
+		foreach ( $registrar as $callback ) {
+			if ( is_callable( $callback ) ) {
+				call_user_func( $callback );
+			}
+		}
+	}
+
+	/**
 	 * Compone il guscio completo della console.
 	 *
 	 * @param array<string,mixed> $conf {

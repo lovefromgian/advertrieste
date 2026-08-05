@@ -19,6 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Le registrazioni vanno fatte prima di comporre: `wp_localize_script()` su un
+// handle non ancora registrato scarta i dati senza dire nulla, e lo script si
+// ritrova senza configurazione.
+\AdverTrieste\Console\Console::registra_asset_plugin();
+
 // Il contenuto si compone PRIMA di wp_head(): è lì che la console accoda i
 // propri asset, e wp_head deve trovarli già in coda per stamparli nell'head.
 // Rimandandolo dopo, CSS e JS finirebbero nel piè di pagina e la console
