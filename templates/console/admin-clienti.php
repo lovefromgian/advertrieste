@@ -84,7 +84,7 @@ foreach ( get_users( $advtr_args ) as $advtr_u ) {
 			: '<span class="ac-cella-tenue">' . esc_html__( 'nessuna scheda collegata', 'advertrieste' ) . '</span>',
 		esc_html( number_format_i18n( $advtr_offerte ) ),
 		$advtr_scad,
-		'<a class="ac-btn ac-btn-neutro" href="' . esc_url( get_edit_user_link( $advtr_u->ID ) ) . '">' .
+		'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'clienti', array( 'id' => $advtr_u->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>',
 	);
 }

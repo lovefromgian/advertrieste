@@ -119,7 +119,7 @@ foreach ( get_posts(
 					),
 				)
 			) .
-			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( get_edit_post_link( $advtr_ev->ID ) ) . '">' .
+			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'eventi', array( 'id' => $advtr_ev->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',
 	);

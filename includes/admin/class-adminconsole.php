@@ -148,6 +148,20 @@ class AdminConsole {
 	}
 
 	/**
+	 * Template di dettaglio per sezione.
+	 *
+	 * @var array<string,string>
+	 */
+	const DETTAGLI = array(
+		'locali'  => 'admin-locale',
+		'poi'     => 'admin-poi-dettaglio',
+		'offerte' => 'admin-offerta',
+		'eventi'  => 'admin-evento',
+		'qr'      => 'admin-qr-dettaglio',
+		'clienti' => 'admin-cliente',
+	);
+
+	/**
 	 * Menu della console, raggruppato per attività.
 	 *
 	 * @return array<string,array<string,string>>
@@ -236,7 +250,14 @@ class AdminConsole {
 	public static function id_corrente() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sola navigazione.
 		$id = isset( $_GET['id'] ) ? absint( wp_unslash( $_GET['id'] ) ) : 0;
-		return ( $id && get_post( $id ) ) ? $id : 0;
+		if ( ! $id ) {
+			return 0;
+		}
+		// Nella sezione clienti l'id è di un utente, non di un post.
+		if ( 'clienti' === self::sezione_corrente() ) {
+			return get_userdata( $id ) ? $id : 0;
+		}
+		return get_post( $id ) ? $id : 0;
 	}
 
 	/**
@@ -313,6 +334,21 @@ class AdminConsole {
 				break;
 			case 'evidenza':
 				self::redirect( $sezione, self::evidenza( $id ) );
+				break;
+			case 'poi_salva':
+				self::redirect_dettaglio( 'poi', $id, Salva::poi() );
+				break;
+			case 'qr_salva':
+				self::redirect_dettaglio( 'qr', $id, Salva::qr() );
+				break;
+			case 'offerta_salva':
+				self::redirect_dettaglio( 'offerte', $id, Salva::offerta() );
+				break;
+			case 'evento_salva':
+				self::redirect_dettaglio( 'eventi', $id, Salva::evento() );
+				break;
+			case 'cliente_salva':
+				self::redirect_dettaglio( 'clienti', $id, Salva::cliente() );
 				break;
 			case 'scheda_salva':
 				$esito = Scheda::salva();
@@ -412,6 +448,27 @@ class AdminConsole {
 		update_post_meta( $id, 'advtr_evidenza_inizio', current_time( 'Y-m-d' ) );
 		update_post_meta( $id, 'advtr_evidenza_fine', wp_date( 'Y-m-d', time() + YEAR_IN_SECONDS ) );
 		return 'evidenza_on';
+	}
+
+	/**
+	 * Reindirizza alla schermata di dettaglio con un esito.
+	 *
+	 * @param string $sezione Sezione.
+	 * @param int    $id      ID dell'elemento.
+	 * @param string $avviso  Codice di esito.
+	 * @return void
+	 */
+	private static function redirect_dettaglio( $sezione, $id, $avviso ) {
+		wp_safe_redirect(
+			self::url(
+				$sezione,
+				array(
+					'id'     => $id,
+					'avviso' => $avviso,
+				)
+			)
+		);
+		exit;
 	}
 
 	/**
@@ -564,7 +621,9 @@ class AdminConsole {
 
 		// Con un id valido si apre il dettaglio, non l'elenco: è ciò che fa il
 		// pulsante "Apri", che deve restare dentro la console.
-		$vista = ( $id && 'locali' === $sezione ) ? 'admin-locale' : 'admin-' . $sezione;
+		$vista = ( $id && isset( self::DETTAGLI[ $sezione ] ) )
+			? self::DETTAGLI[ $sezione ]
+			: 'admin-' . $sezione;
 
 		ob_start();
 		require ADVTR_PATH . 'templates/console/' . $vista . '.php';
@@ -586,7 +645,7 @@ class AdminConsole {
 				'marchio'     => get_bloginfo( 'name' ),
 				'menu'        => $menu,
 				'attiva'      => $sezione,
-				'titolo'      => $id ? get_the_title( $id ) : self::sezioni()[ $sezione ],
+				'titolo'      => $id ? self::titolo_dettaglio( $sezione, $id ) : self::sezioni()[ $sezione ],
 				'sottotitolo' => $id
 					? __( 'Modifica la scheda senza uscire dalla console', 'advertrieste' )
 					: self::sottotitolo( $sezione ),
@@ -600,6 +659,21 @@ class AdminConsole {
 				'contenuto'   => $contenuto,
 			)
 		);
+	}
+
+	/**
+	 * Titolo della schermata di dettaglio.
+	 *
+	 * @param string $sezione Sezione.
+	 * @param int    $id      ID dell'elemento.
+	 * @return string
+	 */
+	private static function titolo_dettaglio( $sezione, $id ) {
+		if ( 'clienti' === $sezione ) {
+			$u = get_userdata( $id );
+			return $u ? $u->display_name : '';
+		}
+		return get_the_title( $id );
 	}
 
 	/**

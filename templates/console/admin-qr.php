@@ -41,7 +41,7 @@ foreach ( get_posts( $advtr_args ) as $advtr_q ) {
 		'attivo' === $advtr_stato
 			? Tabella::pill( __( 'Attivo', 'advertrieste' ), 'ok' )
 			: Tabella::pill( __( 'Inattivo', 'advertrieste' ), '' ),
-		'<a class="ac-btn ac-btn-neutro" href="' . esc_url( get_edit_post_link( $advtr_q->ID ) ) . '">' .
+		'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'qr', array( 'id' => $advtr_q->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>',
 	);
 }
