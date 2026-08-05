@@ -39,7 +39,6 @@ class ReservedArea {
 	 */
 	public static function init() {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
-		add_shortcode( 'advtr_area_riservata', array( __CLASS__, 'shortcode' ) );
 	}
 
 	/**
@@ -89,7 +88,7 @@ class ReservedArea {
 	 *
 	 * @return void
 	 */
-	private static function enqueue_qr_assets() {
+	public static function enqueue_qr_assets() {
 		wp_enqueue_style( 'leaflet' );
 		wp_enqueue_script( 'leaflet' );
 		wp_enqueue_style( 'advtr-map' );

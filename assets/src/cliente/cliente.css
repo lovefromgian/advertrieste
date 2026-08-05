@@ -1,0 +1,438 @@
+/**
+ * Area clienti in front-end.
+ *
+ * Superficie autonoma: colori di sfondo e testo sono dichiarati esplicitamente,
+ * senza ereditare dal tema. È deliberato — l'area finisce dentro temi qualsiasi,
+ * chiari o scuri, e un pannello di lavoro deve restare leggibile in entrambi
+ * (è lo stesso inciampo dei filtri della mappa: sfondo dichiarato e testo no).
+ */
+
+.advtr-cliente {
+	--advtr-testo: #1d2327;
+	--advtr-tenue: #646970;
+	--advtr-bordo: #dcdcde;
+	--advtr-sfondo: #fff;
+	--advtr-superficie: #f6f7f7;
+	--advtr-accento: #2271b1;
+	--advtr-ok: #00844a;
+	--advtr-errore: #b32d2e;
+	--advtr-attesa: #996800;
+
+	box-sizing: border-box;
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 24px;
+	background: var(--advtr-sfondo);
+	color: var(--advtr-testo);
+	border: 1px solid var(--advtr-bordo);
+	border-radius: 10px;
+	font-size: 15px;
+	line-height: 1.6;
+}
+
+.advtr-cliente *,
+.advtr-cliente *::before,
+.advtr-cliente *::after {
+	box-sizing: inherit;
+}
+
+.advtr-cliente h2,
+.advtr-cliente h3 {
+	color: var(--advtr-testo);
+	margin: 0 0 12px;
+	line-height: 1.3;
+}
+
+.advtr-cliente h3 {
+	font-size: 18px;
+	margin-top: 28px;
+}
+
+.advtr-cliente h3:first-child {
+	margin-top: 0;
+}
+
+/* Intestazione ------------------------------------------------------- */
+
+.advtr-cliente-testa {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--advtr-bordo);
+}
+
+.advtr-cliente-occhiello {
+	display: block;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--advtr-tenue);
+}
+
+.advtr-cliente-nome {
+	font-size: 18px;
+}
+
+/* Navigazione -------------------------------------------------------- */
+
+.advtr-cliente-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin: 16px 0 20px;
+}
+
+.advtr-cliente-voce {
+	padding: 8px 14px;
+	border-radius: 999px;
+	text-decoration: none;
+	color: var(--advtr-tenue);
+	background: var(--advtr-superficie);
+	font-size: 14px;
+}
+
+.advtr-cliente-voce:hover {
+	color: var(--advtr-testo);
+}
+
+.advtr-cliente-voce.attiva {
+	background: var(--advtr-testo);
+	color: #fff;
+}
+
+/* Avvisi ------------------------------------------------------------- */
+
+.advtr-cliente-avviso {
+	margin: 0 0 20px;
+	padding: 12px 16px;
+	border-radius: 6px;
+	border-left: 4px solid var(--advtr-tenue);
+	background: var(--advtr-superficie);
+	color: var(--advtr-testo);
+}
+
+.advtr-cliente-avviso.ok {
+	border-left-color: var(--advtr-ok);
+}
+
+.advtr-cliente-avviso.errore {
+	border-left-color: var(--advtr-errore);
+}
+
+/* Form --------------------------------------------------------------- */
+
+.advtr-form label,
+.advtr-accesso-box label {
+	display: block;
+	margin: 16px 0 6px;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.advtr-form input[type="text"],
+.advtr-form input[type="email"],
+.advtr-form input[type="url"],
+.advtr-form input[type="date"],
+.advtr-form select,
+.advtr-form textarea,
+.advtr-accesso-box input[type="text"],
+.advtr-accesso-box input[type="email"],
+.advtr-accesso-box input[type="password"] {
+	width: 100%;
+	padding: 9px 12px;
+	border: 1px solid var(--advtr-bordo);
+	border-radius: 6px;
+	background: #fff;
+	color: var(--advtr-testo);
+	font: inherit;
+}
+
+.advtr-form textarea {
+	resize: vertical;
+}
+
+.advtr-form input:focus,
+.advtr-form select:focus,
+.advtr-form textarea:focus,
+.advtr-accesso-box input:focus {
+	outline: 2px solid var(--advtr-accento);
+	outline-offset: 1px;
+	border-color: var(--advtr-accento);
+}
+
+.advtr-aiuto {
+	margin: 6px 0 0;
+	font-size: 13px;
+	color: var(--advtr-tenue);
+}
+
+.advtr-nota {
+	color: var(--advtr-tenue);
+	font-size: 14px;
+}
+
+.advtr-fieldset {
+	margin: 24px 0;
+	padding: 16px 18px;
+	border: 1px solid var(--advtr-bordo);
+	border-radius: 8px;
+}
+
+.advtr-fieldset legend {
+	padding: 0 6px;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.advtr-griglia-2 {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 16px;
+}
+
+.advtr-check-griglia {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 18px;
+}
+
+.advtr-check {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	font-weight: 400;
+}
+
+.advtr-form-azioni {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 24px;
+	padding-top: 20px;
+	border-top: 1px solid var(--advtr-bordo);
+}
+
+.advtr-form-stato {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 8px;
+}
+
+/* Bottoni ------------------------------------------------------------ */
+
+.advtr-btn {
+	display: inline-block;
+	padding: 9px 18px;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	font: inherit;
+	font-size: 14px;
+	cursor: pointer;
+	text-decoration: none;
+	line-height: 1.4;
+}
+
+.advtr-btn-primario {
+	background: var(--advtr-accento);
+	color: #fff;
+}
+
+.advtr-btn-primario:hover {
+	background: #185a8c;
+	color: #fff;
+}
+
+.advtr-btn-neutro {
+	background: var(--advtr-superficie);
+	color: var(--advtr-testo);
+	border-color: var(--advtr-bordo);
+}
+
+.advtr-btn-neutro:hover {
+	color: var(--advtr-testo);
+}
+
+.advtr-btn-rimuovi {
+	background: transparent;
+	color: var(--advtr-errore);
+	border-color: var(--advtr-bordo);
+	padding: 5px 12px;
+	font-size: 13px;
+}
+
+.advtr-btn-rimuovi.conferma {
+	background: var(--advtr-errore);
+	color: #fff;
+	border-color: var(--advtr-errore);
+}
+
+/* Pill di stato ------------------------------------------------------ */
+
+.advtr-pill {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #fff;
+	background: var(--advtr-tenue);
+}
+
+.advtr-pill.ok {
+	background: var(--advtr-ok);
+}
+
+.advtr-pill.attesa {
+	background: var(--advtr-attesa);
+}
+
+/* Media -------------------------------------------------------------- */
+
+.advtr-media-riga {
+	display: flex;
+	align-items: flex-start;
+	gap: 24px;
+	flex-wrap: wrap;
+}
+
+.advtr-media-griglia {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	gap: 16px;
+	margin: 16px 0;
+}
+
+.advtr-media-item {
+	margin: 0;
+	padding: 10px;
+	border: 1px solid var(--advtr-bordo);
+	border-radius: 8px;
+	text-align: center;
+	background: var(--advtr-superficie);
+}
+
+.advtr-media-item img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 4px;
+	margin-bottom: 8px;
+}
+
+.advtr-upload {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 16px;
+	border: 1px dashed var(--advtr-bordo);
+	border-radius: 8px;
+	background: var(--advtr-superficie);
+}
+
+/* Tabella ------------------------------------------------------------ */
+
+.advtr-tabella {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 12px 0;
+	font-size: 14px;
+}
+
+.advtr-tabella th,
+.advtr-tabella td {
+	padding: 10px 12px;
+	text-align: left;
+	border-bottom: 1px solid var(--advtr-bordo);
+	vertical-align: middle;
+}
+
+.advtr-tabella th {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--advtr-tenue);
+}
+
+.advtr-tabella-azioni {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	white-space: nowrap;
+}
+
+.advtr-tabella-azioni form {
+	margin: 0;
+}
+
+/* Selettore posizione ------------------------------------------------ */
+
+.advtr-mappa-picker {
+	height: 320px;
+	margin-bottom: 12px;
+	border: 1px solid var(--advtr-bordo);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+/* Accesso ------------------------------------------------------------ */
+
+.advtr-cliente-accesso {
+	max-width: 420px;
+}
+
+.advtr-accesso-nota {
+	color: var(--advtr-tenue);
+	font-size: 14px;
+	margin: 0 0 8px;
+}
+
+.advtr-accesso-ricorda {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 400;
+}
+
+.advtr-accesso-box .advtr-btn {
+	width: 100%;
+	margin-top: 20px;
+	text-align: center;
+}
+
+.advtr-accesso-alt {
+	margin: 16px 0 0;
+	font-size: 14px;
+	text-align: center;
+}
+
+/* Stato vuoto -------------------------------------------------------- */
+
+.advtr-cliente-vuoto {
+	padding: 32px;
+	text-align: center;
+	background: var(--advtr-superficie);
+	border-radius: 8px;
+}
+
+.advtr-cliente-vuoto h3 {
+	margin-top: 0;
+}
+
+@media (max-width: 600px) {
+
+	.advtr-griglia-2 {
+		grid-template-columns: 1fr;
+	}
+
+	.advtr-cliente {
+		padding: 16px;
+	}
+}

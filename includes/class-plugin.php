@@ -33,9 +33,11 @@ use AdverTrieste\Frontend\Map;
 use AdverTrieste\Frontend\Onboarding;
 use AdverTrieste\Frontend\Scheda;
 use AdverTrieste\Frontend\ReservedArea;
+use AdverTrieste\Frontend\ClientArea;
 use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
 use AdverTrieste\Frontend\Eventi as EventiView;
+use AdverTrieste\Access\AdminLock;
 use AdverTrieste\Payments\WooBridge;
 use AdverTrieste\Cron\Cron;
 
@@ -120,6 +122,8 @@ final class Plugin {
 		Onboarding::init();
 		Scheda::init();
 		ReservedArea::init();
+		ClientArea::init();
+		AdminLock::init();
 		StatsDashboard::init();
 		OfferteView::init();
 		EventiView::init();

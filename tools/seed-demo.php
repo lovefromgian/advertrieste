@@ -577,7 +577,7 @@ $pagine = array(
 		'key'     => 'page-area',
 		'title'   => 'Area clienti',
 		'slug'    => 'area-clienti',
-		'content' => '[advtr_area_riservata]',
+		'content' => '[advtr_area_clienti]',
 	),
 	array(
 		'key'     => 'page-stats',
