@@ -106,7 +106,14 @@ $advtr_pubblica = 'publish' === $locale->post_status;
 
 	<fieldset class="advtr-fieldset">
 		<legend><?php esc_html_e( 'Posizione sulla mappa', 'advertrieste' ); ?></legend>
-		<p class="advtr-aiuto"><?php esc_html_e( 'Trascina il segnaposto sulla posizione esatta dell\'ingresso.', 'advertrieste' ); ?></p>
+		<p class="advtr-aiuto"><?php esc_html_e( 'Parti dall\'indirizzo che hai scritto sopra, poi trascina il segnaposto sull\'ingresso esatto.', 'advertrieste' ); ?></p>
+
+		<div class="advtr-geo-riga">
+			<button type="button" class="advtr-btn advtr-btn-neutro" data-advtr-geocode>
+				<?php esc_html_e( 'Trova dall\'indirizzo', 'advertrieste' ); ?>
+			</button>
+			<span class="advtr-geo-esito" data-advtr-geo-esito aria-live="polite"></span>
+		</div>
 
 		<div
 			class="advtr-mappa-picker"

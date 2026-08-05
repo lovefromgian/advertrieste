@@ -70,6 +70,78 @@
 				mappa.setView( [ nLat, nLng ] );
 			} );
 		} );
+
+		initGeocode( mappa, segna, aggiorna );
+	}
+
+	/**
+	 * Pulsante "Trova dall'indirizzo".
+	 *
+	 * Riusa il campo Indirizzo già compilato nei contatti invece di chiederlo una
+	 * seconda volta: due campi per lo stesso dato divergono al primo cambio di
+	 * sede. Il risultato è comunque solo un punto di partenza — il geocoder
+	 * restituisce il centro dell'indirizzo, non l'ingresso del locale.
+	 *
+	 * @param {Object}   mappa   Mappa Leaflet.
+	 * @param {Object}   segna   Segnaposto.
+	 * @param {Function} scrivi  Callback che aggiorna i campi coordinate.
+	 */
+	function initGeocode( mappa, segna, scrivi ) {
+		var cfg = window.advtrCliente;
+		var bottone = document.querySelector( '[data-advtr-geocode]' );
+		var esito = document.querySelector( '[data-advtr-geo-esito]' );
+		var campoInd = document.querySelector( '[name="advtr_indirizzo"]' );
+
+		if ( ! cfg || ! cfg.geocode || ! bottone || ! campoInd ) {
+			return;
+		}
+
+		function messaggio( testo, tipo ) {
+			if ( ! esito ) {
+				return;
+			}
+			esito.textContent = testo;
+			esito.className = 'advtr-geo-esito' + ( tipo ? ' ' + tipo : '' );
+		}
+
+		bottone.addEventListener( 'click', function () {
+			var indirizzo = campoInd.value.trim();
+			if ( ! indirizzo ) {
+				messaggio( cfg.i18n.senzaIndirizzo, 'errore' );
+				campoInd.focus();
+				return;
+			}
+
+			bottone.disabled = true;
+			messaggio( cfg.i18n.ricerca );
+
+			window.fetch( cfg.geocode + '?indirizzo=' + encodeURIComponent( indirizzo ), {
+				headers: {
+					Accept: 'application/json',
+					'X-WP-Nonce': cfg.nonce
+				}
+			} ).then( function ( r ) {
+				return r.json().then( function ( d ) {
+					return { ok: r.ok, dati: d };
+				} );
+			} ).then( function ( res ) {
+				bottone.disabled = false;
+
+				if ( ! res.ok || ! res.dati || typeof res.dati.lat !== 'number' ) {
+					messaggio( ( res.dati && res.dati.message ) || cfg.i18n.errore, 'errore' );
+					return;
+				}
+
+				var posizione = L.latLng( res.dati.lat, res.dati.lng );
+				segna.setLatLng( posizione );
+				mappa.setView( posizione, 18 );
+				scrivi( posizione );
+				messaggio( cfg.i18n.trovato, 'ok' );
+			} ).catch( function () {
+				bottone.disabled = false;
+				messaggio( cfg.i18n.errore, 'errore' );
+			} );
+		} );
 	}
 
 	/**

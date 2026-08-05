@@ -23,6 +23,7 @@ use AdverTrieste\Cliente\Scheda as SchedaCliente;
 use AdverTrieste\Cliente\Media as MediaCliente;
 use AdverTrieste\Cliente\Offerte as OfferteCliente;
 use AdverTrieste\Cpt\Locale;
+use AdverTrieste\Rest\Markers;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -83,8 +84,65 @@ class ClientArea {
 		add_shortcode( 'advtr_area_clienti', array( __CLASS__, 'shortcode' ) );
 		// Alias storico, così le pagine già create continuano a funzionare.
 		add_shortcode( 'advtr_area_riservata', array( __CLASS__, 'shortcode' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'evita_cache' ), 5 );
 		add_action( 'template_redirect', array( __CLASS__, 'gestisci_azioni' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'registra_asset' ) );
+	}
+
+	/**
+	 * Shortcode le cui pagine non devono MAI finire in una page cache.
+	 *
+	 * @var string[]
+	 */
+	const SHORTCODE_NON_CACHABILI = array(
+		'advtr_area_clienti',
+		'advtr_area_riservata',
+		'advtr_statistiche',
+		'advtr_valida_coupon',
+	);
+
+	/**
+	 * Impedisce alle cache di pagina di conservare l'area clienti.
+	 *
+	 * Non è un'ottimizzazione mancata, è correttezza. Queste pagine contengono
+	 * nonce: un nonce vive fra 12 e 24 ore, mentre la copia in cache viene
+	 * servita per tutta la durata configurata. Appena il nonce scade, il modulo
+	 * di accesso smette di funzionare e `check_admin_referer` mostra la schermata
+	 * di errore di WordPress — proprio ciò che l'area serve a evitare. Contengono
+	 * inoltre dati personali dell'utente, che non vanno serviti a un altro
+	 * visitatore.
+	 *
+	 * `DONOTCACHEPAGE` è la convenzione riconosciuta da WP Rocket, W3 Total
+	 * Cache, WP Super Cache e WP-Optimize: non dipendiamo da un plugin preciso.
+	 *
+	 * @return void
+	 */
+	public static function evita_cache() {
+		if ( is_admin() ) {
+			return;
+		}
+		$post = get_queried_object();
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+
+		$da_proteggere = false;
+		foreach ( self::SHORTCODE_NON_CACHABILI as $tag ) {
+			if ( has_shortcode( $post->post_content, $tag ) ) {
+				$da_proteggere = true;
+				break;
+			}
+		}
+		if ( ! $da_proteggere ) {
+			return;
+		}
+
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			// Volutamente SENZA prefisso del plugin: è il nome esatto che i plugin
+			// di cache cercano. Prefissarlo lo renderebbe inerte.
+			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
+		}
+		nocache_headers();
 	}
 
 	/**
@@ -340,6 +398,23 @@ class ClientArea {
 		wp_enqueue_script( 'leaflet' );
 		wp_enqueue_style( self::HANDLE );
 		wp_enqueue_script( self::HANDLE );
+
+		// Ricerca indirizzo del selettore di posizione. Il nonce qui è affidabile:
+		// l'area è per soli utenti autenticati, quindi non finisce in page cache.
+		wp_localize_script(
+			self::HANDLE,
+			'advtrCliente',
+			array(
+				'geocode' => rest_url( Markers::NAMESPACE . '/geocode' ),
+				'nonce'   => wp_create_nonce( 'wp_rest' ),
+				'i18n'    => array(
+					'ricerca'        => __( 'Ricerca in corso…', 'advertrieste' ),
+					'trovato'        => __( 'Trovato. Ora trascina il segnaposto sull\'ingresso esatto.', 'advertrieste' ),
+					'senzaIndirizzo' => __( 'Scrivi prima l\'indirizzo nel riquadro Contatti.', 'advertrieste' ),
+					'errore'         => __( 'Ricerca non riuscita: posiziona il segnaposto a mano.', 'advertrieste' ),
+				),
+			)
+		);
 
 		$avviso = self::avviso_corrente();
 

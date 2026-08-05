@@ -382,6 +382,27 @@
 	overflow: hidden;
 }
 
+.advtr-geo-riga {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+.advtr-geo-esito {
+	font-size: 13px;
+	color: var(--advtr-tenue);
+}
+
+.advtr-geo-esito.ok {
+	color: var(--advtr-ok);
+}
+
+.advtr-geo-esito.errore {
+	color: var(--advtr-errore);
+}
+
 /* Accesso ------------------------------------------------------------ */
 
 .advtr-cliente-accesso {
