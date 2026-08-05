@@ -266,6 +266,154 @@ class Salva {
 	}
 
 	/**
+	 * Tipi creabili dalla console: sezione => post type.
+	 *
+	 * @var array<string,string>
+	 */
+	const CREABILI = array(
+		'locali'  => 'locale',
+		'poi'     => 'poi',
+		'offerte' => 'offerta',
+		'eventi'  => 'evento',
+		'qr'      => 'punto_qr',
+	);
+
+	/**
+	 * Titolo provvisorio di un nuovo elemento.
+	 *
+	 * Non si crea senza titolo: un elenco pieno di righe vuote è illeggibile, e
+	 * un titolo provvisorio dice subito che il lavoro è da finire.
+	 *
+	 * @param string $sezione Sezione.
+	 * @return string
+	 */
+	private static function titolo_nuovo( $sezione ) {
+		$titoli = array(
+			'locali'  => __( 'Nuova attività (da completare)', 'advertrieste' ),
+			'poi'     => __( 'Nuovo punto d\'interesse (da completare)', 'advertrieste' ),
+			'offerte' => __( 'Nuova offerta (da completare)', 'advertrieste' ),
+			'eventi'  => __( 'Nuovo evento (da completare)', 'advertrieste' ),
+			'qr'      => __( 'Nuovo espositore (da completare)', 'advertrieste' ),
+		);
+		return $titoli[ $sezione ] ?? __( 'Nuovo elemento', 'advertrieste' );
+	}
+
+	/**
+	 * Crea un elemento in bozza e ne restituisce l'ID.
+	 *
+	 * Nasce sempre NON pubblicato: un contenuto vuoto non deve comparire sulla
+	 * mappa nell'istante in cui si preme "Aggiungi".
+	 *
+	 * @param string $sezione Sezione di provenienza.
+	 * @return int ID creato, 0 se non consentito.
+	 */
+	public static function crea( $sezione ) {
+		if ( ! current_user_can( 'manage_options' ) || ! isset( self::CREABILI[ $sezione ] ) ) {
+			return 0;
+		}
+
+		$id = wp_insert_post(
+			array(
+				'post_type'   => self::CREABILI[ $sezione ],
+				'post_status' => 'draft',
+				'post_title'  => self::titolo_nuovo( $sezione ),
+				'post_author' => get_current_user_id(),
+			),
+			true
+		);
+
+		if ( is_wp_error( $id ) ) {
+			return 0;
+		}
+
+		// Valori di partenza sensati, così la scheda non nasce già sbagliata.
+		if ( 'locali' === $sezione ) {
+			update_post_meta( $id, 'advtr_zoom_min', 14 );
+			update_post_meta( $id, 'advtr_data_inizio', current_time( 'Y-m-d' ) );
+			update_post_meta( $id, 'advtr_data_fine', wp_date( 'Y-m-d', time() + YEAR_IN_SECONDS ) );
+		} elseif ( 'poi' === $sezione ) {
+			update_post_meta( $id, 'advtr_zoom_min', 0 );
+		} elseif ( 'qr' === $sezione ) {
+			update_post_meta( $id, 'advtr_stato', 'attivo' );
+		} elseif ( 'eventi' === $sezione ) {
+			update_post_meta( $id, 'advtr_tipo_evento', 'grande' );
+		}
+
+		return (int) $id;
+	}
+
+	/**
+	 * Crea un account cliente.
+	 *
+	 * La password NON viene scelta qui e non viene mostrata: l'account nasce con
+	 * una password casuale e al cliente parte l'email con il link per impostarne
+	 * una propria. È il flusso del core, ed evita che una password transiti da un
+	 * modulo o finisca scritta in una schermata.
+	 *
+	 * @return array{esito:string,id:int}
+	 */
+	public static function crea_cliente() {
+		if ( ! current_user_can( 'create_users' ) ) {
+			return array(
+				'esito' => 'negato',
+				'id'    => 0,
+			);
+		}
+
+		$nome  = self::testo( 'advtr_nome' );
+		$email = sanitize_email( self::testo( 'advtr_email' ) );
+		$ruolo = self::testo( 'advtr_ruolo' );
+		$ruolo = in_array( $ruolo, array( Roles::CLIENTE, Roles::ORGANIZZATORE ), true ) ? $ruolo : Roles::CLIENTE;
+
+		if ( '' === $nome || ! is_email( $email ) ) {
+			return array(
+				'esito' => 'account_ko',
+				'id'    => 0,
+			);
+		}
+		if ( email_exists( $email ) ) {
+			return array(
+				'esito' => 'account_email',
+				'id'    => 0,
+			);
+		}
+
+		// Nome utente derivato dall'email, reso unico se già preso.
+		$base  = sanitize_user( current( explode( '@', $email ) ), true );
+		$login = '' !== $base ? $base : 'cliente';
+		$n     = 1;
+		while ( username_exists( $login ) ) {
+			++$n;
+			$login = $base . $n;
+		}
+
+		$id = wp_insert_user(
+			array(
+				'user_login'   => $login,
+				'user_email'   => $email,
+				'user_pass'    => wp_generate_password( 24, true, true ),
+				'display_name' => $nome,
+				'role'         => $ruolo,
+			)
+		);
+
+		if ( is_wp_error( $id ) ) {
+			return array(
+				'esito' => 'account_ko',
+				'id'    => 0,
+			);
+		}
+
+		// Email al nuovo utente con il link per impostare la password.
+		wp_new_user_notification( $id, null, 'user' );
+
+		return array(
+			'esito' => 'creato_cliente',
+			'id'    => (int) $id,
+		);
+	}
+
+	/**
 	 * Salva le coordinate, se numeriche.
 	 *
 	 * @param int $post_id ID.

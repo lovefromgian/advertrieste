@@ -68,6 +68,14 @@ foreach ( get_posts( $advtr_args ) as $advtr_e ) {
 	);
 }
 
+?>
+<div class="ac-barra-azioni">
+	<?php
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+	echo AdminConsole::bottone_nuovo( 'eventi', __( 'Aggiungi un evento', 'advertrieste' ) );
+	?>
+</div>
+<?php
 $advtr_tabella = Tabella::rendi(
 	array(
 		'colonne' => array(

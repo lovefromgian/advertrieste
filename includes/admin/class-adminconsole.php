@@ -335,6 +335,20 @@ class AdminConsole {
 			case 'evidenza':
 				self::redirect( $sezione, self::evidenza( $id ) );
 				break;
+			case 'crea':
+				$nuovo = Salva::crea( $sezione );
+				if ( ! $nuovo ) {
+					self::redirect( $sezione, 'negato' );
+				}
+				self::redirect_dettaglio( $sezione, $nuovo, 'creato' );
+				break;
+			case 'crea_cliente':
+				$esito = Salva::crea_cliente();
+				if ( $esito['id'] ) {
+					self::redirect_dettaglio( 'clienti', $esito['id'], $esito['esito'] );
+				}
+				self::redirect( 'clienti', $esito['esito'] );
+				break;
 			case 'poi_salva':
 				self::redirect_dettaglio( 'poi', $id, Salva::poi() );
 				break;
@@ -481,6 +495,26 @@ class AdminConsole {
 	private static function redirect( $sezione = '', $avviso = '' ) {
 		wp_safe_redirect( self::url( $sezione, $avviso ? array( 'avviso' => $avviso ) : array() ) );
 		exit;
+	}
+
+	/**
+	 * Bottone "Aggiungi" per una sezione.
+	 *
+	 * @param string $sezione   Sezione.
+	 * @param string $etichetta Testo del bottone.
+	 * @return string Markup già escapato.
+	 */
+	public static function bottone_nuovo( $sezione, $etichetta ) {
+		return Tabella::azione(
+			array(
+				'azione'    => 'crea',
+				'etichetta' => $etichetta,
+				'url'       => self::url( $sezione ),
+				'nonce'     => self::NONCE,
+				'classe'    => 'ac-btn ac-btn-verde',
+				'campi'     => array( 'advtr_sezione' => $sezione ),
+			)
+		);
 	}
 
 	/**

@@ -956,3 +956,14 @@ body.advtr-console-pagina {
 		border-right: 0;
 	}
 }
+
+.ac-barra-azioni {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+
+.ac-barra-azioni .ac-azione-form {
+	display: inline-block;
+}

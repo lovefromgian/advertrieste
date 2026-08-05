@@ -95,13 +95,20 @@ $advtr_n_cli   = $advtr_clienti['avail_roles']['cliente_locale'] ?? 0;
 	<div class="ac-card">
 		<h3 class="ac-card-titolo"><?php esc_html_e( 'Scorciatoie', 'advertrieste' ); ?></h3>
 		<p class="ac-card-sottotitolo"><?php esc_html_e( 'Le operazioni che si fanno più spesso', 'advertrieste' ); ?></p>
-		<p style="display:flex;gap:8px;flex-wrap:wrap;margin:0">
-			<a class="ac-btn ac-btn-neutro" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=locale' ) ); ?>"><?php esc_html_e( 'Nuovo locale', 'advertrieste' ); ?></a>
-			<a class="ac-btn ac-btn-neutro" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=punto_qr' ) ); ?>"><?php esc_html_e( 'Nuovo punto QR', 'advertrieste' ); ?></a>
-			<a class="ac-btn ac-btn-neutro" href="<?php echo esc_url( admin_url( 'user-new.php' ) ); ?>"><?php esc_html_e( 'Nuovo cliente', 'advertrieste' ); ?></a>
-		</p>
+		<div class="ac-barra-azioni">
+			<?php
+			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- markup dei componenti, già escapato.
+			echo AdminConsole::bottone_nuovo( 'locali', __( 'Nuovo locale', 'advertrieste' ) );
+			echo AdminConsole::bottone_nuovo( 'qr', __( 'Nuovo punto QR', 'advertrieste' ) );
+			echo AdminConsole::bottone_nuovo( 'eventi', __( 'Nuovo evento', 'advertrieste' ) );
+			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
+			?>
+			<a class="ac-btn ac-btn-neutro" href="<?php echo esc_url( AdminConsole::url( 'clienti' ) ); ?>">
+				<?php esc_html_e( 'Nuovo cliente', 'advertrieste' ); ?>
+			</a>
+		</div>
 		<p class="ac-card-sottotitolo" style="margin-top:12px;margin-bottom:0">
-			<?php esc_html_e( 'La creazione di contenuti lunghi resta negli editor di WordPress: qui si prendono le decisioni, lì si scrive.', 'advertrieste' ); ?>
+			<?php esc_html_e( 'Ogni elemento nasce in bozza: si completa e si pubblica quando è pronto.', 'advertrieste' ); ?>
 		</p>
 	</div>
 </div>

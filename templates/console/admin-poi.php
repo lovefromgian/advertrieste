@@ -64,6 +64,14 @@ foreach ( get_posts( $advtr_args ) as $advtr_p ) {
 	);
 }
 
+?>
+<div class="ac-barra-azioni">
+	<?php
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+	echo AdminConsole::bottone_nuovo( 'poi', __( 'Aggiungi un punto d\'interesse', 'advertrieste' ) );
+	?>
+</div>
+<?php
 $advtr_tabella = Tabella::rendi(
 	array(
 		'colonne' => array(

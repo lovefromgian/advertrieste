@@ -67,6 +67,14 @@ foreach ( AdminConsole::locali( $cerca ) as $advtr_p ) {
 	);
 }
 
+?>
+<div class="ac-barra-azioni">
+	<?php
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+	echo AdminConsole::bottone_nuovo( 'locali', __( 'Aggiungi un locale', 'advertrieste' ) );
+	?>
+</div>
+<?php
 $advtr_tabella = Tabella::rendi(
 	array(
 		'colonne' => array(

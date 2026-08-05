@@ -46,6 +46,14 @@ foreach ( get_posts( $advtr_args ) as $advtr_q ) {
 	);
 }
 
+?>
+<div class="ac-barra-azioni">
+	<?php
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+	echo AdminConsole::bottone_nuovo( 'qr', __( 'Aggiungi un espositore', 'advertrieste' ) );
+	?>
+</div>
+<?php
 $advtr_tabella = Tabella::rendi(
 	array(
 		'colonne' => array(
