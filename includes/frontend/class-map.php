@@ -133,15 +133,33 @@ class Map {
 					'novita'      => __( 'Novità', 'advertrieste' ),
 					'indicazioni' => __( 'Indicazioni', 'advertrieste' ),
 					'inEvento'    => __( 'Evento in corso', 'advertrieste' ),
+					'inEvidenza'  => __( 'In evidenza', 'advertrieste' ),
+					'coupon'      => __( 'Coupon', 'advertrieste' ),
+					'vediScheda'  => __( 'Vedi scheda completa →', 'advertrieste' ),
+					'nessuno'     => __( 'Nessun risultato in questa zona. Sposta la mappa o cambia filtro.', 'advertrieste' ),
+					/* translators: %d: numero di risultati trovati */
+					'conta'       => __( '%d risultati · in evidenza per primi', 'advertrieste' ),
+					'contaUno'    => __( '1 risultato', 'advertrieste' ),
+					'poi'         => __( 'Punto d\'interesse', 'advertrieste' ),
 				),
 			)
 		);
 
-		$dom_id = 'advtr-map-' . wp_unique_id();
-		$height = (int) $atts['height'];
+		$dom_id    = 'advtr-map-' . wp_unique_id();
+		$height    = (int) $atts['height'];
+		$altezza   = $height;
+		$categorie = self::categorie_list();
 
 		ob_start();
-		require ADVTR_PATH . 'templates/map.php';
+		if ( class_exists( '\AdverTrieste\Frontend\Pubblico' ) && \AdverTrieste\Frontend\Pubblico::e_pagina_nostra() ) {
+			// Dentro il guscio del plugin la mappa è la schermata "Esplora":
+			// lista sincronizzata a sinistra, mappa a destra.
+			require ADVTR_PATH . 'templates/pubblico/esplora.php';
+		} else {
+			// Fuori (shortcode incorporato in una pagina del tema) resta il
+			// contenitore semplice, che non impone un layout a chi lo ospita.
+			require ADVTR_PATH . 'templates/map.php';
+		}
 		return (string) ob_get_clean();
 	}
 

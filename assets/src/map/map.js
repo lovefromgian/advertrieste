@@ -39,6 +39,16 @@
 		var layer = L.layerGroup().addTo( map );
 		var inquadrato = false;
 
+		// Riferimenti della schermata "Esplora" (schermata 06). Se mancano,
+		// siamo nel contenitore semplice e la lista non esiste: tutto il resto
+		// continua a funzionare.
+		var box = el.closest( '[data-advtr-esplora]' );
+		var elenco = box ? box.querySelector( '[data-advtr-risultati]' ) : null;
+		var conta = box ? box.querySelector( '[data-advtr-conta]' ) : null;
+		var campoQ = box ? box.querySelector( '#ae-q' ) : null;
+		var soloOfferte = false;
+		var marcatori = {};
+
 		// Categoria e ricerca arrivano dall'ingresso guidato
 		// (?categoria=slug&q=testo).
 		var categoriaAttiva = '';
@@ -149,9 +159,14 @@
 				return r.ok ? r.json() : [];
 			} ).then( function ( markers ) {
 				layer.clearLayers();
+				marcatori = {};
 				var trovati = [];
+				var visibili = [];
 				( markers || [] ).forEach( function ( m ) {
 					if ( typeof m.lat !== 'number' || typeof m.lng !== 'number' ) {
+						return;
+					}
+					if ( soloOfferte && ! m.offerta ) {
 						return;
 					}
 					var marker = L.marker( [ m.lat, m.lng ], { icon: markerIcon( m ) } );
@@ -160,8 +175,12 @@
 						trackMapClick( m );
 					} );
 					marker.addTo( layer );
+					marcatori[ m.id ] = marker;
 					trovati.push( [ m.lat, m.lng ] );
+					visibili.push( m );
 				} );
+
+				disegnaElenco( visibili );
 
 				// Solo alla prima risposta di una ricerca: dopo, l'utente comanda.
 				if ( ricerca && ! inquadrato && trovati.length ) {
@@ -171,6 +190,167 @@
 			} ).catch( function () {
 				layer.clearLayers();
 			} );
+		}
+
+		/**
+		 * Disegna l'elenco dei risultati accanto alla mappa.
+		 *
+		 * Costruito con createElement e textContent, mai con innerHTML: i titoli
+		 * arrivano dal database e finirebbero interpretati come markup.
+		 *
+		 * @param {Array} elementi Marker visibili.
+		 */
+		function disegnaElenco( elementi ) {
+			if ( ! elenco ) {
+				return;
+			}
+			elenco.textContent = '';
+
+			if ( conta ) {
+				conta.textContent = elementi.length === 1
+					? cfg.i18n.contaUno
+					: cfg.i18n.conta.replace( '%d', elementi.length );
+			}
+
+			if ( ! elementi.length ) {
+				var vuoto = document.createElement( 'p' );
+				vuoto.className = 'ae-vuoto';
+				vuoto.textContent = cfg.i18n.nessuno;
+				elenco.appendChild( vuoto );
+				return;
+			}
+
+			elementi.forEach( function ( m ) {
+				var card = document.createElement( 'a' );
+				card.className = 'ae-card' + ( m.in_evidenza ? ' evidenza' : '' );
+				card.href = m.permalink || '#';
+				card.setAttribute( 'data-id', m.id );
+
+				var mini = document.createElement( 'span' );
+				mini.className = 'ae-card-img tipo-' + m.type;
+				if ( m.logo ) {
+					mini.style.backgroundImage = 'url("' + encodeURI( m.logo ) + '")';
+				}
+				card.appendChild( mini );
+
+				var testo = document.createElement( 'span' );
+				testo.className = 'ae-card-testo';
+
+				var nome = document.createElement( 'span' );
+				nome.className = 'ae-card-nome';
+				nome.textContent = m.title;
+				testo.appendChild( nome );
+
+				var cat = document.createElement( 'span' );
+				cat.className = 'ae-card-cat';
+				cat.textContent = ( m.categorie && m.categorie.length )
+					? m.categorie.join( ' · ' )
+					: ( m.type === 'poi' ? cfg.i18n.poi : '' );
+				testo.appendChild( cat );
+
+				if ( m.indirizzo ) {
+					var ind = document.createElement( 'span' );
+					ind.className = 'ae-card-ind';
+					ind.textContent = m.indirizzo;
+					testo.appendChild( ind );
+				}
+
+				var badge = document.createElement( 'span' );
+				badge.className = 'ae-card-badge';
+				if ( m.in_evidenza ) {
+					badge.appendChild( pill( '★ ' + cfg.i18n.inEvidenza, 'oro' ) );
+				}
+				if ( m.offerta ) {
+					badge.appendChild( pill( cfg.i18n.coupon, 'corallo' ) );
+				}
+				if ( m.novita ) {
+					badge.appendChild( pill( cfg.i18n.novita, 'verde' ) );
+				}
+				if ( badge.childNodes.length ) {
+					testo.appendChild( badge );
+				}
+
+				card.appendChild( testo );
+
+				// Lista → mappa: il marker corrispondente si apre e si centra.
+				card.addEventListener( 'click', function ( e ) {
+					var mk = marcatori[ m.id ];
+					if ( ! mk ) {
+						return;
+					}
+					e.preventDefault();
+					map.setView( mk.getLatLng(), Math.max( map.getZoom(), 16 ) );
+					mk.openPopup();
+				} );
+				card.addEventListener( 'mouseenter', function () {
+					var mk = marcatori[ m.id ];
+					if ( mk && mk._icon ) {
+						mk._icon.classList.add( 'evidenziato' );
+					}
+				} );
+				card.addEventListener( 'mouseleave', function () {
+					var mk = marcatori[ m.id ];
+					if ( mk && mk._icon ) {
+						mk._icon.classList.remove( 'evidenziato' );
+					}
+				} );
+
+				elenco.appendChild( card );
+			} );
+		}
+
+		/**
+		 * Etichetta colorata.
+		 *
+		 * @param {string} testo  Testo.
+		 * @param {string} colore Variante.
+		 * @return {HTMLElement} Elemento pronto.
+		 */
+		function pill( testo, colore ) {
+			var s = document.createElement( 'span' );
+			s.className = 'ae-pill ' + colore;
+			s.textContent = testo;
+			return s;
+		}
+
+		function buildChip() {
+			if ( ! box ) {
+				return;
+			}
+			var chip = box.querySelectorAll( '.ae-chip-btn' );
+			chip.forEach( function ( b ) {
+				if ( b.getAttribute( 'data-cat' ) === categoriaAttiva && ! b.hasAttribute( 'data-solo-offerte' ) ) {
+					b.classList.add( 'attivo' );
+				} else if ( ! b.hasAttribute( 'data-solo-offerte' ) ) {
+					b.classList.remove( 'attivo' );
+				}
+
+				b.addEventListener( 'click', function () {
+					if ( b.hasAttribute( 'data-solo-offerte' ) ) {
+						soloOfferte = ! soloOfferte;
+						b.classList.toggle( 'attivo', soloOfferte );
+						loadMarkers();
+						return;
+					}
+					categoriaAttiva = b.getAttribute( 'data-cat' ) || '';
+					chip.forEach( function ( x ) {
+						if ( ! x.hasAttribute( 'data-solo-offerte' ) ) {
+							x.classList.remove( 'attivo' );
+						}
+					} );
+					b.classList.add( 'attivo' );
+					loadMarkers();
+				} );
+			} );
+
+			// La ricerca filtra senza ricaricare la pagina.
+			if ( campoQ ) {
+				campoQ.addEventListener( 'input', debounce( function () {
+					ricerca = campoQ.value.trim();
+					inquadrato = false;
+					loadMarkers();
+				}, 350 ) );
+			}
 		}
 
 		function buildFiltri() {
@@ -202,6 +382,7 @@
 		}
 
 		buildFiltri();
+		buildChip();
 		map.on( 'moveend', debounce( loadMarkers, 250 ) );
 		loadMarkers();
 	}

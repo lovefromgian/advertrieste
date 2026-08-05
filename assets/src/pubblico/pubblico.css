@@ -572,3 +572,271 @@ body.advtr-pubblico-pagina {
 		margin-left: 0;
 	}
 }
+
+/* ══ Esplora la mappa (schermata 06) ══════════════════════════════ */
+
+.ae-esplora {
+	--ae-scuro: #1b2a3a;
+	--ae-verde: #2f6b4f;
+	--ae-corallo: #d9694e;
+	--ae-oro: #e3ab35;
+	--ae-carta: #fff;
+	--ae-bordo: #e6e1d6;
+	--ae-fondo: #f3f0e9;
+	--ae-grigio: #6b7280;
+	box-sizing: border-box;
+}
+
+.ae-esplora *,
+.ae-esplora *::before,
+.ae-esplora *::after {
+	box-sizing: inherit;
+}
+
+/* ── Barra strumenti ─────────────────────────────────────────────── */
+
+.ae-barra {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+
+.ae-cerca {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1 1 280px;
+	min-width: 0;
+	padding: 8px 14px;
+	background: var(--ae-carta);
+	border: 1px solid var(--ae-bordo);
+	border-radius: 999px;
+}
+
+.ae-cerca input[type="search"] {
+	flex: 1;
+	min-width: 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	font: inherit;
+	font-size: 14px;
+	color: var(--ae-scuro);
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.ae-cerca-azzera {
+	color: var(--ae-grigio);
+	text-decoration: none;
+	font-size: 18px;
+	line-height: 1;
+	padding: 0 2px;
+}
+
+.ae-chip {
+	display: flex;
+	gap: 7px;
+	flex-wrap: wrap;
+}
+
+.ae-chip-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 15px;
+	border: 1px solid var(--ae-bordo);
+	border-radius: 999px;
+	background: var(--ae-carta);
+	color: var(--ae-scuro);
+	font: inherit;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.ae-chip-btn:hover {
+	border-color: var(--ae-verde);
+}
+
+.ae-chip-btn.attivo {
+	background: var(--ae-verde);
+	border-color: var(--ae-verde);
+	color: #fff;
+}
+
+.ae-chip-offerte.attivo {
+	background: var(--ae-corallo);
+	border-color: var(--ae-corallo);
+}
+
+/* ── Corpo: lista + mappa ────────────────────────────────────────── */
+
+.ae-corpo {
+	display: grid;
+	grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+	gap: 16px;
+	align-items: start;
+}
+
+.ae-lista {
+	background: var(--ae-carta);
+	border: 1px solid var(--ae-bordo);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.ae-lista-testa {
+	padding: 16px 18px 10px;
+	border-bottom: 1px solid var(--ae-bordo);
+}
+
+.ae-lista-titolo {
+	margin: 0;
+	font-size: 17px;
+	font-weight: 700;
+}
+
+.ae-lista-conta {
+	margin: 2px 0 0;
+	font-size: 12px;
+	color: var(--ae-grigio);
+}
+
+.ae-lista-corpo {
+	max-height: 600px;
+	overflow-y: auto;
+	padding: 10px;
+}
+
+/* ── Scheda risultato ────────────────────────────────────────────── */
+
+.ae-card {
+	display: flex;
+	gap: 12px;
+	padding: 10px;
+	margin-bottom: 8px;
+	border: 1px solid var(--ae-bordo);
+	border-radius: 10px;
+	text-decoration: none;
+	color: inherit;
+	background: var(--ae-carta);
+}
+
+.ae-card:hover {
+	border-color: var(--ae-verde);
+	background: var(--ae-fondo);
+}
+
+.ae-card.evidenza {
+	border-color: var(--ae-oro);
+	box-shadow: inset 3px 0 0 var(--ae-oro);
+}
+
+.ae-card-img {
+	flex: none;
+	width: 62px;
+	height: 62px;
+	border-radius: 8px;
+	background-color: #cbd5dd;
+	background-size: cover;
+	background-position: center;
+}
+
+.ae-card-img.tipo-poi {
+	background-color: #b9cdbf;
+}
+
+.ae-card-testo {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.ae-card-nome {
+	font-weight: 700;
+	font-size: 14.5px;
+	line-height: 1.25;
+}
+
+.ae-card-cat {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ae-verde);
+}
+
+.ae-card-ind {
+	font-size: 12px;
+	color: var(--ae-grigio);
+}
+
+.ae-card-badge {
+	display: flex;
+	gap: 5px;
+	flex-wrap: wrap;
+	margin-top: 4px;
+}
+
+.ae-pill {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 10px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #fff;
+}
+
+.ae-pill.oro {
+	background: var(--ae-oro);
+	color: #4a3708;
+}
+
+.ae-pill.corallo {
+	background: var(--ae-corallo);
+}
+
+.ae-pill.verde {
+	background: var(--ae-verde);
+}
+
+.ae-vuoto {
+	margin: 0;
+	padding: 26px 14px;
+	text-align: center;
+	color: var(--ae-grigio);
+	font-size: 13.5px;
+}
+
+/* ── Mappa ───────────────────────────────────────────────────────── */
+
+.ae-mappa .advtr-map {
+	border-radius: 12px;
+	overflow: hidden;
+	border: 1px solid var(--ae-bordo);
+}
+
+/* Marker sotto il puntatore nella lista. */
+
+.advtr-marker.evidenziato,
+.leaflet-marker-icon.evidenziato .advtr-marker {
+	transform: scale( 1.45 );
+	z-index: 500;
+}
+
+@media (max-width: 860px) {
+
+	.ae-corpo {
+		grid-template-columns: 1fr;
+	}
+
+	.ae-lista-corpo {
+		max-height: 340px;
+	}
+}

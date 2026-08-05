@@ -23,6 +23,8 @@ use AdverTrieste\Cpt\Locale;
 use AdverTrieste\Cpt\Poi;
 use AdverTrieste\Cpt\Categoria;
 use AdverTrieste\Stats\Stats;
+use AdverTrieste\Cpt\Offerta;
+use AdverTrieste\Coupon\Coupon;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Query;
@@ -211,7 +213,7 @@ class Markers {
 			$markers[]           = $marker;
 		}
 
-		return new WP_REST_Response( $markers, 200 );
+		return new WP_REST_Response( self::ordina( $markers ), 200 );
 	}
 
 	/**
@@ -276,6 +278,7 @@ class Markers {
 	 */
 	private static function format_marker( $post, $type, $zoom_min ) {
 		$terms = wp_get_post_terms( $post->ID, Categoria::TAXONOMY, array( 'fields' => 'slugs' ) );
+		$nomi  = wp_get_post_terms( $post->ID, Categoria::TAXONOMY, array( 'fields' => 'names' ) );
 
 		$logo_id  = (int) get_post_meta( $post->ID, 'advtr_logo_id', true );
 		$logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'thumbnail' ) : get_the_post_thumbnail_url( $post->ID, 'thumbnail' );
@@ -287,13 +290,78 @@ class Markers {
 			'lat'         => (float) get_post_meta( $post->ID, 'advtr_lat', true ),
 			'lng'         => (float) get_post_meta( $post->ID, 'advtr_lng', true ),
 			'categoria'   => is_array( $terms ) ? $terms : array(),
+			'categorie'   => is_array( $nomi ) ? $nomi : array(),
+			'indirizzo'   => (string) get_post_meta( $post->ID, 'advtr_indirizzo', true ),
+			// Offerta attiva: il badge "coupon" della schermata 06.
+			'offerta'     => ( Locale::POST_TYPE === $type ) ? self::offerta_attiva( $post->ID ) : null,
 			'in_evidenza' => ( Locale::POST_TYPE === $type ) ? self::is_in_evidenza( $post->ID ) : false,
+			'priorita'    => (int) get_post_meta( $post->ID, 'advtr_evidenza_priorita', true ),
 			// Badge "Novità" finché la scheda non supera la soglia visite (§1.6).
 			'novita'      => ( Locale::POST_TYPE === $type ) ? Stats::is_novita( $post->ID ) : false,
 			'zoom_min'    => $zoom_min,
 			'permalink'   => get_permalink( $post ),
 			'logo'        => $logo_url ? $logo_url : '',
 		);
+	}
+
+	/**
+	 * Titolo dell'offerta attiva di un locale, se ce n'è una.
+	 *
+	 * Alimenta il badge coupon nell'elenco: nel mockup c'è, e mostrarlo solo
+	 * quando l'offerta è davvero valida evita di promettere sconti scaduti.
+	 *
+	 * @param int $locale_id ID del locale.
+	 * @return string|null
+	 */
+	private static function offerta_attiva( $locale_id ) {
+		$offerte = get_posts(
+			array(
+				'post_type'      => Offerta::POST_TYPE,
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
+						'key'   => 'advtr_locale_id',
+						'value' => (int) $locale_id,
+					),
+				),
+			)
+		);
+
+		foreach ( $offerte as $offerta ) {
+			if ( Coupon::is_offer_active( $offerta->ID ) ) {
+				return get_the_title( $offerta );
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Ordina i marker: prima l'evidenza, per priorità, poi il resto.
+	 *
+	 * Il badge "In Evidenza" si vende anche come "posizionamento prioritario nei
+	 * risultati" (§2.4): finora `advtr_evidenza_priorita` veniva salvato e mai
+	 * usato, quindi la priorità era promessa e non consegnata.
+	 *
+	 * @param array<int,array<string,mixed>> $marker Marker da ordinare.
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function ordina( array $marker ) {
+		usort(
+			$marker,
+			static function ( $a, $b ) {
+				if ( $a['in_evidenza'] !== $b['in_evidenza'] ) {
+					return $a['in_evidenza'] ? -1 : 1;
+				}
+				if ( $a['in_evidenza'] && $a['priorita'] !== $b['priorita'] ) {
+					// Priorità più alta prima.
+					return $b['priorita'] - $a['priorita'];
+				}
+				return strcasecmp( (string) $a['title'], (string) $b['title'] );
+			}
+		);
+		return $marker;
 	}
 
 	/**
