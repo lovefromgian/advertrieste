@@ -121,6 +121,11 @@ class Markers {
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_title',
 			),
+			'q'         => array(
+				'required'          => false,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
 		);
 	}
 
@@ -137,6 +142,7 @@ class Markers {
 		$max_lng   = $request->get_param( 'max_lng' );
 		$zoom      = (int) $request->get_param( 'zoom' );
 		$categoria = $request->get_param( 'categoria' );
+		$cerca     = (string) $request->get_param( 'q' );
 
 		$meta_query = array(
 			'relation' => 'AND',
@@ -165,6 +171,13 @@ class Markers {
 			'meta_query'             => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 		);
 
+		// Ricerca libera per nome, via o zona (§1.2). WP_Query cerca in titolo e
+		// contenuto; l'indirizzo sta in un meta, quindi va aggiunto a mano.
+		if ( '' !== $cerca ) {
+			$args['s'] = $cerca;
+			add_filter( 'posts_search', array( __CLASS__, 'cerca_anche_indirizzo' ), 10, 2 );
+		}
+
 		if ( $categoria ) {
 			$args['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				array(
@@ -175,9 +188,13 @@ class Markers {
 			);
 		}
 
-		$query      = new WP_Query( $args );
-		$markers    = array();
-		$in_evento  = Eventi::locali_in_evento();
+		$query = new WP_Query( $args );
+		if ( '' !== $cerca ) {
+			remove_filter( 'posts_search', array( __CLASS__, 'cerca_anche_indirizzo' ), 10 );
+		}
+
+		$markers   = array();
+		$in_evento = Eventi::locali_in_evento();
 
 		foreach ( $query->posts as $post ) {
 			$type     = $post->post_type;
@@ -189,12 +206,64 @@ class Markers {
 				continue;
 			}
 
-			$marker               = self::format_marker( $post, $type, $zoom_min );
-			$marker['in_evento']  = isset( $in_evento[ $post->ID ] );
-			$markers[]            = $marker;
+			$marker              = self::format_marker( $post, $type, $zoom_min );
+			$marker['in_evento'] = isset( $in_evento[ $post->ID ] );
+			$markers[]           = $marker;
 		}
 
 		return new WP_REST_Response( $markers, 200 );
+	}
+
+	/**
+	 * Sostituisce la ricerca di WordPress con una che include l'indirizzo.
+	 *
+	 * Chi scrive "Via Giulia" cerca una via, non un nome di locale: l'indirizzo
+	 * sta in un meta, che la ricerca del core non guarda — e le specifiche §1.2
+	 * promettono la ricerca per via o zona.
+	 *
+	 * La clausola viene RICOSTRUITA, non modificata con una sostituzione: quella
+	 * del core contiene anche la condizione sulla password, e un'espressione
+	 * regolare avida finiva per mettere l'indirizzo in alternativa a quella
+	 * anziché alla ricerca. La condizione sulla password è quindi riaggiunta qui
+	 * esplicitamente.
+	 *
+	 * Cerca la frase intera, non le singole parole: su una directory "Caffè San
+	 * Marco" deve trovare quel locale, non tutto ciò che contiene "San".
+	 *
+	 * @param string    $search Clausola costruita dal core (scartata).
+	 * @param \WP_Query $query  Query in corso.
+	 * @return string
+	 */
+	public static function cerca_anche_indirizzo( $search, $query ) {
+		$termine = (string) $query->get( 's' );
+		if ( '' === trim( $termine ) ) {
+			return $search;
+		}
+
+		global $wpdb;
+		$like = '%' . $wpdb->esc_like( $termine ) . '%';
+
+		$clausola = $wpdb->prepare(
+			" AND (
+				{$wpdb->posts}.post_title LIKE %s
+				OR {$wpdb->posts}.post_content LIKE %s
+				OR EXISTS (
+					SELECT 1 FROM {$wpdb->postmeta} pm
+					WHERE pm.post_id = {$wpdb->posts}.ID
+					AND pm.meta_key = 'advtr_indirizzo'
+					AND pm.meta_value LIKE %s
+				)
+			) ",
+			$like,
+			$like,
+			$like
+		);
+
+		// Reintrodotta perché ricostruiamo da zero: senza, una scheda protetta
+		// da password comparirebbe fra i risultati.
+		$clausola .= " AND ({$wpdb->posts}.post_password = '') ";
+
+		return $clausola;
 	}
 
 	/**

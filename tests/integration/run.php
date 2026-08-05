@@ -59,6 +59,22 @@ function advtr_eq( $expected, $actual, $label ) {
 }
 
 /**
+ * Il titolo compare fra i marker restituiti?
+ *
+ * @param mixed  $marker Risposta dell'endpoint.
+ * @param string $titolo Titolo cercato.
+ * @return bool
+ */
+function in_titoli( $marker, $titolo ) {
+	foreach ( (array) $marker as $m ) {
+		if ( isset( $m['title'] ) && $m['title'] === $titolo ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Esegue una richiesta REST e ne restituisce [status, data].
  *
  * @param string      $method Metodo.
@@ -292,6 +308,45 @@ advtr_ok( is_array( get_transient( EventiRest::CACHE_LOCALI_IN_EVENTO ) ), 'risu
 
 wp_update_post( array( 'ID' => $grande, 'post_title' => 'Barcolana 2' ) );
 advtr_ok( false === get_transient( EventiRest::CACHE_LOCALI_IN_EVENTO ), 'modifica evento → cache invalidata' );
+
+/* ------------------------------------------------------------------ */
+echo "\n# 9. Ricerca libera sulla mappa (§1.2)\n";
+// L'ingresso guidato manda il termine qui: se la ricerca non trovasse nulla,
+// il campo della home sarebbe decorativo.
+update_post_meta( $loc, 'advtr_indirizzo', 'Via delle Prove 42, Trieste' );
+// La scheda di prova nasce senza coordinate: l'endpoint filtra per riquadro,
+// quindi senza queste non comparirebbe a prescindere dalla ricerca.
+update_post_meta( $loc, 'advtr_lat', 45.65 );
+update_post_meta( $loc, 'advtr_lng', 13.77 );
+update_post_meta( $loc, 'advtr_zoom_min', 0 );
+$bbox = array( 'min_lat' => 45.0, 'max_lat' => 46.0, 'min_lng' => 13.0, 'max_lng' => 14.5, 'zoom' => 18 );
+
+list( , $r ) = advtr_req( 'GET', '/advertrieste/v1/map/markers', array_merge( $bbox, array( 'q' => 'Loc' ) ) );
+advtr_ok( in_titoli( $r, get_the_title( $loc ) ), 'ricerca per nome trova la scheda' );
+
+list( , $r ) = advtr_req( 'GET', '/advertrieste/v1/map/markers', array_merge( $bbox, array( 'q' => 'delle Prove' ) ) );
+advtr_ok( in_titoli( $r, get_the_title( $loc ) ), 'ricerca per VIA trova la scheda (indirizzo nei meta)' );
+
+list( , $r ) = advtr_req( 'GET', '/advertrieste/v1/map/markers', array_merge( $bbox, array( 'q' => 'zzznonesiste' ) ) );
+advtr_eq( 0, count( (array) $r ), 'termine inesistente non restituisce nulla' );
+
+list( , $r ) = advtr_req( 'GET', '/advertrieste/v1/map/markers', $bbox );
+advtr_ok( count( (array) $r ) > 1, 'senza termine i marker restano tutti' );
+
+// La ricerca non deve aggirare la visibilità.
+$protetta = wp_insert_post(
+	array(
+		'post_type'      => 'locale',
+		'post_status'    => 'publish',
+		'post_title'     => 'Scheda Protetta Prove',
+		'post_password'  => 'segreto',
+	)
+);
+update_post_meta( $protetta, 'advtr_lat', 45.65 );
+update_post_meta( $protetta, 'advtr_lng', 13.77 );
+list( , $r ) = advtr_req( 'GET', '/advertrieste/v1/map/markers', array_merge( $bbox, array( 'q' => 'Protetta Prove' ) ) );
+advtr_ok( ! in_titoli( $r, 'Scheda Protetta Prove' ), 'una scheda protetta da password resta fuori dai risultati' );
+wp_delete_post( $protetta, true );
 
 /* ------------------------------------------------------------------ */
 // Pulizia.

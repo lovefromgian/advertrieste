@@ -37,14 +37,19 @@
 		} ).addTo( map );
 
 		var layer = L.layerGroup().addTo( map );
+		var inquadrato = false;
 
-		// Categoria pre-selezionata dall'ingresso guidato (?categoria=slug).
+		// Categoria e ricerca arrivano dall'ingresso guidato
+		// (?categoria=slug&q=testo).
 		var categoriaAttiva = '';
+		var ricerca = '';
 		try {
-			var fromUrl = new URLSearchParams( window.location.search ).get( 'categoria' );
+			var params = new URLSearchParams( window.location.search );
+			var fromUrl = params.get( 'categoria' );
 			if ( fromUrl && cfg.categorie && cfg.categorie.some( function ( c ) { return c.slug === fromUrl; } ) ) {
 				categoriaAttiva = fromUrl;
 			}
+			ricerca = ( params.get( 'q' ) || '' ).trim();
 		} catch ( e ) {}
 
 		function markerIcon( m ) {
@@ -134,6 +139,9 @@
 			if ( categoriaAttiva ) {
 				params.set( 'categoria', categoriaAttiva );
 			}
+			if ( ricerca ) {
+				params.set( 'q', ricerca );
+			}
 
 			window.fetch( cfg.endpoint + '?' + params.toString(), {
 				headers: { Accept: 'application/json' }
@@ -141,6 +149,7 @@
 				return r.ok ? r.json() : [];
 			} ).then( function ( markers ) {
 				layer.clearLayers();
+				var trovati = [];
 				( markers || [] ).forEach( function ( m ) {
 					if ( typeof m.lat !== 'number' || typeof m.lng !== 'number' ) {
 						return;
@@ -151,7 +160,14 @@
 						trackMapClick( m );
 					} );
 					marker.addTo( layer );
+					trovati.push( [ m.lat, m.lng ] );
 				} );
+
+				// Solo alla prima risposta di una ricerca: dopo, l'utente comanda.
+				if ( ricerca && ! inquadrato && trovati.length ) {
+					inquadrato = true;
+					map.fitBounds( trovati, { padding: [ 40, 40 ], maxZoom: 17 } );
+				}
 			} ).catch( function () {
 				layer.clearLayers();
 			} );

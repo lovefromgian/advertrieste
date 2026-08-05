@@ -617,7 +617,7 @@ $home_id   = advtr_demo_upsert(
 		'post_title'   => 'AdverTrieste',
 		'post_name'    => 'advertrieste-home',
 		'post_content' => sprintf(
-			"[advtr_onboarding map=\"%s\" titolo=\"Cosa stai cercando a Trieste?\"]\n\n[advtr_map zoom=\"13\" height=\"600\"]",
+			"[advtr_home]",
 			esc_url( $mappa_url )
 		),
 	)

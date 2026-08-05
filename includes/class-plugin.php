@@ -35,6 +35,7 @@ use AdverTrieste\Frontend\Onboarding;
 use AdverTrieste\Frontend\Scheda;
 use AdverTrieste\Frontend\ReservedArea;
 use AdverTrieste\Frontend\ClientArea;
+use AdverTrieste\Frontend\Home;
 use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
 use AdverTrieste\Frontend\Eventi as EventiView;
@@ -127,6 +128,7 @@ final class Plugin {
 		ReservedArea::init();
 		add_action( 'wp_enqueue_scripts', array( Console::class, 'registra_asset' ) );
 		ClientArea::init();
+		Home::init();
 		AdminLock::init();
 		StatsDashboard::init();
 		OfferteView::init();

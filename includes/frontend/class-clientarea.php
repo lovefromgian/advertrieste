@@ -25,6 +25,7 @@ use AdverTrieste\Cliente\Offerte as OfferteCliente;
 use AdverTrieste\Cpt\Locale;
 use AdverTrieste\Rest\Markers;
 use AdverTrieste\Console\Console;
+use AdverTrieste\Console\Pagina;
 use AdverTrieste\Cliente\Evidenza;
 use AdverTrieste\Cliente\Abbonamento;
 
@@ -262,16 +263,7 @@ class ClientArea {
 			return;
 		}
 
-		foreach ( wp_styles()->queue as $handle ) {
-			if ( ! self::asset_ammesso( wp_styles(), $handle ) ) {
-				wp_dequeue_style( $handle );
-			}
-		}
-		foreach ( wp_scripts()->queue as $handle ) {
-			if ( ! self::asset_ammesso( wp_scripts(), $handle ) ) {
-				wp_dequeue_script( $handle );
-			}
-		}
+		Pagina::pulisci_asset();
 	}
 
 	/**
@@ -285,51 +277,7 @@ class ClientArea {
 		if ( ! self::e_console() ) {
 			return $tag;
 		}
-		$registro = 'style_loader_tag' === current_filter() ? wp_styles() : wp_scripts();
-		return self::asset_ammesso( $registro, $handle ) ? $tag : '';
-	}
-
-	/**
-	 * L'asset può restare sulla console?
-	 *
-	 * La regola è "viene da questo plugin", non un elenco di handle: un elenco va
-	 * aggiornato a ogni asset nuovo, e dimenticarne uno significa una sezione che
-	 * smette di funzionare in silenzio — è già successo con la validazione dei
-	 * coupon. Leaflet rientra perché è distribuito dentro il plugin.
-	 *
-	 * @param \WP_Dependencies $registro Registro degli stili o degli script.
-	 * @param string           $handle   Handle da valutare.
-	 * @return bool
-	 */
-	private static function asset_ammesso( $registro, $handle ) {
-		if ( in_array( $handle, self::asset_sempre_ammessi(), true ) ) {
-			return true;
-		}
-
-		$src = isset( $registro->registered[ $handle ] ) ? $registro->registered[ $handle ]->src : '';
-
-		if ( ! is_string( $src ) || '' === $src ) {
-			// Handle senza file proprio. Non sono sempre innocui: i temi li usano
-			// per iniettare CSS inline (betheme ci mette anche lo sfondo di
-			// `html`, che trapelerebbe dietro la console). Passano solo i nostri.
-			return 0 === strpos( $handle, 'advtr' );
-		}
-
-		return 0 === strpos( $src, ADVTR_URL );
-	}
-
-	/**
-	 * Handle sempre ammessi, oltre a quelli del plugin.
-	 *
-	 * @return string[]
-	 */
-	private static function asset_sempre_ammessi() {
-		/**
-		 * Handle da conservare sulla console anche se esterni al plugin.
-		 *
-		 * @param string[] $ammessi Elenco di handle.
-		 */
-		return apply_filters( 'advtr_console_asset_consentiti', array() );
+		return Pagina::filtra_tag( $tag, $handle );
 	}
 
 	/**
