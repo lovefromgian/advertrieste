@@ -234,6 +234,14 @@ body.advtr-pubblico-pagina {
 	font-size: 15px;
 }
 
+/* Contenitore di titolo e descrizione: serve al layout a riga del telefono. */
+
+.ap-carta-testo {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
 .ap-carta-dett {
 	font-size: 12px;
 	color: var(--ap-tenue);
@@ -867,40 +875,6 @@ body.advtr-pubblico-pagina {
 	box-sizing: inherit;
 }
 
-/* ── Fascia d'apertura ───────────────────────────────────────────── */
-
-.as-eroe {
-	position: relative;
-	height: 170px;
-	background:
-		repeating-linear-gradient( 135deg, rgba( 255, 255, 255, 0.07 ) 0 14px, rgba( 255, 255, 255, 0 ) 14px 28px ),
-		linear-gradient( 100deg, #d9694e, #e3ab35 );
-}
-
-.as-eroe.evidenza {
-	background:
-		repeating-linear-gradient( 135deg, rgba( 255, 255, 255, 0.10 ) 0 14px, rgba( 255, 255, 255, 0 ) 14px 28px ),
-		linear-gradient( 100deg, #d9694e, #e8b93f );
-}
-
-.as-eroe-badge {
-	position: absolute;
-	top: 16px;
-	right: 18px;
-	padding: 5px 12px;
-	border-radius: 999px;
-	background: rgba( 27, 42, 58, 0.82 );
-	color: #fff;
-	font-size: 11px;
-	font-weight: 700;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-}
-
-.as-eroe-badge.nov {
-	background: rgba( 47, 107, 79, 0.9 );
-}
-
 /* ── Intestazione ────────────────────────────────────────────────── */
 
 .as-intestazione {
@@ -908,20 +882,18 @@ body.advtr-pubblico-pagina {
 	align-items: flex-end;
 	gap: 18px;
 	flex-wrap: wrap;
-	padding: 0 26px 18px;
-	margin-top: -46px;
+	padding: 26px 26px 18px;
 }
 
 .as-logo {
 	flex: none;
 	display: grid;
 	place-items: center;
-	width: 92px;
-	height: 92px;
+	width: 84px;
+	height: 84px;
 	border-radius: 16px;
-	background: var(--as-carta);
-	border: 4px solid var(--as-carta);
-	box-shadow: 0 6px 18px rgba( 27, 42, 58, 0.16 );
+	background: var(--as-fondo);
+	border: 1px solid var(--as-bordo);
 	overflow: hidden;
 }
 
@@ -1010,6 +982,33 @@ body.advtr-pubblico-pagina {
 .as-btn-primario:hover {
 	background: #c25a41;
 	color: #fff;
+}
+
+.as-badge {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin: 6px 0 0;
+}
+
+.as-pill {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #fff;
+}
+
+.as-pill.oro {
+	background: var(--as-oro);
+	color: #4a3708;
+}
+
+.as-pill.verde {
+	background: var(--as-verde);
 }
 
 /* ── Corpo a due colonne ─────────────────────────────────────────── */
@@ -1211,5 +1210,165 @@ body.advtr-pubblico-pagina {
 
 	.as-intestazione {
 		padding: 0 18px 16px;
+	}
+}
+
+/* ══ Telefono ═════════════════════════════════════════════════════ */
+/* Sotto i 560px non basta impilare: alcune scelte vanno cambiate.   */
+
+@media (max-width: 560px) {
+
+	/* Ingresso: una scheda per riga. Due colonne da 165px spezzano le
+	   descrizioni su quattro righe e diventano illeggibili. */
+
+	.ap-intenzioni {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+
+	.ap-carta {
+		flex-direction: row;
+		align-items: center;
+		text-align: left;
+		gap: 12px;
+		padding: 12px 14px;
+	}
+
+	.ap-carta-icona {
+		margin-bottom: 0;
+		width: 40px;
+		height: 40px;
+		font-size: 19px;
+	}
+
+	.ap-carta-testo {
+		min-width: 0;
+	}
+
+	/* Ricerca: il bottone va a capo invece di schiacciare il campo. */
+
+	.ap-cerca {
+		flex-wrap: wrap;
+		border-radius: 16px;
+		padding: 12px;
+		gap: 8px;
+	}
+
+	.ap-cerca input[type="search"] {
+		flex: 1 1 100%;
+		order: 2;
+	}
+
+	.ap-cerca .ap-btn {
+		flex: 1 1 100%;
+		order: 3;
+		text-align: center;
+	}
+
+	.ap-cerca-icona {
+		order: 1;
+	}
+
+	.ap-titolo {
+		font-size: 30px;
+	}
+
+	.ap-eroe {
+		justify-content: flex-start;
+		padding-top: 24px;
+	}
+
+	/* Barra della mappa: i chip scorrono in orizzontale invece di
+	   impilarsi su quattro righe e spingere giù la mappa. */
+
+	.ae-chip {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		padding-bottom: 2px;
+		margin: 0 -16px;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+
+	.ae-chip::-webkit-scrollbar {
+		display: none;
+	}
+
+	.ae-chip-btn {
+		flex: none;
+		padding: 11px 16px;
+	}
+
+	.ae-cerca {
+		flex: 1 1 100%;
+		padding: 11px 14px;
+	}
+
+	/* La mappa non deve occupare tutto lo schermo: l'elenco sotto deve
+	   restare intuibile senza scorrere alla cieca. */
+
+	.ae-mappa .advtr-map,
+	.advtr-map[style*="height"] {
+		height: 52vh !important;
+		min-height: 260px;
+	}
+
+	.ae-lista-corpo {
+		max-height: none;
+	}
+
+	/* Scheda attività. */
+
+	.as-intestazione {
+		padding: 18px 16px 14px;
+		gap: 14px;
+	}
+
+	.as-logo {
+		width: 64px;
+		height: 64px;
+	}
+
+	.as-azioni {
+		width: 100%;
+	}
+
+	.as-azioni .as-btn {
+		flex: 1;
+		text-align: center;
+	}
+
+	.as-corpo {
+		padding: 4px 16px 24px;
+		gap: 18px;
+	}
+
+	.as-galleria {
+		grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+	}
+
+	.as-scheda .advtr-scheda-map {
+		height: 220px;
+	}
+
+	.ap-contenuto {
+		padding: 20px 16px 36px;
+	}
+
+	.ap-nav {
+		padding: 14px 16px;
+	}
+
+	.ap-pie {
+		padding: 18px 16px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.ap-pie-voci {
+		margin-left: 0;
 	}
 }

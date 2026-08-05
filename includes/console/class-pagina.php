@@ -89,6 +89,26 @@ class Pagina {
 	}
 
 	/**
+	 * Stampa `wp_head()` senza i tag viewport altrui.
+	 *
+	 * Temi e plugin ne aggiungono uno proprio, spesso con `maximum-scale=1`, che
+	 * impedisce di ingrandire la pagina con le dita: su telefono è un ostacolo di
+	 * accessibilità, non una scelta di stile. Poiché il documento è nostro, il
+	 * viewport lo dichiariamo noi e togliamo i duplicati.
+	 *
+	 * @return void
+	 */
+	public static function stampa_head() {
+		ob_start();
+		wp_head();
+		$head = (string) ob_get_clean();
+
+		$head = preg_replace( '#<meta[^>]*name=["\']viewport["\'][^>]*>#i', '', $head );
+
+		echo $head; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output di wp_head, già escapato dal core e dai plugin.
+	}
+
+	/**
 	 * La pagina interrogata contiene uno degli shortcode indicati?
 	 *
 	 * @param string[] $shortcode Tag da cercare.

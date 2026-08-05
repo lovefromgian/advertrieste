@@ -21,7 +21,7 @@ $advtr_contenuto = \AdverTrieste\Frontend\Pubblico::prepara();
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<?php wp_head(); ?>
+	<?php \AdverTrieste\Console\Pagina::stampa_head(); ?>
 </head>
 <body class="advtr-pubblico-pagina">
 	<?php echo $advtr_contenuto; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del plugin, già escapato. ?>

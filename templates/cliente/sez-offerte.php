@@ -41,6 +41,7 @@ function advtr_data_input( $valore ) {
 	<?php if ( ! $advtr_mie ) : ?>
 		<p class="advtr-nota"><?php esc_html_e( 'Non hai ancora creato offerte.', 'advertrieste' ); ?></p>
 	<?php else : ?>
+		<div class="advtr-tabella-scorri">
 		<table class="advtr-tabella">
 			<thead>
 				<tr>
@@ -89,6 +90,7 @@ function advtr_data_input( $valore ) {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
+		</div>
 	<?php endif; ?>
 
 	<h3><?php echo $advtr_edit ? esc_html__( 'Modifica offerta', 'advertrieste' ) : esc_html__( 'Nuova offerta', 'advertrieste' ); ?></h3>

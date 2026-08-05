@@ -35,7 +35,7 @@ $advtr_contenuto = \AdverTrieste\Frontend\ClientArea::shortcode();
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<?php wp_head(); ?>
+	<?php \AdverTrieste\Console\Pagina::stampa_head(); ?>
 </head>
 <body class="advtr-console-pagina">
 	<?php echo $advtr_contenuto; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup della console, già escapato. ?>

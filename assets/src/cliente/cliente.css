@@ -457,3 +457,49 @@
 		padding: 16px;
 	}
 }
+
+/* ══ Telefono ═════════════════════════════════════════════════════ */
+
+@media (max-width: 560px) {
+
+	.advtr-media-griglia {
+		grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+		gap: 10px;
+	}
+
+	.advtr-upload {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.advtr-upload .advtr-btn,
+	.advtr-upload .ac-btn {
+		width: 100%;
+		text-align: center;
+	}
+
+	.advtr-form-azioni {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.advtr-form-azioni .advtr-btn,
+	.advtr-form-azioni .ac-btn {
+		width: 100%;
+		text-align: center;
+	}
+
+	.advtr-tabella-azioni {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 6px;
+	}
+
+	.advtr-mappa-picker {
+		height: 240px;
+	}
+
+	.advtr-media-riga {
+		flex-direction: column;
+	}
+}

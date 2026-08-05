@@ -747,3 +747,96 @@ body.advtr-console-pagina {
 .ac-accesso-avviso.errore {
 	border-left-color: var(--ac-rosso);
 }
+
+/* ══ Telefono ═════════════════════════════════════════════════════ */
+
+@media (max-width: 700px) {
+
+	/* Il menu diventa una riga che scorre: impilato, nove voci spingono
+	   il contenuto sotto due schermate di altezza. */
+
+	.ac-lato {
+		padding: 14px 0 10px;
+	}
+
+	.ac-lato nav {
+		display: flex;
+		gap: 6px;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		padding: 0 12px 4px;
+	}
+
+	.ac-lato nav::-webkit-scrollbar {
+		display: none;
+	}
+
+	.ac-gruppo {
+		display: none;
+	}
+
+	.ac-voce {
+		flex: none;
+		margin: 0;
+		padding: 10px 14px;
+		white-space: nowrap;
+		background: var(--ac-scuro-alto);
+	}
+
+	.ac-marchio {
+		padding: 0 16px 14px;
+	}
+
+	.ac-utente {
+		margin: 12px;
+	}
+
+	.ac-corpo {
+		padding: 20px 16px 28px;
+	}
+
+	.ac-titolo {
+		font-size: 21px;
+	}
+
+	.ac-kpi-valore {
+		font-size: 26px;
+	}
+
+	/* Tabelle: scorrono in orizzontale invece di far scorrere la pagina. */
+
+	.ac-tabella-scorri,
+	.advtr-tabella-scorri {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: 0 -16px;
+		padding: 0 16px;
+	}
+
+	.advtr-tabella {
+		min-width: 520px;
+	}
+
+	/* Aree tattili: sotto i 44px il dito sbaglia. */
+
+	.ac-btn,
+	.advtr-btn {
+		padding: 12px 18px;
+	}
+
+	.ac-avviso {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.ac-avviso .ac-btn {
+		margin-left: 0;
+		width: 100%;
+		text-align: center;
+	}
+
+	.ac-accesso-scheda {
+		padding: 24px 20px;
+	}
+}

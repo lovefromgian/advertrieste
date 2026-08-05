@@ -57,10 +57,12 @@ $advtr_intenzioni = Home::intenzioni();
 				?>
 				<a class="ap-carta" href="<?php echo esc_url( Home::url_mappa( array( 'categoria' => $advtr_term->slug ) ) ); ?>">
 					<span class="ap-carta-icona" aria-hidden="true"><?php echo esc_html( $advtr_icona ); ?></span>
-					<span class="ap-carta-titolo"><?php echo esc_html( $advtr_titolo ); ?></span>
-					<?php if ( $advtr_dett ) : ?>
-						<span class="ap-carta-dett"><?php echo esc_html( $advtr_dett ); ?></span>
-					<?php endif; ?>
+					<span class="ap-carta-testo">
+						<span class="ap-carta-titolo"><?php echo esc_html( $advtr_titolo ); ?></span>
+						<?php if ( $advtr_dett ) : ?>
+							<span class="ap-carta-dett"><?php echo esc_html( $advtr_dett ); ?></span>
+						<?php endif; ?>
+					</span>
 				</a>
 			<?php endforeach; ?>
 		</div>

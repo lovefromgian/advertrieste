@@ -3,8 +3,8 @@
  * Scheda attività — schermata 07 della proposta (§1.3).
  *
  * Renderizzata dentro il guscio pubblico del plugin (vedi Frontend\Pubblico):
- * fascia d'apertura sfumata con il logo a riquadro, titolo e azioni, poi due
- * colonne — contenuti a sinistra, offerta e informazioni a destra.
+ * intestazione con logo, titolo e azioni, poi due colonne — contenuti a
+ * sinistra, offerta e informazioni a destra.
  *
  * Conserva gli agganci che la scheda aveva già: `data-advtr-sezione` per le
  * sezioni più viste, `data-advtr-contact` per i click sui contatti,
@@ -73,14 +73,6 @@ while ( have_posts() ) :
 	?>
 	<article class="as-scheda">
 
-		<header class="as-eroe<?php echo $advtr_in_evid ? ' evidenza' : ''; ?>">
-			<?php if ( $advtr_in_evid ) : ?>
-				<span class="as-eroe-badge">★ <?php esc_html_e( 'In evidenza', 'advertrieste' ); ?></span>
-			<?php elseif ( $advtr_novita ) : ?>
-				<span class="as-eroe-badge nov"><?php esc_html_e( 'Novità', 'advertrieste' ); ?></span>
-			<?php endif; ?>
-		</header>
-
 		<div class="as-intestazione">
 			<span class="as-logo">
 				<?php if ( $advtr_logo ) : ?>
@@ -92,6 +84,16 @@ while ( have_posts() ) :
 
 			<div class="as-intestazione-testo">
 				<h1 class="as-titolo"><?php the_title(); ?></h1>
+				<?php if ( $advtr_in_evid || $advtr_novita ) : ?>
+					<p class="as-badge">
+						<?php if ( $advtr_in_evid ) : ?>
+							<span class="as-pill oro">★ <?php esc_html_e( 'In evidenza', 'advertrieste' ); ?></span>
+						<?php endif; ?>
+						<?php if ( $advtr_novita ) : ?>
+							<span class="as-pill verde"><?php esc_html_e( 'Novità', 'advertrieste' ); ?></span>
+						<?php endif; ?>
+					</p>
+				<?php endif; ?>
 				<p class="as-meta">
 					<?php if ( $advtr_terms && ! is_wp_error( $advtr_terms ) ) : ?>
 						<span class="as-cat"><?php echo esc_html( implode( ' · ', wp_list_pluck( $advtr_terms, 'name' ) ) ); ?></span>
