@@ -50,7 +50,9 @@ advertrieste/
 │   │   └── class-cron.php       # advtr_expire_coupons + advtr_check_scadenze (giornalieri)
 │   ├── access/               # ruoli, capability e controlli di accesso
 │   │   ├── class-roles.php      # ruoli cliente_locale/organizzatore_evento + capability
-│   │   └── class-access.php     # helper: can_view_qr_map(), is_cliente()
+│   │   ├── class-access.php     # helper: can_view_qr_map(), is_cliente()
+│   │   └── class-adminlock.php  # tiene i clienti fuori da wp-admin + media per autore
+│   ├── cliente/              # scritture dell'area clienti (scheda, media, offerte)
 │   ├── meta/                 # meta box e campi
 │   │   ├── class-localemeta.php # meta del CPT `locale` (register + box + save)
 │   │   ├── class-poimeta.php    # meta del CPT `poi` (coordinate, zoom, tipo)
@@ -68,7 +70,8 @@ advertrieste/
 │   └── frontend/             # front-end pubblico e riservato
 │       ├── class-map.php            # shortcode [advtr_map] + enqueue Leaflet
 │       ├── class-onboarding.php     # shortcode [advtr_onboarding] (ingresso guidato)
-│       ├── class-reservedarea.php   # shortcode [advtr_area_riservata] + mappa QR
+│       ├── class-reservedarea.php   # asset della mappa QR riservata
+│       ├── class-clientarea.php     # area clienti front-end: accesso + sezioni
 │       ├── class-statsdashboard.php # shortcode [advtr_statistiche] (tiles + grafico)
 │       ├── class-offerte.php        # shortcode [advtr_offerte] + [advtr_valida_coupon]
 │       ├── class-eventi.php         # shortcode [advtr_grandi_eventi] + [advtr_eventi]
@@ -108,7 +111,7 @@ Attributi: `lat`, `lng` (centro, default Trieste), `zoom` (default 13), `height`
 
 Ruoli custom (installati all'attivazione): `cliente_locale`, `organizzatore_evento`. Capability: `advtr_view_qr_map`, `advtr_edit_own_locale`, `advtr_submit_evento`, `advtr_approve_evento` (tutte assegnate anche all'amministratore).
 
-Shortcode `[advtr_area_riservata]`: gate lato server (non loggato → invito al login; autenticato non-cliente → avviso; cliente con `advtr_view_qr_map` → dashboard + **mappa dei punti QR**). Le coordinate dei `punto_qr` sono servite SOLO dall'endpoint autenticato `GET advertrieste/v1/qr-map` (permission: autenticato + `advtr_view_qr_map`); non compaiono mai nell'endpoint pubblico né nella pagina.
+Shortcode `[advtr_area_clienti]` (alias storico: `[advtr_area_riservata]`): accesso, recupero password e gestione, tutto in front-end. Il ruolo cliente **non accede alla bacheca** — `Access\AdminLock` reindirizza `/wp-admin`, nasconde la admin bar e limita la libreria media ai propri file. Sezioni: scheda, logo e foto, offerte, statistiche, valida coupon, **mappa dei punti QR**. Le coordinate dei `punto_qr` sono servite SOLO dall'endpoint autenticato `GET advertrieste/v1/qr-map` (permission: autenticato + `advtr_view_qr_map`); non compaiono mai nell'endpoint pubblico né nella pagina.
 
 > Visibilità mappa QR: attualmente ogni cliente con capability vede l'intera rete (decisione da confermare — vedi specifiche §2.5).
 

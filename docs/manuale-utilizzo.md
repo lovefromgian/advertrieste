@@ -20,7 +20,7 @@ Quattro livelli di accesso:
 | Capability | A cosa serve | Pubblico | Cliente | Organizz. | Admin |
 |---|---|:--:|:--:|:--:|:--:|
 | `advtr_view_qr_map` | Vedere la mappa riservata dei punti QR | — | ✓ | — | ✓ |
-| `advtr_edit_own_locale` | Gestire la propria scheda locale in bacheca | — | ✓ | — | ✓ |
+| `advtr_edit_own_locale` | Gestire la propria scheda dall'area clienti | — | ✓ | — | ✓ |
 | `advtr_submit_evento` | Inviare un evento in revisione | — | — | ✓ | ✓ |
 | `advtr_approve_evento` | Approvare e pubblicare un evento | — | — | — | ✓ |
 
@@ -42,7 +42,7 @@ Ogni funzionalità front-end si attiva inserendo uno **shortcode** nel contenuto
 |---|---|---|---|
 | `[advtr_map]` | Mappa pubblica con marker, filtri categoria, ricerca | `lat`, `lng`, `zoom`, `height` | Pubblico |
 | `[advtr_onboarding]` | Ingresso guidato "Cosa stai cercando?" con schede d'intenzione | `map` (URL mappa), `titolo` | Pubblico |
-| `[advtr_area_riservata]` | Area clienti: login gate + mappa riservata dei punti QR | — | Cliente, Admin |
+| `[advtr_area_clienti]` | Area clienti completa: accesso, scheda, foto, offerte, statistiche, coupon, mappa QR | — | Cliente, Admin |
 | `[advtr_statistiche]` | Dashboard statistiche di una scheda (contatori + grafico) | `id` (opzionale) | Proprietario, Admin |
 | `[advtr_offerte]` | Elenco offerte attive con countdown e codice | `locale` (opzionale) | Pubblico |
 | `[advtr_valida_coupon]` | Form esercente per validare un coupon sul posto | — | Esercente, Admin |
@@ -84,23 +84,34 @@ I ruoli custom vengono creati automaticamente all'attivazione del plugin.
 
 1. **Bacheca → Utenti → Aggiungi nuovo.** Inserisci email e username.
 2. **Ruolo:** scegli **"Cliente (locale)"** oppure **"Organizzatore evento"** dal menu a tendina.
-3. **Collega i contenuti impostandolo come Autore.** Apri la sua scheda locale (o la sua offerta/evento) e nel box "Autore" seleziona questo utente. È ciò che gli dà accesso alle proprie statistiche e alla validazione dei propri coupon.
-4. **L'utente accede da `/wp-login.php`.** Le pagine con `[advtr_area_riservata]` reindirizzano automaticamente al login chi non è autenticato, e riportano alla pagina dopo l'accesso.
+3. **Collega i contenuti impostandolo come Autore.** Apri la sua scheda locale (o la sua offerta/evento) e nel box "Autore" seleziona questo utente. È ciò che gli dà accesso alla propria scheda, alle proprie statistiche e alla validazione dei propri coupon.
+4. **Comunicagli l'indirizzo dell'area clienti** (la pagina con `[advtr_area_clienti]`). Accede da lì: il modulo di accesso è dentro la pagina, con la grafica del sito.
+
+### Il cliente non entra mai in WordPress
+
+Il cliente **non vede la bacheca**. Se prova ad aprire `/wp-admin` viene riportato all'area clienti, la barra di amministrazione non compare, e la libreria media è limitata ai file che ha caricato lui — non vede quelli del sito né quelli degli altri clienti.
+
+L'organizzatore di eventi, invece, continua a usare la bacheca (il suo flusso è più raro e passa comunque da approvazione).
 
 ### Chi entra come, e cosa vede
 
 | Come entra / cosa vede | Pubblico | Cliente | Organizz. | Admin |
 |---|:--:|:--:|:--:|:--:|
-| Accesso | senza login | wp-login | wp-login | wp-login |
-| Bacheca WordPress | — | solo le proprie schede | solo i propri eventi | completa |
+| Accesso | senza login | area clienti | wp-login | wp-login |
+| Bacheca WordPress | — | **mai** | solo i propri eventi | completa |
 | Mappa & schede pubbliche | ✓ | ✓ | ✓ | ✓ |
-| Area riservata / mappa QR | — | ✓ | — | ✓ |
+| Modificare la propria scheda | — | ✓ | — | tutte |
+| Logo e galleria | — | ✓ (solo i propri file) | — | tutti |
+| Creare e gestire offerte | — | ✓ (le proprie) | — | tutte |
 | Statistiche (proprie schede) | — | ✓ | — | tutte |
 | Validare coupon (proprie offerte) | — | ✓ | — | tutte |
+| Mappa QR | — | ✓ | — | ✓ |
 | Inviare eventi in revisione | — | — | ✓ | ✓ |
 | Approvare / pubblicare eventi | — | — | — | ✓ |
 
-> **Self-service.** Cliente e organizzatore gestiscono i **propri** contenuti direttamente dalla bacheca: un cliente vede e modifica solo le proprie schede locale; un organizzatore crea e modifica solo i propri eventi (e li invia in revisione). L'admin mantiene l'accesso completo e approva gli eventi. È il ruolo (impostato in Utenti) + l'Autore del contenuto a determinare cosa ciascuno può gestire.
+> **Self-service.** Il cliente gestisce i **propri** contenuti dall'area clienti in front-end; l'organizzatore i propri eventi dalla bacheca. In entrambi i casi è il ruolo (impostato in Utenti) più l'**Autore** del contenuto a determinare cosa ciascuno può toccare: non esiste modo di aprire la scheda di un altro, nemmeno indovinandone l'indirizzo.
+
+> **Cosa resta all'amministratore.** I campi commerciali non compaiono nell'area clienti e non sono modificabili dal cliente nemmeno inviandoli a mano: **date di validità**, **badge "In evidenza"** e **zoom minimo**. Restano leve tue.
 
 ---
 
@@ -137,15 +148,26 @@ Ogni **locale pubblicato** ha una pagina dedicata all'indirizzo `/locale/{slug}/
 
 ---
 
-## 7. Area riservata & mappa QR
+## 7. Area clienti
 
-Una pagina protetta dove i clienti vedono la rete di espositori e QR code.
+Una sola pagina con `[advtr_area_clienti]` è tutto ciò che serve: contiene accesso e gestione, e il cliente non esce mai dal sito.
 
-1. **Crea una pagina** con `[advtr_area_riservata]`.
-2. **Chi non è loggato** vede l'invito ad accedere; **chi è loggato ma non è cliente** vede un avviso.
-3. **Il cliente (o l'admin)** vede la dashboard con la **mappa dei punti QR**.
+Chi non è autenticato vede il **modulo di accesso** (con "password dimenticata"); chi è autenticato ma non è un cliente vede un avviso. Il cliente trova una barra di navigazione con sei sezioni:
 
-> **Protezione lato server.** Le coordinate dei QR arrivano solo dall'endpoint autenticato `GET advertrieste/v1/qr-map`, che risponde **401** a chi non è loggato e **403** a chi non ha il permesso. Nessun dato riservato è incorporato nella pagina.
+| Sezione | Cosa fa |
+|---|---|
+| **La mia scheda** | Nome, descrizione, categorie, servizi, contatti, orari e posizione sulla mappa con segnaposto trascinabile |
+| **Logo e foto** | Carica il logo e fino a 12 foto di galleria (JPG, PNG, WebP, GIF, max 5 MB) |
+| **Offerte** | Crea, modifica ed elimina le proprie promozioni con date e codice coupon |
+| **Statistiche** | Contatori e andamento visite delle proprie schede |
+| **Valida coupon** | Verifica il codice presentato dal cliente finale |
+| **Mappa punti QR** | La rete di espositori sul territorio |
+
+**Le modifiche vanno online subito**, senza approvazione: la moderazione dell'amministratore è a posteriori. Fa eccezione una scheda **appena creata**, che resta in attesa finché non la pubblichi tu.
+
+> **Se il cliente non ha ancora una scheda** vede un messaggio che lo invita a contattare la redazione: la scheda la crei tu, assegnandogliela come Autore. Il cliente la completa, non la crea.
+
+> **Protezione lato server.** Le coordinate dei QR arrivano solo dall'endpoint autenticato `GET advertrieste/v1/qr-map`, che risponde **401** a chi non è loggato e **403** a chi non ha il permesso. Nessun dato riservato è incorporato nella pagina. Lo stesso vale per ogni salvataggio: la proprietà è verificata sul server, non dedotta dal modulo.
 
 > **Decisione da confermare.** Oggi ogni cliente con permesso vede **l'intera rete** di punti QR. Alternative: "ciascuno vede solo i propri" o "solo admin".
 
@@ -169,7 +191,7 @@ Promozioni a tempo con countdown, e coupon validabili dall'esercente sul posto.
 
 ### Creare un'offerta
 
-1. **Offerte → Aggiungi nuova.** Titolo e descrizione nell'editor.
+1. **Il cliente** la crea dall'area clienti, sezione **Offerte**. In alternativa, dalla bacheca: **Offerte → Aggiungi nuova**.
 2. **Box "Dati offerta":** collega il **locale**, imposta **inizio** e **scadenza**, scegli **tipo coupon** (codice o QR) e il **codice** (ciò che il cliente presenta all'esercente).
 3. **Pubblica.** Comparirà nella pagina con `[advtr_offerte]` finché è nella finestra di validità, con il countdown.
 
@@ -224,14 +246,14 @@ Due job giornalieri (WP-Cron) girano da soli.
 2. **Primi contenuti** — crea qualche **Locale** con coordinate e categoria, e qualche **Punto d'interesse**.
 3. **Pagina Mappa** — nuova pagina con `[advtr_map]`, aggiungila al menu.
 4. **Utenti clienti** — crea gli utenti **Cliente (locale)** e impostali come Autore delle rispettive schede.
-5. **Area riservata** — pagina con `[advtr_area_riservata]` e, se vuoi, pagine con `[advtr_statistiche]` e `[advtr_valida_coupon]`.
+5. **Area clienti** — una pagina con `[advtr_area_clienti]`: contiene già accesso, scheda, foto, offerte, statistiche, coupon e mappa QR. Comunica l'indirizzo ai clienti.
 6. **Offerte ed eventi** — crea le prime offerte; per gli eventi ricorda il passaggio di **approvazione**. Pubblica le pagine `[advtr_offerte]`, `[advtr_grandi_eventi]`, `[advtr_eventi]`.
 
 ---
 
 ## 13. Stato attuale & limiti
 
-- **Pronto:** mappa pubblica + ingresso guidato, schede locali complete (con mini-mappa, indicazioni, recensioni), Punti d'interesse posizionabili, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo + evidenziazione locali durante i grandi eventi, scadenze + email automatiche, **editing self-service** per clienti e organizzatori (bacheca scoped).
+- **Pronto:** mappa pubblica + ingresso guidato, schede locali complete (con mini-mappa, indicazioni, recensioni), Punti d'interesse posizionabili, categorie, area riservata + mappa QR protetta, statistiche + tracking, offerte + coupon + validazione, eventi con workflow completo + evidenziazione locali durante i grandi eventi, scadenze + email automatiche, **area clienti in front-end** (scheda, foto, offerte, statistiche, coupon) con la bacheca preclusa ai clienti; editing self-service in bacheca per gli organizzatori di eventi.
 - **Condizionato:** recensioni Google (§1.5) attive solo con chiave `ADVTR_GOOGLE_PLACES_KEY` in `wp-config.php` (+ tetto di spesa lato Google). Pagamenti WooCommerce (§2.6): il bridge di rinnovo validità è pronto ma richiede WooCommerce + Subscriptions installati per funzionare.
 - **In sospeso:** import automatico eventi da fonti esterne (turismofvg.it) — subordinato a permesso.
 - **Da confermare:** visibilità della mappa QR (tutti i clienti / solo i propri / solo admin).
