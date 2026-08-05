@@ -61,7 +61,7 @@ foreach ( AdminConsole::locali( $cerca ) as $advtr_p ) {
 					),
 				)
 			) .
-			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( get_edit_post_link( $advtr_p->ID ) ) . '">' .
+			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'locali', array( 'id' => $advtr_p->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',
 	);

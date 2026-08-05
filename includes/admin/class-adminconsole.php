@@ -30,6 +30,7 @@ use AdverTrieste\Access\Roles;
 use AdverTrieste\Cliente\Abbonamento;
 use AdverTrieste\Cliente\Evidenza;
 use AdverTrieste\Evento\Workflow;
+use AdverTrieste\Frontend\ClientArea;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -228,6 +229,17 @@ class AdminConsole {
 	}
 
 	/**
+	 * ID dell'elemento aperto in dettaglio, se valido.
+	 *
+	 * @return int
+	 */
+	public static function id_corrente() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sola navigazione.
+		$id = isset( $_GET['id'] ) ? absint( wp_unslash( $_GET['id'] ) ) : 0;
+		return ( $id && get_post( $id ) ) ? $id : 0;
+	}
+
+	/**
 	 * Messaggi di esito.
 	 *
 	 * @return array<string,array{0:string,1:string}>
@@ -302,6 +314,18 @@ class AdminConsole {
 			case 'evidenza':
 				self::redirect( $sezione, self::evidenza( $id ) );
 				break;
+			case 'scheda_salva':
+				$esito = Scheda::salva();
+				wp_safe_redirect(
+					self::url(
+						'locali',
+						array(
+							'id'     => $id,
+							'avviso' => $esito,
+						)
+					)
+				);
+				exit;
 		}
 	}
 
@@ -507,6 +531,27 @@ class AdminConsole {
 				'</div></div>';
 		}
 
+		// Il dettaglio usa il selettore di posizione e la ricerca indirizzo:
+		// stessi asset dell'area clienti, nessun duplicato.
+		wp_enqueue_style( 'leaflet' );
+		wp_enqueue_script( 'leaflet' );
+		wp_enqueue_style( ClientArea::HANDLE );
+		wp_enqueue_script( ClientArea::HANDLE );
+		wp_localize_script(
+			ClientArea::HANDLE,
+			'advtrCliente',
+			array(
+				'geocode' => rest_url( 'advertrieste/v1/geocode' ),
+				'nonce'   => wp_create_nonce( 'wp_rest' ),
+				'i18n'    => array(
+					'ricerca'        => __( 'Ricerca in corso…', 'advertrieste' ),
+					'trovato'        => __( 'Trovato. Trascina il segnaposto sul punto esatto.', 'advertrieste' ),
+					'senzaIndirizzo' => __( 'Scrivi prima l\'indirizzo nel riquadro Contatti.', 'advertrieste' ),
+					'errore'         => __( 'Ricerca non riuscita: posiziona il segnaposto a mano.', 'advertrieste' ),
+				),
+			)
+		);
+
 		$corrente = get_queried_object_id();
 		if ( $corrente && (int) get_option( self::OPTION_PAGE ) !== $corrente ) {
 			update_option( self::OPTION_PAGE, $corrente );
@@ -515,9 +560,14 @@ class AdminConsole {
 		$sezione = self::sezione_corrente();
 		$utente  = wp_get_current_user();
 		$cerca   = self::ricerca();
+		$id      = self::id_corrente();
+
+		// Con un id valido si apre il dettaglio, non l'elenco: è ciò che fa il
+		// pulsante "Apri", che deve restare dentro la console.
+		$vista = ( $id && 'locali' === $sezione ) ? 'admin-locale' : 'admin-' . $sezione;
 
 		ob_start();
-		require ADVTR_PATH . 'templates/console/admin-' . $sezione . '.php';
+		require ADVTR_PATH . 'templates/console/' . $vista . '.php';
 		$contenuto = (string) ob_get_clean();
 
 		$menu = array();
@@ -536,8 +586,10 @@ class AdminConsole {
 				'marchio'     => get_bloginfo( 'name' ),
 				'menu'        => $menu,
 				'attiva'      => $sezione,
-				'titolo'      => self::sezioni()[ $sezione ],
-				'sottotitolo' => self::sottotitolo( $sezione ),
+				'titolo'      => $id ? get_the_title( $id ) : self::sezioni()[ $sezione ],
+				'sottotitolo' => $id
+					? __( 'Modifica la scheda senza uscire dalla console', 'advertrieste' )
+					: self::sottotitolo( $sezione ),
 				'utente'      => array(
 					'sigla' => Console::sigla( $utente->display_name ),
 					'nome'  => $utente->display_name,
