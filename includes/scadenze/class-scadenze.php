@@ -14,6 +14,7 @@ namespace AdverTrieste\Scadenze;
 
 use AdverTrieste\Cpt\Locale;
 use AdverTrieste\Email\Mailer;
+use AdverTrieste\Cliente\Abbonamento;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -85,10 +86,16 @@ class Scadenze {
 			if ( '' === $fine ) {
 				continue;
 			}
-			$end       = strtotime( $fine . ' 23:59:59' );
-			$days_left = (int) ceil( ( $end - $now ) / DAY_IN_SECONDS );
+			// Una sola definizione di "giorni mancanti" in tutto il prodotto: se
+			// qui e nella dashboard divergessero, l'email direbbe un numero e
+			// l'area clienti un altro.
+			$days_left = Abbonamento::giorni_alla_scadenza( $id );
+			if ( null === $days_left ) {
+				continue;
+			}
 
-			if ( $days_left <= 0 ) {
+			// La scheda vale per tutto l'ultimo giorno: si sospende dal giorno dopo.
+			if ( $days_left < 0 ) {
 				if ( self::sospendi( $id ) ) {
 					++$summary['sospese'];
 				}

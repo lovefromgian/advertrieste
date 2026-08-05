@@ -70,7 +70,7 @@ while ( have_posts() ) :
 			<?php endif; ?>
 
 			<?php if ( ! empty( $advtr_servizi ) ) : ?>
-				<section class="advtr-scheda-sez">
+				<section class="advtr-scheda-sez" data-advtr-sezione="servizi">
 					<h2><?php esc_html_e( 'Servizi', 'advertrieste' ); ?></h2>
 					<ul class="advtr-servizi">
 						<?php foreach ( $advtr_servizi as $advtr_srv ) : ?>
@@ -81,7 +81,7 @@ while ( have_posts() ) :
 			<?php endif; ?>
 
 			<?php if ( ! empty( $advtr_galleria ) ) : ?>
-				<section class="advtr-scheda-sez">
+				<section class="advtr-scheda-sez" data-advtr-sezione="galleria">
 					<h2><?php esc_html_e( 'Galleria', 'advertrieste' ); ?></h2>
 					<div class="advtr-galleria">
 						<?php foreach ( $advtr_galleria as $advtr_att ) : ?>
@@ -114,7 +114,7 @@ while ( have_posts() ) :
 
 		<aside class="advtr-scheda-side">
 			<?php if ( $advtr_tel || $advtr_email || $advtr_sito || $advtr_indir ) : ?>
-				<section class="advtr-scheda-box">
+				<section class="advtr-scheda-box" data-advtr-sezione="contatti">
 					<h2><?php esc_html_e( 'Contatti', 'advertrieste' ); ?></h2>
 					<ul class="advtr-contatti">
 						<?php if ( $advtr_indir ) : ?>
@@ -140,7 +140,7 @@ while ( have_posts() ) :
 			<?php endif; ?>
 
 			<?php if ( $advtr_has_geo ) : ?>
-				<section class="advtr-scheda-box">
+				<section class="advtr-scheda-box" data-advtr-sezione="mappa">
 					<h2><?php esc_html_e( 'Dove siamo', 'advertrieste' ); ?></h2>
 					<div id="advtr-scheda-map" class="advtr-scheda-map" data-advtr-scheda-map="1"></div>
 					<a class="advtr-indicazioni" target="_blank" rel="noopener"

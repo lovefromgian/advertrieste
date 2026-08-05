@@ -40,7 +40,7 @@ class Stats {
 	 *
 	 * @var string[]
 	 */
-	const TIPI = array( 'view', 'map_click', 'coupon', 'contact' );
+	const TIPI = array( 'view', 'map_click', 'coupon', 'contact', 'sezione' );
 
 	/**
 	 * Tipi registrabili dall'endpoint pubblico `/locale/{id}/track`.
@@ -52,7 +52,7 @@ class Stats {
 	 *
 	 * @var string[]
 	 */
-	const TIPI_PUBBLICI = array( 'view', 'map_click', 'contact' );
+	const TIPI_PUBBLICI = array( 'view', 'map_click', 'contact', 'sezione' );
 
 	/**
 	 * Soglia di visite oltre la quale si mostra il conteggio reale (§1.6).
@@ -168,6 +168,110 @@ class Stats {
 			if ( isset( $out[ $row['tipo'] ] ) ) {
 				$out[ $row['tipo'] ] = (int) $row['n'];
 			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Totali per tipo dentro una finestra di giorni, con confronto.
+	 *
+	 * Restituisce il periodo corrente e quello immediatamente precedente della
+	 * stessa lunghezza, così la dashboard può mostrare la variazione senza
+	 * doversi calcolare le date da sola (ed evitando di sbagliarle).
+	 *
+	 * @param int $post_id ID della scheda.
+	 * @param int $giorni  Ampiezza della finestra.
+	 * @return array{ora:array<string,int>,prima:array<string,int>}
+	 */
+	public static function totali_confronto( $post_id, $giorni = 30 ) {
+		$giorni = max( 1, min( 365, (int) $giorni ) );
+
+		// Fuso del sito, coerente con come sono scritte le righe.
+		$inizio_ora   = wp_date( 'Y-m-d', time() - ( $giorni - 1 ) * DAY_IN_SECONDS ) . ' 00:00:00';
+		$inizio_prima = wp_date( 'Y-m-d', time() - ( $giorni * 2 - 1 ) * DAY_IN_SECONDS ) . ' 00:00:00';
+
+		return array(
+			'ora'   => self::totali_da( $post_id, $inizio_ora, null ),
+			'prima' => self::totali_da( $post_id, $inizio_prima, $inizio_ora ),
+		);
+	}
+
+	/**
+	 * Totali per tipo in un intervallo di date.
+	 *
+	 * @param int         $post_id ID della scheda.
+	 * @param string      $da      Inizio incluso (formato MySQL).
+	 * @param string|null $a       Fine esclusa (null: fino a ora).
+	 * @return array<string,int>
+	 */
+	private static function totali_da( $post_id, $da, $a = null ) {
+		global $wpdb;
+		$table = self::table();
+
+		if ( null === $a ) {
+			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"SELECT tipo, COUNT(*) AS n FROM {$table} WHERE post_id = %d AND created_at >= %s GROUP BY tipo", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					(int) $post_id,
+					$da
+				),
+				ARRAY_A
+			);
+		} else {
+			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"SELECT tipo, COUNT(*) AS n FROM {$table} WHERE post_id = %d AND created_at >= %s AND created_at < %s GROUP BY tipo", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					(int) $post_id,
+					$da,
+					$a
+				),
+				ARRAY_A
+			);
+		}
+
+		$out = array_fill_keys( self::TIPI, 0 );
+		foreach ( (array) $rows as $row ) {
+			if ( isset( $out[ $row['tipo'] ] ) ) {
+				$out[ $row['tipo'] ] = (int) $row['n'];
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Conteggi raggruppati per `meta` di un tipo di evento.
+	 *
+	 * Serve alle "sezioni più viste": il dettaglio della sezione viaggia nel
+	 * campo meta dell'evento `sezione`.
+	 *
+	 * @param int    $post_id ID della scheda.
+	 * @param string $tipo    Tipo di evento.
+	 * @param int    $giorni  Finestra in giorni.
+	 * @return array<string,int> meta => conteggio, in ordine decrescente.
+	 */
+	public static function conteggi_per_meta( $post_id, $tipo, $giorni = 30 ) {
+		if ( ! in_array( $tipo, self::TIPI, true ) ) {
+			return array();
+		}
+		$giorni = max( 1, min( 365, (int) $giorni ) );
+		$da     = wp_date( 'Y-m-d', time() - ( $giorni - 1 ) * DAY_IN_SECONDS ) . ' 00:00:00';
+
+		global $wpdb;
+		$table = self::table();
+
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT meta, COUNT(*) AS n FROM {$table} WHERE post_id = %d AND tipo = %s AND created_at >= %s AND meta IS NOT NULL AND meta <> '' GROUP BY meta ORDER BY n DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				(int) $post_id,
+				$tipo,
+				$da
+			),
+			ARRAY_A
+		);
+
+		$out = array();
+		foreach ( (array) $rows as $row ) {
+			$out[ (string) $row['meta'] ] = (int) $row['n'];
 		}
 		return $out;
 	}

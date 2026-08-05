@@ -39,6 +39,7 @@ use AdverTrieste\Frontend\StatsDashboard;
 use AdverTrieste\Frontend\Offerte as OfferteView;
 use AdverTrieste\Frontend\Eventi as EventiView;
 use AdverTrieste\Access\AdminLock;
+use AdverTrieste\Console\Console;
 use AdverTrieste\Payments\WooBridge;
 use AdverTrieste\Cron\Cron;
 
@@ -124,6 +125,7 @@ final class Plugin {
 		Onboarding::init();
 		Scheda::init();
 		ReservedArea::init();
+		add_action( 'wp_enqueue_scripts', array( Console::class, 'registra_asset' ) );
 		ClientArea::init();
 		AdminLock::init();
 		StatsDashboard::init();

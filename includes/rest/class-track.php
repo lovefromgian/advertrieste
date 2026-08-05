@@ -180,8 +180,11 @@ class Track {
 			);
 		}
 
-		// Rate-limit per IP + scheda + tipo: silenziosamente "ok" ma non registra.
-		$key = 'advtr_rl_' . md5( self::client_ip() . "|{$post_id}|{$tipo}" );
+		// Rate-limit per IP + scheda + tipo + dettaglio. Il dettaglio è parte
+		// della chiave perché eventi con meta diverso sono interazioni diverse:
+		// senza, di più sezioni viste nello stesso minuto ne verrebbe contata
+		// una sola, e le "sezioni più viste" mostrerebbero sempre la prima.
+		$key = 'advtr_rl_' . md5( self::client_ip() . "|{$post_id}|{$tipo}|{$meta}" );
 		if ( get_transient( $key ) ) {
 			return new WP_REST_Response(
 				array(

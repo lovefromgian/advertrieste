@@ -1,0 +1,579 @@
+/**
+ * Sistema visivo delle console (cliente e amministratore).
+ *
+ * Trascrizione dei mockup della proposta di progetto: fondo avorio, sidebar
+ * scura con voci raggruppate, card bianche, titoli in grazie e corpo in
+ * bastoni, accenti verde/corallo/oro.
+ *
+ * Due scelte deliberate:
+ *
+ * 1. Ogni colore è dichiarato, mai ereditato. Le console vivono dentro temi
+ *    qualsiasi, chiari o scuri: un solo valore lasciato al tema (tipicamente
+ *    il colore del testo) produce testo bianco su bianco.
+ * 2. Nessun font remoto. I mockup usano un serif editoriale; qui si ottiene
+ *    con la pila di sistema, senza chiamate esterne né spostamenti di layout
+ *    al caricamento.
+ */
+
+.advtr-console {
+	/* Superfici */
+	--ac-fondo: #f3f0e9;
+	--ac-carta: #fff;
+	--ac-carta-tenue: #faf8f4;
+	--ac-bordo: #e6e1d6;
+	--ac-scuro: #1b2a3a;
+	--ac-scuro-alto: #24384c;
+
+	/* Testo */
+	--ac-testo: #1b2a3a;
+	--ac-tenue: #6b7280;
+	--ac-inverso: #f3f0e9;
+	--ac-inverso-tenue: #93a3b5;
+
+	/* Accenti */
+	--ac-verde: #2f6b4f;
+	--ac-corallo: #d9694e;
+	--ac-oro: #e3ab35;
+	--ac-blu: #5b7fb8;
+	--ac-rosso: #b32d2e;
+
+	--ac-raggio: 10px;
+	--ac-ombra: 0 1px 2px rgba(27, 42, 58, 0.06), 0 8px 24px rgba(27, 42, 58, 0.06);
+
+	--ac-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	--ac-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: 232px minmax(0, 1fr);
+	min-height: 640px;
+	margin: 0 auto;
+	max-width: 1180px;
+	background: var(--ac-fondo);
+	color: var(--ac-testo);
+	font-family: var(--ac-sans);
+	font-size: 14px;
+	line-height: 1.6;
+	border-radius: 14px;
+	overflow: hidden;
+	box-shadow: var(--ac-ombra);
+}
+
+.advtr-console *,
+.advtr-console *::before,
+.advtr-console *::after {
+	box-sizing: inherit;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+
+.ac-lato {
+	display: flex;
+	flex-direction: column;
+	background: var(--ac-scuro);
+	color: var(--ac-inverso);
+	padding: 22px 0 16px;
+}
+
+.ac-marchio {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 20px 22px;
+	font-family: var(--ac-serif);
+	font-size: 18px;
+	font-weight: 700;
+	color: #fff;
+}
+
+.ac-marchio-pin {
+	width: 18px;
+	height: 18px;
+	border-radius: 50% 50% 50% 0;
+	transform: rotate(-45deg);
+	background: var(--ac-corallo);
+	flex: none;
+}
+
+.ac-gruppo {
+	margin-top: 18px;
+	padding: 0 20px 6px;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ac-inverso-tenue);
+}
+
+.ac-gruppo:first-of-type {
+	margin-top: 0;
+}
+
+.ac-voce {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 1px 10px;
+	padding: 8px 10px;
+	border-radius: 7px;
+	color: var(--ac-inverso);
+	text-decoration: none;
+	font-size: 13.5px;
+}
+
+.ac-voce::before {
+	content: "";
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--ac-inverso-tenue);
+	flex: none;
+}
+
+.ac-voce:hover {
+	background: var(--ac-scuro-alto);
+	color: #fff;
+}
+
+.ac-voce.attiva {
+	background: var(--ac-scuro-alto);
+	color: #fff;
+	font-weight: 600;
+}
+
+.ac-voce.attiva::before {
+	background: var(--ac-verde);
+}
+
+.ac-utente {
+	margin: auto 12px 0;
+	padding: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	background: var(--ac-scuro-alto);
+	border-radius: 9px;
+}
+
+.ac-utente-sigla {
+	width: 34px;
+	height: 34px;
+	flex: none;
+	display: grid;
+	place-items: center;
+	border-radius: 7px;
+	background: var(--ac-verde);
+	color: #fff;
+	font-family: var(--ac-serif);
+	font-weight: 700;
+	font-size: 13px;
+}
+
+.ac-utente-nome {
+	font-weight: 600;
+	font-size: 13px;
+	color: #fff;
+	line-height: 1.3;
+}
+
+.ac-utente-ruolo {
+	font-size: 11px;
+	color: var(--ac-inverso-tenue);
+}
+
+.ac-esci {
+	margin-left: auto;
+	color: var(--ac-inverso-tenue);
+	text-decoration: none;
+	font-size: 11px;
+}
+
+.ac-esci:hover {
+	color: #fff;
+}
+
+/* ── Contenuto ───────────────────────────────────────────────────── */
+
+.ac-corpo {
+	padding: 26px 28px 34px;
+	min-width: 0;
+}
+
+.ac-testa {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin-bottom: 20px;
+}
+
+.ac-titolo {
+	margin: 0;
+	font-family: var(--ac-serif);
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--ac-testo);
+}
+
+.ac-sottotitolo {
+	margin: 2px 0 0;
+	font-size: 13px;
+	color: var(--ac-tenue);
+}
+
+/* ── Avvisi ──────────────────────────────────────────────────────── */
+
+.ac-avviso {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 14px 16px;
+	margin-bottom: 20px;
+	border-radius: var(--ac-raggio);
+	background: var(--ac-carta);
+	border: 1px solid var(--ac-bordo);
+	border-left: 4px solid var(--ac-tenue);
+}
+
+.ac-avviso.ok {
+	border-left-color: var(--ac-verde);
+}
+
+.ac-avviso.errore {
+	border-left-color: var(--ac-rosso);
+}
+
+.ac-avviso.attesa {
+	border-left-color: var(--ac-corallo);
+	background: #fdf3ef;
+	border-color: #f3d9d0;
+}
+
+.ac-avviso-testo {
+	min-width: 0;
+}
+
+.ac-avviso-titolo {
+	font-weight: 700;
+	color: var(--ac-testo);
+}
+
+.ac-avviso-dett {
+	font-size: 12.5px;
+	color: var(--ac-tenue);
+}
+
+.ac-avviso .ac-btn {
+	margin-left: auto;
+	flex: none;
+}
+
+/* ── Card ────────────────────────────────────────────────────────── */
+
+.ac-card {
+	background: var(--ac-carta);
+	border: 1px solid var(--ac-bordo);
+	border-radius: var(--ac-raggio);
+	padding: 18px 20px;
+}
+
+.ac-card-titolo {
+	margin: 0;
+	font-family: var(--ac-serif);
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.ac-card-sottotitolo {
+	margin: 1px 0 14px;
+	font-size: 12px;
+	color: var(--ac-tenue);
+}
+
+.ac-griglia {
+	display: grid;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.ac-griglia-4 {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ac-griglia-2 {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ac-griglia-3-2 {
+	grid-template-columns: 3fr 2fr;
+}
+
+/* ── KPI ─────────────────────────────────────────────────────────── */
+
+.ac-kpi {
+	position: relative;
+	background: var(--ac-carta);
+	border: 1px solid var(--ac-bordo);
+	border-radius: var(--ac-raggio);
+	padding: 14px 16px 18px;
+	overflow: hidden;
+}
+
+.ac-kpi-eti {
+	font-size: 12px;
+	color: var(--ac-tenue);
+}
+
+.ac-kpi-valore {
+	font-family: var(--ac-serif);
+	font-size: 30px;
+	font-weight: 700;
+	line-height: 1.15;
+	margin: 2px 0 4px;
+}
+
+.ac-kpi-delta {
+	font-size: 11.5px;
+	font-weight: 700;
+}
+
+.ac-kpi-delta.su {
+	color: var(--ac-verde);
+}
+
+.ac-kpi-delta.giu {
+	color: var(--ac-corallo);
+}
+
+.ac-kpi-delta.pari {
+	color: var(--ac-tenue);
+}
+
+.ac-kpi-barra {
+	position: absolute;
+	left: 16px;
+	right: 16px;
+	bottom: 10px;
+	height: 3px;
+	border-radius: 2px;
+	background: var(--ac-verde);
+}
+
+.ac-kpi:nth-child(2) .ac-kpi-barra {
+	background: var(--ac-blu);
+}
+
+.ac-kpi:nth-child(3) .ac-kpi-barra {
+	background: var(--ac-oro);
+}
+
+.ac-kpi:nth-child(4) .ac-kpi-barra {
+	background: var(--ac-corallo);
+}
+
+/* ── Barre orizzontali (sezioni più viste) ───────────────────────── */
+
+.ac-barre {
+	display: grid;
+	gap: 8px;
+}
+
+.ac-barra-riga {
+	display: grid;
+	grid-template-columns: 92px minmax(0, 1fr);
+	align-items: center;
+	gap: 10px;
+	font-size: 12.5px;
+}
+
+.ac-barra-pista {
+	background: var(--ac-fondo);
+	border-radius: 5px;
+	height: 20px;
+	overflow: hidden;
+}
+
+.ac-barra-riemp {
+	height: 100%;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding-right: 7px;
+	color: #fff;
+	font-size: 10.5px;
+	font-weight: 700;
+	min-width: 30px;
+	background: var(--ac-verde);
+}
+
+.ac-barra-riga:nth-child(2) .ac-barra-riemp {
+	background: var(--ac-oro);
+}
+
+.ac-barra-riga:nth-child(3) .ac-barra-riemp {
+	background: var(--ac-blu);
+}
+
+.ac-barra-riga:nth-child(4) .ac-barra-riemp {
+	background: var(--ac-corallo);
+}
+
+.ac-barra-riga:nth-child(5) .ac-barra-riemp {
+	background: var(--ac-scuro);
+}
+
+/* ── Bottoni ─────────────────────────────────────────────────────── */
+
+.ac-btn {
+	display: inline-block;
+	padding: 8px 16px;
+	border: 1px solid transparent;
+	border-radius: 7px;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.4;
+	cursor: pointer;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.ac-btn-primario {
+	background: var(--ac-corallo);
+	color: #fff;
+}
+
+.ac-btn-primario:hover {
+	background: #c25a41;
+	color: #fff;
+}
+
+.ac-btn-verde {
+	background: var(--ac-verde);
+	color: #fff;
+}
+
+.ac-btn-verde:hover {
+	background: #255740;
+	color: #fff;
+}
+
+.ac-btn-neutro {
+	background: var(--ac-carta);
+	color: var(--ac-testo);
+	border-color: var(--ac-bordo);
+}
+
+.ac-btn-neutro:hover {
+	background: var(--ac-carta-tenue);
+	color: var(--ac-testo);
+}
+
+.ac-btn-fragile {
+	background: transparent;
+	color: var(--ac-rosso);
+	border-color: var(--ac-bordo);
+	padding: 5px 12px;
+	font-size: 12px;
+}
+
+.ac-btn-fragile.conferma {
+	background: var(--ac-rosso);
+	color: #fff;
+	border-color: var(--ac-rosso);
+}
+
+/* ── Pill ────────────────────────────────────────────────────────── */
+
+.ac-pill {
+	display: inline-block;
+	padding: 3px 9px;
+	border-radius: 999px;
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #fff;
+	background: var(--ac-tenue);
+}
+
+.ac-pill.ok {
+	background: var(--ac-verde);
+}
+
+.ac-pill.oro {
+	background: var(--ac-oro);
+	color: #4a3708;
+}
+
+.ac-pill.attesa {
+	background: var(--ac-corallo);
+}
+
+/* ── Stato vuoto ─────────────────────────────────────────────────── */
+
+.ac-vuoto {
+	background: var(--ac-carta);
+	border: 1px dashed var(--ac-bordo);
+	border-radius: var(--ac-raggio);
+	padding: 40px 28px;
+	text-align: center;
+}
+
+.ac-vuoto h3 {
+	margin: 0 0 6px;
+	font-family: var(--ac-serif);
+	font-size: 18px;
+}
+
+.ac-vuoto p {
+	margin: 0 auto;
+	max-width: 460px;
+	color: var(--ac-tenue);
+}
+
+/* ── Grafico ─────────────────────────────────────────────────────── */
+
+.ac-grafico {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.ac-grafico-asse {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 6px;
+	font-size: 10.5px;
+	color: var(--ac-tenue);
+}
+
+/* ── Adattamento ─────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+
+	.advtr-console {
+		grid-template-columns: 1fr;
+	}
+
+	.ac-lato {
+		padding-bottom: 10px;
+	}
+
+	.ac-utente {
+		margin-top: 14px;
+	}
+
+	.ac-griglia-4,
+	.ac-griglia-2,
+	.ac-griglia-3-2 {
+		grid-template-columns: 1fr;
+	}
+
+	.ac-corpo {
+		padding: 20px 16px 26px;
+	}
+}

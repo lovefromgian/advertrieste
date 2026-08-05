@@ -36,6 +36,32 @@
 	// Visita (§1.6): una per caricamento, il server applica il rate-limit.
 	track( 'view' );
 
+	// Sezioni più viste: si registra una sola volta per sezione e per visita,
+	// quando entra davvero nel campo visivo. Contarle al caricamento direbbe
+	// soltanto che esistono, non che qualcuno le ha guardate.
+	if ( 'IntersectionObserver' in window ) {
+		var sezioni = document.querySelectorAll( '[data-advtr-sezione]' );
+		var viste = {};
+		var osservatore = new window.IntersectionObserver( function ( voci ) {
+			voci.forEach( function ( voce ) {
+				if ( ! voce.isIntersecting ) {
+					return;
+				}
+				var nome = voce.target.getAttribute( 'data-advtr-sezione' );
+				if ( ! nome || viste[ nome ] ) {
+					return;
+				}
+				viste[ nome ] = true;
+				osservatore.unobserve( voce.target );
+				track( 'sezione', nome );
+			} );
+		}, { threshold: 0.4 } );
+
+		sezioni.forEach( function ( s ) {
+			osservatore.observe( s );
+		} );
+	}
+
 	// Click sui contatti.
 	document.querySelectorAll( '[data-advtr-contact]' ).forEach( function ( a ) {
 		a.addEventListener( 'click', function () {

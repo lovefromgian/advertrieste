@@ -24,6 +24,9 @@ use AdverTrieste\Cliente\Media as MediaCliente;
 use AdverTrieste\Cliente\Offerte as OfferteCliente;
 use AdverTrieste\Cpt\Locale;
 use AdverTrieste\Rest\Markers;
+use AdverTrieste\Console\Console;
+use AdverTrieste\Cliente\Evidenza;
+use AdverTrieste\Cliente\Abbonamento;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,17 +65,44 @@ class ClientArea {
 	 * @return array<string,string>
 	 */
 	public static function sezioni() {
-		$sezioni = array(
-			'scheda'      => __( 'La mia scheda', 'advertrieste' ),
-			'immagini'    => __( 'Logo e foto', 'advertrieste' ),
-			'offerte'     => __( 'Offerte', 'advertrieste' ),
-			'statistiche' => __( 'Statistiche', 'advertrieste' ),
-			'coupon'      => __( 'Valida coupon', 'advertrieste' ),
-		);
-		if ( Access::can_view_qr_map() ) {
-			$sezioni['qr'] = __( 'Mappa punti QR', 'advertrieste' );
+		$sezioni = array();
+		foreach ( self::menu() as $voci ) {
+			foreach ( $voci as $slug => $etichetta ) {
+				$sezioni[ $slug ] = $etichetta;
+			}
 		}
 		return $sezioni;
+	}
+
+	/**
+	 * Menu della console cliente, raggruppato come nella proposta di progetto.
+	 *
+	 * @return array<string,array<string,string>> Gruppo => [ slug => etichetta ].
+	 */
+	public static function menu() {
+		$menu = array(
+			__( 'Principale', 'advertrieste' ) => array(
+				'statistiche' => __( 'Statistiche', 'advertrieste' ),
+				'scheda'      => __( 'La mia scheda', 'advertrieste' ),
+				'immagini'    => __( 'Galleria media', 'advertrieste' ),
+			),
+			__( 'Marketing', 'advertrieste' )  => array(
+				'offerte'  => __( 'Offerte & Coupon', 'advertrieste' ),
+				'coupon'   => __( 'Valida coupon', 'advertrieste' ),
+				'evidenza' => __( 'Piano In Evidenza', 'advertrieste' ),
+			),
+			__( 'Account', 'advertrieste' )    => array(
+				'abbonamento'  => __( 'Abbonamento', 'advertrieste' ),
+				'impostazioni' => __( 'Impostazioni', 'advertrieste' ),
+			),
+		);
+
+		if ( Access::can_view_qr_map() ) {
+			$menu[ __( 'Strumenti', 'advertrieste' ) ] = array(
+				'qr' => __( 'Mappa punti QR', 'advertrieste' ),
+			);
+		}
+		return $menu;
 	}
 
 	/**
@@ -207,7 +237,7 @@ class ClientArea {
 	public static function sezione_corrente() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sola navigazione.
 		$s = isset( $_GET['sezione'] ) ? sanitize_key( wp_unslash( $_GET['sezione'] ) ) : '';
-		return array_key_exists( $s, self::sezioni() ) ? $s : 'scheda';
+		return array_key_exists( $s, self::sezioni() ) ? $s : 'statistiche';
 	}
 
 	/**
@@ -247,6 +277,9 @@ class ClientArea {
 			'offerta_ok'   => array( 'ok', __( 'Offerta salvata.', 'advertrieste' ) ),
 			'offerta_del'  => array( 'ok', __( 'Offerta eliminata.', 'advertrieste' ) ),
 			'offerta_date' => array( 'errore', __( 'La data di scadenza deve essere successiva a quella di inizio.', 'advertrieste' ) ),
+			'account_ok'   => array( 'ok', __( 'Dati dell\'account aggiornati.', 'advertrieste' ) ),
+			'account_ko'   => array( 'errore', __( 'Controlla nome ed email inseriti.', 'advertrieste' ) ),
+			'account_email' => array( 'errore', __( 'Questa email è già usata da un altro account.', 'advertrieste' ) ),
 			'negato'       => array( 'errore', __( 'Operazione non consentita.', 'advertrieste' ) ),
 		);
 	}
@@ -312,6 +345,9 @@ class ClientArea {
 				break;
 			case 'offerta_elimina':
 				self::redirect( 'offerte', OfferteCliente::elimina() );
+				break;
+			case 'account_salva':
+				self::redirect( 'impostazioni', self::salva_account() );
 				break;
 		}
 	}
@@ -432,12 +468,224 @@ class ClientArea {
 				'</div>';
 		}
 
+		wp_enqueue_style( Console::HANDLE );
+
 		$sezione = self::sezione_corrente();
 		$locale  = self::locale_utente();
 		$utente  = wp_get_current_user();
 
+		// Il contenuto della sezione viene composto prima, poi montato nel guscio
+		// condiviso: le due console usano lo stesso layout e gli stessi componenti.
 		ob_start();
-		require ADVTR_PATH . 'templates/cliente/dashboard.php';
-		return (string) ob_get_clean();
+		if ( ! $locale && in_array( $sezione, array( 'scheda', 'immagini', 'offerte', 'evidenza', 'abbonamento' ), true ) ) {
+			require ADVTR_PATH . 'templates/console/cliente-senza-scheda.php';
+		} else {
+			switch ( $sezione ) {
+				case 'scheda':
+					require ADVTR_PATH . 'templates/cliente/sez-scheda.php';
+					break;
+				case 'immagini':
+					require ADVTR_PATH . 'templates/cliente/sez-immagini.php';
+					break;
+				case 'offerte':
+					require ADVTR_PATH . 'templates/cliente/sez-offerte.php';
+					break;
+				case 'coupon':
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- lo shortcode restituisce markup già escapato.
+					echo do_shortcode( '[advtr_valida_coupon]' );
+					break;
+				case 'qr':
+					require ADVTR_PATH . 'templates/cliente/sez-qr.php';
+					break;
+				case 'evidenza':
+					require ADVTR_PATH . 'templates/console/cliente-evidenza.php';
+					break;
+				case 'abbonamento':
+					require ADVTR_PATH . 'templates/console/cliente-abbonamento.php';
+					break;
+				case 'impostazioni':
+					require ADVTR_PATH . 'templates/console/cliente-impostazioni.php';
+					break;
+				case 'statistiche':
+				default:
+					require ADVTR_PATH . 'templates/console/cliente-statistiche.php';
+					break;
+			}
+		}
+		$contenuto = (string) ob_get_clean();
+
+		return Console::guscio(
+			array(
+				'marchio'     => get_bloginfo( 'name' ),
+				'menu'        => self::menu_per_guscio(),
+				'attiva'      => $sezione,
+				'titolo'      => self::titolo_sezione( $sezione ),
+				'sottotitolo' => self::sottotitolo_sezione( $sezione, $locale ),
+				'utente'      => array(
+					'sigla' => Console::sigla( $locale ? $locale->post_title : $utente->display_name ),
+					'nome'  => $locale ? $locale->post_title : $utente->display_name,
+					'ruolo' => self::etichetta_piano( $locale ),
+					'esci'  => wp_logout_url( self::url() ),
+				),
+				'avviso'      => $avviso ? array(
+					'tipo'  => 'errore' === $avviso['tipo'] ? 'errore' : 'ok',
+					'testo' => $avviso['testo'],
+				) : self::avviso_scadenza( $locale ),
+				'contenuto'   => $contenuto,
+			)
+		);
+	}
+
+	/**
+	 * Salva nome visualizzato ed email dell'account.
+	 *
+	 * L'email è il recapito per gli avvisi di scadenza: se è già di un altro
+	 * utente il salvataggio viene rifiutato, altrimenti si romperebbe l'accesso.
+	 *
+	 * @return string Codice di esito.
+	 */
+	private static function salva_account() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce già verificato dal controller.
+		$nome  = isset( $_POST['advtr_nome'] ) ? sanitize_text_field( wp_unslash( $_POST['advtr_nome'] ) ) : '';
+		$email = isset( $_POST['advtr_email'] ) ? sanitize_email( wp_unslash( $_POST['advtr_email'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		if ( '' === $nome || ! is_email( $email ) ) {
+			return 'account_ko';
+		}
+
+		$uid       = get_current_user_id();
+		$occupante = get_user_by( 'email', $email );
+		if ( $occupante && (int) $occupante->ID !== $uid ) {
+			return 'account_email';
+		}
+
+		$esito = wp_update_user(
+			array(
+				'ID'           => $uid,
+				'display_name' => $nome,
+				'user_email'   => $email,
+			)
+		);
+
+		return is_wp_error( $esito ) ? 'account_ko' : 'account_ok';
+	}
+
+	/**
+	 * Menu nel formato atteso dal guscio (slug, etichetta, url).
+	 *
+	 * @return array<string,array<int,array<string,string>>>
+	 */
+	private static function menu_per_guscio() {
+		$out = array();
+		foreach ( self::menu() as $gruppo => $voci ) {
+			foreach ( $voci as $slug => $etichetta ) {
+				$out[ $gruppo ][] = array(
+					'slug'      => $slug,
+					'etichetta' => $etichetta,
+					'url'       => self::url( $slug ),
+				);
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Titolo della schermata.
+	 *
+	 * @param string $sezione Slug.
+	 * @return string
+	 */
+	private static function titolo_sezione( $sezione ) {
+		$titoli = array(
+			'statistiche' => __( 'Statistiche della scheda', 'advertrieste' ),
+			'scheda'      => __( 'La mia scheda', 'advertrieste' ),
+			'immagini'    => __( 'Galleria media', 'advertrieste' ),
+			'offerte'     => __( 'Offerte & Coupon', 'advertrieste' ),
+			'coupon'      => __( 'Valida un coupon', 'advertrieste' ),
+			'evidenza'    => __( 'Piano In Evidenza', 'advertrieste' ),
+			'abbonamento' => __( 'Il tuo abbonamento', 'advertrieste' ),
+			'impostazioni' => __( 'Impostazioni', 'advertrieste' ),
+			'qr'          => __( 'Mappa dei punti QR', 'advertrieste' ),
+		);
+		return $titoli[ $sezione ] ?? '';
+	}
+
+	/**
+	 * Sottotitolo della schermata.
+	 *
+	 * @param string        $sezione Slug.
+	 * @param \WP_Post|null $locale  Scheda del cliente.
+	 * @return string
+	 */
+	private static function sottotitolo_sezione( $sezione, $locale ) {
+		$sottotitoli = array(
+			'statistiche' => __( 'Andamento delle visualizzazioni e interazioni', 'advertrieste' ),
+			'scheda'      => __( 'I contenuti che il pubblico vede sulla tua pagina', 'advertrieste' ),
+			'immagini'    => __( 'Logo e fotografie della tua attività', 'advertrieste' ),
+			'offerte'     => __( 'Promozioni a tempo e coupon da validare sul posto', 'advertrieste' ),
+			'coupon'      => __( 'Verifica il codice che il cliente ti mostra', 'advertrieste' ),
+			'evidenza'    => __( 'Marker dorato e priorità nei risultati', 'advertrieste' ),
+			'abbonamento' => __( 'Validità della tua presenza sulla mappa', 'advertrieste' ),
+			'impostazioni' => __( 'Dati del tuo account', 'advertrieste' ),
+			'qr'          => __( 'La rete di espositori sul territorio', 'advertrieste' ),
+		);
+		unset( $locale );
+		return $sottotitoli[ $sezione ] ?? '';
+	}
+
+	/**
+	 * Etichetta del piano mostrata sotto il nome, nella sidebar.
+	 *
+	 * @param \WP_Post|null $locale Scheda del cliente.
+	 * @return string
+	 */
+	private static function etichetta_piano( $locale ) {
+		if ( ! $locale ) {
+			return __( 'Nessuna scheda', 'advertrieste' );
+		}
+		return Evidenza::attiva( $locale->ID )
+			? __( 'Piano In Evidenza', 'advertrieste' )
+			: __( 'Piano base', 'advertrieste' );
+	}
+
+	/**
+	 * Banner di scadenza imminente, come nella proposta di progetto.
+	 *
+	 * @param \WP_Post|null $locale Scheda del cliente.
+	 * @return array<string,string>|null
+	 */
+	private static function avviso_scadenza( $locale ) {
+		if ( ! $locale ) {
+			return null;
+		}
+		$giorni = Abbonamento::giorni_alla_scadenza( $locale->ID );
+		if ( null === $giorni || $giorni > 30 ) {
+			return null;
+		}
+
+		if ( $giorni > 0 ) {
+			$titolo = sprintf(
+				/* translators: %d: giorni mancanti */
+				_n( 'Il tuo abbonamento scade fra %d giorno', 'Il tuo abbonamento scade fra %d giorni', $giorni, 'advertrieste' ),
+				$giorni
+			);
+			$testo = sprintf(
+				/* translators: %s: data di scadenza */
+				__( 'Rinnova entro il %s per non interrompere la visibilità sulla mappa. Riceverai un promemoria via email.', 'advertrieste' ),
+				Abbonamento::data_scadenza( $locale->ID )
+			);
+		} else {
+			$titolo = __( 'Il tuo abbonamento è scaduto', 'advertrieste' );
+			$testo  = __( 'La scheda non è più visibile sulla mappa. Rinnova per riattivarla.', 'advertrieste' );
+		}
+
+		return array(
+			'tipo'   => 'attesa',
+			'titolo' => $titolo,
+			'testo'  => $testo,
+			'azione' => '<a class="ac-btn ac-btn-primario" href="' . esc_url( self::url( 'abbonamento' ) ) . '">' .
+				esc_html__( 'Rinnova ora', 'advertrieste' ) . '</a>',
+		);
 	}
 }
