@@ -38,7 +38,7 @@ class Scheda {
 	 * @return void
 	 */
 	public static function init() {
-		add_filter( 'template_include', array( __CLASS__, 'template' ) );
+		// Il template è servito dal guscio pubblico (Frontend\Pubblico).
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'assets' ) );
 	}
 

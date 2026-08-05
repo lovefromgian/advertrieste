@@ -2,8 +2,9 @@
 /**
  * Template della scheda attività (pagina singola del CPT `locale`, §1.3).
  *
- * Renderizzato al posto del single del tema (vedi Frontend\Scheda). Usa
- * l'header/footer del tema per integrarsi nel sito.
+ * Renderizzato dentro il guscio pubblico del plugin (vedi Frontend\Pubblico):
+ * niente header/footer del tema, così la scheda condivide la veste della home
+ * e della mappa.
  *
  * @package AdverTrieste
  */
@@ -12,8 +13,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-get_header();
 
 while ( have_posts() ) :
 	the_post();
@@ -153,5 +152,3 @@ while ( have_posts() ) :
 	</div>
 	<?php
 endwhile;
-
-get_footer();

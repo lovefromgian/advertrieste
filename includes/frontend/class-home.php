@@ -88,75 +88,12 @@ class Home {
 	 */
 	public static function init() {
 		add_shortcode( 'advtr_home', array( __CLASS__, 'shortcode' ) );
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'registra_asset' ) );
-		add_filter( 'template_include', array( __CLASS__, 'template' ) );
-		add_filter( 'show_admin_bar', array( __CLASS__, 'niente_barra' ) );
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'pulisci_asset' ), 999 );
-		add_action( 'wp_print_styles', array( __CLASS__, 'pulisci_asset' ), 1 );
-		add_action( 'wp_print_scripts', array( __CLASS__, 'pulisci_asset' ), 1 );
-		add_filter( 'style_loader_tag', array( __CLASS__, 'filtra_tag' ), 10, 2 );
-		add_filter( 'script_loader_tag', array( __CLASS__, 'filtra_tag' ), 10, 2 );
 	}
 
-	/**
-	 * Registra gli asset pubblici.
-	 *
-	 * @return void
-	 */
-	public static function registra_asset() {
-		wp_register_style( self::HANDLE, ADVTR_URL . 'assets/src/pubblico/pubblico.css', array(), ADVTR_VERSION );
-	}
 
-	/**
-	 * Siamo sulla home del progetto?
-	 *
-	 * @return bool
-	 */
-	public static function e_home() {
-		return Pagina::pagina_con_shortcode( self::SHORTCODE );
-	}
 
-	/**
-	 * Sostituisce il template del tema con il documento intero.
-	 *
-	 * @param string $template Template scelto dal tema.
-	 * @return string
-	 */
-	public static function template( $template ) {
-		return self::e_home() ? ADVTR_PATH . 'templates/pubblico/pagina.php' : $template;
-	}
 
-	/**
-	 * Nasconde la barra di amministrazione sulla home.
-	 *
-	 * @param bool $mostra Valore corrente.
-	 * @return bool
-	 */
-	public static function niente_barra( $mostra ) {
-		return self::e_home() ? false : $mostra;
-	}
 
-	/**
-	 * Toglie gli asset estranei.
-	 *
-	 * @return void
-	 */
-	public static function pulisci_asset() {
-		if ( self::e_home() ) {
-			Pagina::pulisci_asset();
-		}
-	}
-
-	/**
-	 * Sopprime i tag degli asset estranei.
-	 *
-	 * @param string $tag    Markup.
-	 * @param string $handle Handle.
-	 * @return string
-	 */
-	public static function filtra_tag( $tag, $handle ) {
-		return self::e_home() ? Pagina::filtra_tag( $tag, $handle ) : $tag;
-	}
 
 	/**
 	 * URL della pagina mappa, con eventuali filtri già applicati.

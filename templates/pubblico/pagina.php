@@ -1,11 +1,10 @@
 <?php
 /**
- * Documento completo delle pagine pubbliche del progetto.
+ * Documento completo delle pagine pubbliche del plugin.
  *
- * Come per la console: niente `get_header()`/`get_footer()`, quindi il markup
- * del tema non esiste. Il contenuto si compone prima di `wp_head()`, perché è
- * lì che si accodano gli asset e `wp_localize_script()` richiede handle già
- * registrati.
+ * Niente `get_header()`/`get_footer()`: il markup del tema non esiste. Il
+ * contenuto si compone prima di `wp_head()`, perché è lì che si accodano gli
+ * asset e `wp_localize_script()` richiede handle già registrati.
  *
  * @package AdverTrieste
  */
@@ -15,10 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-\AdverTrieste\Console\Console::registra_asset_plugin();
-\AdverTrieste\Frontend\Home::registra_asset();
-
-$advtr_contenuto = \AdverTrieste\Frontend\Home::shortcode();
+$advtr_contenuto = \AdverTrieste\Frontend\Pubblico::prepara();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
