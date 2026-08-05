@@ -62,6 +62,39 @@
 		} );
 	}
 
+	// Conto alla rovescia dell'offerta (schermata 07).
+	document.querySelectorAll( '[data-advtr-countdown]' ).forEach( function ( span ) {
+		var fine = Date.parse( ( span.getAttribute( 'data-advtr-countdown' ) || '' ).replace( ' ', 'T' ) );
+		if ( isNaN( fine ) ) {
+			span.textContent = '';
+			return;
+		}
+
+		function tic() {
+			var resta = fine - Date.now();
+			if ( resta <= 0 ) {
+				span.textContent = '—';
+				window.clearInterval( timer );
+				return;
+			}
+			var gg = Math.floor( resta / 86400000 );
+			var hh = Math.floor( resta / 3600000 ) % 24;
+			var mm = Math.floor( resta / 60000 ) % 60;
+			var ss = Math.floor( resta / 1000 ) % 60;
+			// Oltre le 24 ore i secondi non dicono nulla: si mostrano i giorni.
+			span.textContent = gg > 0
+				? gg + 'g ' + due( hh ) + ':' + due( mm )
+				: due( hh ) + ':' + due( mm ) + ':' + due( ss );
+		}
+
+		function due( n ) {
+			return ( n < 10 ? '0' : '' ) + n;
+		}
+
+		tic();
+		var timer = window.setInterval( tic, 1000 );
+	} );
+
 	// Click sui contatti.
 	document.querySelectorAll( '[data-advtr-contact]' ).forEach( function ( a ) {
 		a.addEventListener( 'click', function () {
@@ -110,6 +143,16 @@
 		box.innerHTML = '';
 		var h = el( 'h2', null, ( cfg.i18n && cfg.i18n.recensioni ) || 'Recensioni' );
 		box.appendChild( h );
+		// Lo stesso voto compare accanto al titolo (schermata 07). Si popola solo
+		// se Google lo restituisce: nessuna stella inventata quando la funzione
+		// è spenta o il Place ID non è impostato.
+		var testa = document.querySelector( '[data-advtr-voto]' );
+		if ( testa && d.media_rating ) {
+			testa.textContent = stelle( d.media_rating ) + ' ' + d.media_rating.toFixed( 1 ) +
+				' · ' + d.totale + ' ' + ( ( cfg.i18n && cfg.i18n.basato ) || '' );
+			testa.hidden = false;
+		}
+
 		if ( d.media_rating ) {
 			var head = el( 'div', 'advtr-rev-media' );
 			head.appendChild( el( 'span', 'advtr-rev-stelle', stelle( d.media_rating ) ) );

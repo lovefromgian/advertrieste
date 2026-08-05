@@ -840,3 +840,376 @@ body.advtr-pubblico-pagina {
 		max-height: 340px;
 	}
 }
+
+/* ══ Scheda attività (schermata 07) ═══════════════════════════════ */
+
+.as-scheda {
+	--as-scuro: #1b2a3a;
+	--as-verde: #2f6b4f;
+	--as-corallo: #d9694e;
+	--as-oro: #e3ab35;
+	--as-carta: #fff;
+	--as-bordo: #e6e1d6;
+	--as-fondo: #f3f0e9;
+	--as-grigio: #6b7280;
+	--as-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+
+	box-sizing: border-box;
+	background: var(--as-carta);
+	border: 1px solid var(--as-bordo);
+	border-radius: 14px;
+	overflow: hidden;
+}
+
+.as-scheda *,
+.as-scheda *::before,
+.as-scheda *::after {
+	box-sizing: inherit;
+}
+
+/* ── Fascia d'apertura ───────────────────────────────────────────── */
+
+.as-eroe {
+	position: relative;
+	height: 170px;
+	background:
+		repeating-linear-gradient( 135deg, rgba( 255, 255, 255, 0.07 ) 0 14px, rgba( 255, 255, 255, 0 ) 14px 28px ),
+		linear-gradient( 100deg, #d9694e, #e3ab35 );
+}
+
+.as-eroe.evidenza {
+	background:
+		repeating-linear-gradient( 135deg, rgba( 255, 255, 255, 0.10 ) 0 14px, rgba( 255, 255, 255, 0 ) 14px 28px ),
+		linear-gradient( 100deg, #d9694e, #e8b93f );
+}
+
+.as-eroe-badge {
+	position: absolute;
+	top: 16px;
+	right: 18px;
+	padding: 5px 12px;
+	border-radius: 999px;
+	background: rgba( 27, 42, 58, 0.82 );
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+.as-eroe-badge.nov {
+	background: rgba( 47, 107, 79, 0.9 );
+}
+
+/* ── Intestazione ────────────────────────────────────────────────── */
+
+.as-intestazione {
+	display: flex;
+	align-items: flex-end;
+	gap: 18px;
+	flex-wrap: wrap;
+	padding: 0 26px 18px;
+	margin-top: -46px;
+}
+
+.as-logo {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 92px;
+	height: 92px;
+	border-radius: 16px;
+	background: var(--as-carta);
+	border: 4px solid var(--as-carta);
+	box-shadow: 0 6px 18px rgba( 27, 42, 58, 0.16 );
+	overflow: hidden;
+}
+
+.as-logo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.as-logo-sigla {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	background: var(--as-verde);
+	color: #fff;
+	font-family: var(--as-serif);
+	font-size: 28px;
+	font-weight: 700;
+}
+
+.as-intestazione-testo {
+	flex: 1 1 240px;
+	min-width: 0;
+	padding-bottom: 2px;
+}
+
+.as-titolo {
+	margin: 0;
+	font-family: var(--as-serif);
+	font-size: clamp( 24px, 3.4vw, 34px );
+	font-weight: 700;
+	line-height: 1.15;
+	color: var(--as-scuro);
+}
+
+.as-meta {
+	margin: 4px 0 0;
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	align-items: center;
+	font-size: 13px;
+}
+
+.as-cat {
+	color: var(--as-verde);
+	font-weight: 700;
+}
+
+.as-voto {
+	color: var(--as-oro);
+	font-weight: 600;
+}
+
+.as-azioni {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	padding-bottom: 2px;
+}
+
+.as-btn {
+	display: inline-block;
+	padding: 9px 18px;
+	border-radius: 999px;
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+	border: 1px solid var(--as-bordo);
+}
+
+.as-btn-neutro {
+	background: var(--as-carta);
+	color: var(--as-scuro);
+}
+
+.as-btn-primario {
+	background: var(--as-corallo);
+	border-color: var(--as-corallo);
+	color: #fff;
+}
+
+.as-btn-primario:hover {
+	background: #c25a41;
+	color: #fff;
+}
+
+/* ── Corpo a due colonne ─────────────────────────────────────────── */
+
+.as-corpo {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
+	gap: 26px;
+	padding: 6px 26px 30px;
+}
+
+.as-sez {
+	margin-bottom: 26px;
+}
+
+.as-sez h2,
+.as-info h2,
+.as-offerta-titolo {
+	font-family: var(--as-serif);
+	font-size: 17px;
+	font-weight: 700;
+	margin: 0 0 10px;
+	color: var(--as-scuro);
+}
+
+.as-testo {
+	color: #3b4856;
+}
+
+.as-servizi {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.as-servizi li {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	padding: 6px 13px;
+	border: 1px solid var(--as-bordo);
+	border-radius: 999px;
+	background: var(--as-carta);
+	font-size: 13px;
+}
+
+.as-servizi li::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--as-verde);
+	flex: none;
+}
+
+.as-galleria {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( 140px, 1fr ) );
+	gap: 10px;
+}
+
+.as-galleria img {
+	width: 100%;
+	height: 110px;
+	object-fit: cover;
+	border-radius: 10px;
+	display: block;
+}
+
+/* ── Riquadro offerta ────────────────────────────────────────────── */
+
+.as-offerta {
+	padding: 16px 18px;
+	margin-bottom: 16px;
+	border: 1px dashed var(--as-oro);
+	border-radius: 12px;
+	background: #fdf8ec;
+}
+
+.as-offerta-occhiello {
+	margin: 0 0 4px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--as-corallo);
+}
+
+.as-offerta-scade {
+	margin: 0 0 10px;
+	font-size: 12.5px;
+	color: var(--as-grigio);
+}
+
+.as-offerta-scade span {
+	font-weight: 700;
+	color: var(--as-corallo);
+	font-variant-numeric: tabular-nums;
+}
+
+.as-offerta-testo {
+	margin: 0 0 12px;
+	font-size: 13px;
+	color: #3b4856;
+}
+
+.as-coupon {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 16px 12px;
+	border-radius: 10px;
+	background: var(--as-scuro);
+	color: #fff;
+	text-align: center;
+}
+
+.as-coupon-eti {
+	font-size: 10px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #93a3b5;
+}
+
+.as-coupon-codice {
+	font-family: var(--as-serif);
+	font-size: 22px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+}
+
+.as-coupon-nota {
+	font-size: 11px;
+	color: #93a3b5;
+}
+
+/* ── Riquadro informazioni ───────────────────────────────────────── */
+
+.as-info {
+	padding: 16px 18px;
+	margin-bottom: 16px;
+	border: 1px solid var(--as-bordo);
+	border-radius: 12px;
+	background: var(--as-carta);
+}
+
+.as-info-lista {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	font-size: 13.5px;
+}
+
+.as-info-lista li {
+	display: flex;
+	gap: 10px;
+	padding: 9px 0;
+	border-bottom: 1px solid var(--as-bordo);
+}
+
+.as-info-lista li:last-child {
+	border-bottom: 0;
+}
+
+.as-ico {
+	flex: none;
+	width: 20px;
+	text-align: center;
+}
+
+.as-orari {
+	display: flex;
+	flex-direction: column;
+}
+
+.as-recensione {
+	display: inline-block;
+	margin-top: 10px;
+	font-size: 13px;
+}
+
+.as-scheda .advtr-scheda-map {
+	height: 190px;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid var(--as-bordo);
+}
+
+@media (max-width: 860px) {
+
+	.as-corpo {
+		grid-template-columns: 1fr;
+		padding: 6px 18px 26px;
+	}
+
+	.as-intestazione {
+		padding: 0 18px 16px;
+	}
+}
