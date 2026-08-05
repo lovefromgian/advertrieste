@@ -13,16 +13,21 @@
 	}
 
 	function track( tipo, meta ) {
-		if ( ! cfg.trackBase || ! cfg.nonce ) {
+		if ( ! cfg.trackBase ) {
 			return;
 		}
 		var body = { tipo: tipo };
 		if ( meta ) {
 			body.meta = meta;
 		}
+		// Nonce solo se presente (utenti autenticati): vedi map.js.
+		var headers = { 'Content-Type': 'application/json' };
+		if ( cfg.nonce ) {
+			headers['X-WP-Nonce'] = cfg.nonce;
+		}
 		window.fetch( cfg.trackBase + cfg.id + '/track', {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.nonce },
+			headers: headers,
 			credentials: 'same-origin',
 			body: JSON.stringify( body )
 		} ).catch( function () {} );

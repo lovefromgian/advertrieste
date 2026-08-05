@@ -202,6 +202,69 @@ list( $s ) = advtr_req( 'POST', "/advertrieste/v1/locale/{$loc}/track", array( '
 advtr_eq( 200, $s, '/track con tipo contact → 200 (tipo pubblico ammesso)' );
 
 /* ------------------------------------------------------------------ */
+echo "\n# 6b. Tracciamento senza nonce (compatibilità con le page cache)\n";
+// Il nonce non viene più emesso per gli anonimi: congelato in una pagina in
+// cache scadrebbe (vive 12–24h contro le 24h di una copia servita) e il core
+// risponderebbe 403, azzerando i conteggi in silenzio. Al suo posto si verifica
+// l'origine della richiesta. Questa sezione blocca quel comportamento.
+/**
+ * Esegue una richiesta REST con intestazioni arbitrarie.
+ *
+ * @param string               $method Metodo.
+ * @param string               $route  Route.
+ * @param array<string,mixed>  $params Parametri.
+ * @param array<string,string> $head   Intestazioni.
+ * @return array{0:int,1:mixed}
+ */
+function advtr_req_head( $method, $route, $params = array(), $head = array() ) {
+	$req = new WP_REST_Request( $method, $route );
+	foreach ( $params as $k => $v ) {
+		$req->set_param( $k, $v );
+	}
+	foreach ( $head as $k => $v ) {
+		$req->set_header( $k, $v );
+	}
+	$res = rest_do_request( $req );
+	return array( $res->get_status(), $res->get_data() );
+}
+
+wp_set_current_user( 0 );
+$view_prima = Stats::totals_by_type( $loc )['view'];
+
+list( $s, $d ) = advtr_req_head(
+	'POST',
+	"/advertrieste/v1/locale/{$loc}/track",
+	array( 'tipo' => 'view' ),
+	array( 'Origin' => home_url() )
+);
+advtr_eq( 200, $s, 'senza nonce, dal sito → 200 (visitatore su pagina in cache)' );
+advtr_eq( $view_prima + 1, Stats::totals_by_type( $loc )['view'], 'la visita è stata registrata davvero' );
+
+list( $s ) = advtr_req_head(
+	'POST',
+	"/advertrieste/v1/locale/{$loc}/track",
+	array( 'tipo' => 'contact' ),
+	array( 'Origin' => 'https://sito-esterno.example' )
+);
+advtr_eq( 403, $s, 'senza nonce, da origine esterna → 403' );
+
+list( $s ) = advtr_req_head(
+	'POST',
+	"/advertrieste/v1/locale/{$loc}/track",
+	array( 'tipo' => 'contact' ),
+	array( 'Referer' => 'https://sito-esterno.example/pagina' )
+);
+advtr_eq( 403, $s, 'anche il solo Referer esterno viene rifiutato' );
+
+// Il nonce non deve raggiungere gli anonimi: è ciò che rendeva il tracciamento
+// incompatibile con le page cache. In CLI l'hook wp_enqueue_scripts non scatta,
+// quindi registriamo noi gli asset prima di rendere lo shortcode.
+\AdverTrieste\Frontend\Map::register_assets();
+do_shortcode( '[advtr_map]' );
+$dati_mappa = wp_scripts()->get_data( 'advtr-map', 'data' );
+advtr_ok( is_string( $dati_mappa ) && false !== strpos( $dati_mappa, '"nonce":""' ), 'nessun nonce nella configurazione servita agli anonimi' );
+
+/* ------------------------------------------------------------------ */
 echo "\n# 7. Fuso orario della serie statistica\n";
 // Le righe sono scritte con current_time() (fuso del sito): la finestra della
 // serie deve usare lo stesso fuso. Guardia di regressione sul confine di

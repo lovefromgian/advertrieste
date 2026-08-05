@@ -104,15 +104,19 @@
 		}
 
 		function trackMapClick( m ) {
-			if ( m.type !== 'locale' || ! cfg.trackBase || ! cfg.nonce ) {
+			if ( m.type !== 'locale' || ! cfg.trackBase ) {
 				return;
+			}
+			// Il nonce arriva solo agli utenti autenticati. Per gli anonimi si
+			// invia SENZA: un nonce congelato in una pagina in cache scadrebbe e
+			// il core risponderebbe 403, azzerando i conteggi senza dirlo.
+			var headers = { 'Content-Type': 'application/json' };
+			if ( cfg.nonce ) {
+				headers['X-WP-Nonce'] = cfg.nonce;
 			}
 			window.fetch( cfg.trackBase + m.id + '/track', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-WP-Nonce': cfg.nonce
-				},
+				headers: headers,
 				credentials: 'same-origin',
 				body: JSON.stringify( { tipo: 'map_click' } )
 			} ).catch( function () {} );

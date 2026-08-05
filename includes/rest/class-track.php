@@ -86,23 +86,67 @@ class Track {
 	}
 
 	/**
-	 * Permission: richiede un nonce REST valido (anti-CSRF di base).
+	 * Permission: verifica che la richiesta provenga dal sito.
 	 *
-	 * L'endpoint è pubblico (traccia anche utenti anonimi) ma il nonce evita
-	 * invii da origini esterne; il rate-limit nel callback evita l'inflazione.
+	 * NON richiede un nonce per i visitatori anonimi, e la ragione è concreta.
+	 * Un nonce viene generato quando la pagina è costruita e vale fra 12 e 24
+	 * ore; una page cache serve la stessa pagina per tutta la durata configurata
+	 * (24 ore, nell'installazione di riferimento). Appena il nonce scade, il core
+	 * risponde 403 `rest_cookie_invalid_nonce` — prima ancora di arrivare qui — e
+	 * il tracciamento smette di contare **in silenzio**: nessun errore visibile,
+	 * solo grafici che si appiattiscono.
+	 *
+	 * Per un anonimo quel nonce non proteggeva granché: è identico per tutti i
+	 * visitatori e chiunque può prenderne uno fresco da qualsiasi pagina. Al suo
+	 * posto verifichiamo l'origine della richiesta, che non scade.
+	 *
+	 * Onestà su cosa questo ferma: l'inclusione della chiamata da un altro sito,
+	 * non uno script determinato, che può inviare qualsiasi intestazione. Contro
+	 * l'inflazione dei conteggi la difesa vera resta il rate-limit, insieme al
+	 * fatto che il tipo `coupon` non è accettato da qui (`Stats::TIPI_PUBBLICI`).
+	 *
+	 * Se un nonce c'è, il core l'ha già validato prima di questo callback: agli
+	 * utenti autenticati continua quindi ad applicarsi la protezione CSRF piena.
 	 *
 	 * @param WP_REST_Request $request Richiesta.
 	 * @return true|WP_Error
 	 */
 	public static function permission( WP_REST_Request $request ) {
-		$nonce = $request->get_header( 'X-WP-Nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+		if ( ! self::origine_attendibile( $request ) ) {
 			return new WP_Error(
-				'advtr_track_bad_nonce',
-				__( 'Nonce non valido.', 'advertrieste' ),
+				'advtr_track_origine',
+				__( 'Richiesta proveniente da un\'origine esterna.', 'advertrieste' ),
 				array( 'status' => 403 )
 			);
 		}
+		return true;
+	}
+
+	/**
+	 * La richiesta arriva da una pagina di questo sito?
+	 *
+	 * Confronta `Origin` e, in mancanza, `Referer` con l'host del sito. Se non
+	 * è presente nessuno dei due la richiesta passa: alcuni browser e estensioni
+	 * per la privacy li rimuovono, e rifiutare significherebbe ricadere nello
+	 * stesso problema che stiamo correggendo — perdere dati in silenzio.
+	 *
+	 * @param WP_REST_Request $request Richiesta.
+	 * @return bool
+	 */
+	private static function origine_attendibile( WP_REST_Request $request ) {
+		$sito = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		foreach ( array( 'Origin', 'Referer' ) as $intestazione ) {
+			$valore = $request->get_header( $intestazione );
+			if ( ! $valore ) {
+				continue;
+			}
+			$host = wp_parse_url( $valore, PHP_URL_HOST );
+			// La prima intestazione presente decide: se c'è ed è di un altro
+			// sito, la richiesta non nasce da una nostra pagina.
+			return $host && strtolower( $host ) === strtolower( (string) $sito );
+		}
+
 		return true;
 	}
 

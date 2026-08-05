@@ -120,7 +120,9 @@ class Map {
 			array(
 				'endpoint'  => rest_url( Markers::NAMESPACE . '/map/markers' ),
 				'trackBase' => rest_url( Markers::NAMESPACE . '/locale/' ),
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
+				// Solo per gli autenticati: in una pagina in cache un nonce
+				// scadrebbe e il tracciamento smetterebbe di contare in silenzio.
+				'nonce'     => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 				'center'    => array( (float) $atts['lat'], (float) $atts['lng'] ),
 				'zoom'      => (int) $atts['zoom'],
 				'categorie' => self::categorie_list(),

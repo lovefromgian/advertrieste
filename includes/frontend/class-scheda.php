@@ -84,7 +84,8 @@ class Scheda {
 				'id'         => $post_id,
 				'trackBase'  => rest_url( Markers::NAMESPACE . '/locale/' ),
 				'reviewsUrl' => rest_url( Markers::NAMESPACE . '/locale/' . $post_id . '/reviews' ),
-				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				// Solo per gli autenticati: vedi Frontend\Map.
+				'nonce'      => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 				'lat'        => $lat,
 				'lng'        => $lng,
 				'i18n'       => array(
