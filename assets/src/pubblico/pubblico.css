@@ -904,6 +904,16 @@ body.advtr-pubblico-pagina {
 	display: block;
 }
 
+.as-logo-icona {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	font-size: 34px;
+	line-height: 1;
+	background: var(--as-fondo);
+}
+
 .as-logo-sigla {
 	display: grid;
 	place-items: center;

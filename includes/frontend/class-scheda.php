@@ -13,6 +13,7 @@
 namespace AdverTrieste\Frontend;
 
 use AdverTrieste\Cpt\Locale;
+use AdverTrieste\Cpt\Poi;
 use AdverTrieste\Rest\Markers;
 
 // Guardia: nessun accesso diretto al file.
@@ -61,7 +62,9 @@ class Scheda {
 	 * @return void
 	 */
 	public static function assets() {
-		if ( ! is_singular( Locale::POST_TYPE ) ) {
+		$e_locale = is_singular( Locale::POST_TYPE );
+		$e_poi    = is_singular( Poi::POST_TYPE );
+		if ( ! $e_locale && ! $e_poi ) {
 			return;
 		}
 		$post_id = get_queried_object_id();
@@ -76,6 +79,19 @@ class Scheda {
 
 		$lat = (float) get_post_meta( $post_id, 'advtr_lat', true );
 		$lng = (float) get_post_meta( $post_id, 'advtr_lng', true );
+
+		if ( $e_poi ) {
+			wp_localize_script(
+				self::HANDLE,
+				'advtrScheda',
+				array(
+					'id'  => $post_id,
+					'lat' => $lat,
+					'lng' => $lng,
+				)
+			);
+			return;
+		}
 
 		wp_localize_script(
 			self::HANDLE,

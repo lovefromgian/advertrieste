@@ -18,6 +18,7 @@ namespace AdverTrieste\Frontend;
 use AdverTrieste\Console\Console;
 use AdverTrieste\Console\Pagina;
 use AdverTrieste\Cpt\Locale;
+use AdverTrieste\Cpt\Poi;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -88,8 +89,8 @@ class Pubblico {
 		if ( is_admin() ) {
 			return false;
 		}
-		// La scheda attività è un CPT, non una pagina con shortcode.
-		if ( is_singular( Locale::POST_TYPE ) ) {
+		// Scheda attività e punto d'interesse sono CPT, non pagine con shortcode.
+		if ( is_singular( array( Locale::POST_TYPE, Poi::POST_TYPE ) ) ) {
 			return true;
 		}
 		return Pagina::pagina_con_shortcode( self::SHORTCODE );
@@ -164,6 +165,8 @@ class Pubblico {
 		ob_start();
 		if ( is_singular( Locale::POST_TYPE ) ) {
 			require ADVTR_PATH . 'templates/pubblico/interna-scheda.php';
+		} elseif ( is_singular( Poi::POST_TYPE ) ) {
+			require ADVTR_PATH . 'templates/pubblico/interna-poi.php';
 		} else {
 			require ADVTR_PATH . 'templates/pubblico/interna.php';
 		}
