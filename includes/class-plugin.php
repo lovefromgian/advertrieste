@@ -29,6 +29,7 @@ use AdverTrieste\Rest\Stats as StatsEndpoint;
 use AdverTrieste\Rest\Offerte as OfferteEndpoint;
 use AdverTrieste\Rest\Eventi as EventiEndpoint;
 use AdverTrieste\Rest\Reviews as ReviewsEndpoint;
+use AdverTrieste\Rest\Geocode as GeocodeEndpoint;
 use AdverTrieste\Frontend\Map;
 use AdverTrieste\Frontend\Onboarding;
 use AdverTrieste\Frontend\Scheda;
@@ -118,6 +119,7 @@ final class Plugin {
 		OfferteEndpoint::init();
 		EventiEndpoint::init();
 		ReviewsEndpoint::init();
+		GeocodeEndpoint::init();
 		Map::init();
 		Onboarding::init();
 		Scheda::init();

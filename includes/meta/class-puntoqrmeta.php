@@ -13,6 +13,7 @@
 namespace AdverTrieste\Meta;
 
 use AdverTrieste\Cpt\PuntoQr;
+use AdverTrieste\Rest\Markers;
 
 // Guardia: nessun accesso diretto al file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,6 +48,48 @@ class PuntoQrMeta {
 		add_action( 'init', array( __CLASS__, 'register_fields' ) );
 		add_action( 'add_meta_boxes_' . PuntoQr::POST_TYPE, array( __CLASS__, 'add_meta_box' ) );
 		add_action( 'save_post_' . PuntoQr::POST_TYPE, array( __CLASS__, 'save' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin' ) );
+	}
+
+	/**
+	 * Accoda mappa e ricerca indirizzi sulla schermata del punto QR.
+	 *
+	 * @param string $hook Schermata corrente.
+	 * @return void
+	 */
+	public static function enqueue_admin( $hook ) {
+		if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			return;
+		}
+		$screen = get_current_screen();
+		if ( ! $screen || PuntoQr::POST_TYPE !== $screen->post_type ) {
+			return;
+		}
+
+		wp_enqueue_style( 'leaflet', ADVTR_URL . 'assets/vendor/leaflet/leaflet.css', array(), '1.9.4' );
+		wp_enqueue_script( 'leaflet', ADVTR_URL . 'assets/vendor/leaflet/leaflet.js', array(), '1.9.4', true );
+		wp_enqueue_script(
+			'advtr-punto-qr',
+			ADVTR_URL . 'assets/src/admin/punto-qr.js',
+			array( 'leaflet' ),
+			ADVTR_VERSION,
+			true
+		);
+		wp_localize_script(
+			'advtr-punto-qr',
+			'advtrPuntoQr',
+			array(
+				'endpoint' => rest_url( Markers::NAMESPACE . '/geocode' ),
+				'nonce'    => wp_create_nonce( 'wp_rest' ),
+				'centro'   => array( 45.6495, 13.7768 ),
+				'i18n'     => array(
+					'cerca'          => __( 'Cerca sulla mappa', 'advertrieste' ),
+					'ricerca'        => __( 'Ricerca in corso…', 'advertrieste' ),
+					'trovato'        => __( 'Posizione trovata: controlla il segnaposto e correggilo trascinandolo.', 'advertrieste' ),
+					'erroreGenerico' => __( 'Ricerca non riuscita.', 'advertrieste' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -82,6 +125,17 @@ class PuntoQrMeta {
 				'sanitize_callback' => static function ( $value ) {
 					return ( '' === $value || null === $value ) ? '' : (float) $value;
 				},
+				'auth_callback'     => $auth,
+			)
+		);
+		register_post_meta(
+			PuntoQr::POST_TYPE,
+			'advtr_indirizzo',
+			array(
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => false,
+				'sanitize_callback' => 'sanitize_text_field',
 				'auth_callback'     => $auth,
 			)
 		);
@@ -123,14 +177,31 @@ class PuntoQrMeta {
 	public static function render( $post ) {
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 
-		$lat   = get_post_meta( $post->ID, 'advtr_lat', true );
-		$lng   = get_post_meta( $post->ID, 'advtr_lng', true );
-		$stato = get_post_meta( $post->ID, 'advtr_stato', true );
-		$stati = array(
+		$lat       = get_post_meta( $post->ID, 'advtr_lat', true );
+		$lng       = get_post_meta( $post->ID, 'advtr_lng', true );
+		$indirizzo = get_post_meta( $post->ID, 'advtr_indirizzo', true );
+		$stato     = get_post_meta( $post->ID, 'advtr_stato', true );
+		$stati     = array(
 			'attivo'   => __( 'Attivo', 'advertrieste' ),
 			'inattivo' => __( 'Inattivo', 'advertrieste' ),
 		);
 		?>
+		<p>
+			<label for="advtr_indirizzo"><strong><?php esc_html_e( 'Indirizzo', 'advertrieste' ); ?></strong></label><br />
+			<input type="text" class="widefat" id="advtr_indirizzo" name="advtr_indirizzo"
+				value="<?php echo esc_attr( $indirizzo ); ?>"
+				placeholder="<?php esc_attr_e( 'Es. Piazza Unità d\'Italia 4, Trieste', 'advertrieste' ); ?>" />
+			<button type="button" class="button" id="advtr-geocode-btn" style="margin-top:6px;">
+				<?php esc_html_e( 'Cerca sulla mappa', 'advertrieste' ); ?>
+			</button>
+			<span id="advtr-geocode-esito" class="description" style="margin-left:8px;"></span>
+		</p>
+
+		<div id="advtr-qr-picker" style="height:320px;margin:12px 0;border:1px solid #dcdcde;border-radius:4px;"></div>
+		<p class="description">
+			<?php esc_html_e( 'La ricerca porta all\'indirizzo; il segnaposto va poi trascinato sul punto esatto dell\'espositore. Per una piazza il servizio restituisce il centro, non l\'angolo dove sta il totem.', 'advertrieste' ); ?>
+		</p>
+
 		<p>
 			<label for="advtr_lat"><strong><?php esc_html_e( 'Latitudine', 'advertrieste' ); ?></strong></label><br />
 			<input type="number" step="any" id="advtr_lat" name="advtr_lat" value="<?php echo esc_attr( $lat ); ?>" />
@@ -175,6 +246,13 @@ class PuntoQrMeta {
 
 		self::save_coord( $post_id, 'advtr_lat', $lat );
 		self::save_coord( $post_id, 'advtr_lng', $lng );
+
+		$indirizzo = isset( $_POST['advtr_indirizzo'] ) ? sanitize_text_field( wp_unslash( $_POST['advtr_indirizzo'] ) ) : '';
+		if ( '' === $indirizzo ) {
+			delete_post_meta( $post_id, 'advtr_indirizzo' );
+		} else {
+			update_post_meta( $post_id, 'advtr_indirizzo', $indirizzo );
+		}
 
 		$stato = isset( $_POST['advtr_stato'] ) ? sanitize_text_field( wp_unslash( $_POST['advtr_stato'] ) ) : '';
 		if ( in_array( $stato, array( 'attivo', 'inattivo' ), true ) ) {

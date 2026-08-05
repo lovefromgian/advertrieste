@@ -41,6 +41,18 @@
 		<exclude-pattern>*/index.php</exclude-pattern>
 	</rule>
 
+	<!-- Capability custom del plugin: PHPCS non può dedurle da solo. -->
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="advtr_view_qr_map"/>
+				<element value="advtr_edit_own_locale"/>
+				<element value="advtr_submit_evento"/>
+				<element value="advtr_approve_evento"/>
+			</property>
+		</properties>
+	</rule>
+
 	<!-- Prefissi consentiti per global/hook/costanti. -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
