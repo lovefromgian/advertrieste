@@ -68,6 +68,10 @@ class Offerta {
 			'supports'            => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'offerta' ),
 			'exclude_from_search' => false,
+			// Capability dedicate: senza, il CPT userebbe quelle degli articoli e
+			// un `cliente_locale` non potrebbe gestire le proprie offerte (§2.1).
+			'capability_type'     => array( 'advtr_offerta', 'advtr_offerte' ),
+			'map_meta_cap'        => true,
 		);
 	}
 }

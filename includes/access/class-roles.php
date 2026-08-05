@@ -79,6 +79,13 @@ class Roles {
 	const EVENTO_PLURAL = 'advtr_eventi';
 
 	/**
+	 * Plurale delle capability del CPT `offerta` (capability_type).
+	 *
+	 * @var string
+	 */
+	const OFFERTA_PLURAL = 'advtr_offerte';
+
+	/**
 	 * Genera l'elenco completo delle capability primitive per un CPT.
 	 *
 	 * @param string $plural Plurale del capability_type.
@@ -119,15 +126,22 @@ class Roles {
 	 * @return void
 	 */
 	public static function install() {
-		// Ruolo cliente_locale: gestisce le PROPRIE schede locale in bacheca.
+		// Ruolo cliente_locale: gestisce la PROPRIA scheda e le PROPRIE offerte
+		// dall'area clienti in front-end (non dalla bacheca: vedi Access\AdminLock).
 		$cliente_caps = array(
-			'read'                                  => true,
-			'upload_files'                          => true,
-			self::CAP_VIEW_QR_MAP                   => true,
-			self::CAP_EDIT_OWN_LOCALE               => true,
-			'edit_' . self::LOCALE_PLURAL           => true,
-			'edit_published_' . self::LOCALE_PLURAL => true,
-			'delete_' . self::LOCALE_PLURAL         => true,
+			'read'                                     => true,
+			'upload_files'                             => true,
+			self::CAP_VIEW_QR_MAP                      => true,
+			self::CAP_EDIT_OWN_LOCALE                  => true,
+			'edit_' . self::LOCALE_PLURAL              => true,
+			'edit_published_' . self::LOCALE_PLURAL    => true,
+			'delete_' . self::LOCALE_PLURAL            => true,
+			// Offerte: le pubblica in autonomia, senza passare da approvazione.
+			'edit_' . self::OFFERTA_PLURAL             => true,
+			'edit_published_' . self::OFFERTA_PLURAL   => true,
+			'publish_' . self::OFFERTA_PLURAL          => true,
+			'delete_' . self::OFFERTA_PLURAL           => true,
+			'delete_published_' . self::OFFERTA_PLURAL => true,
 		);
 		self::ensure_role( self::CLIENTE, __( 'Cliente (locale)', 'advertrieste' ), $cliente_caps );
 
@@ -150,7 +164,8 @@ class Roles {
 			$admin_caps = array_merge(
 				self::all_caps(),
 				self::cpt_capabilities( self::LOCALE_PLURAL ),
-				self::cpt_capabilities( self::EVENTO_PLURAL )
+				self::cpt_capabilities( self::EVENTO_PLURAL ),
+				self::cpt_capabilities( self::OFFERTA_PLURAL )
 			);
 			foreach ( $admin_caps as $cap ) {
 				$admin->add_cap( $cap );
@@ -172,7 +187,8 @@ class Roles {
 			$admin_caps = array_merge(
 				self::all_caps(),
 				self::cpt_capabilities( self::LOCALE_PLURAL ),
-				self::cpt_capabilities( self::EVENTO_PLURAL )
+				self::cpt_capabilities( self::EVENTO_PLURAL ),
+				self::cpt_capabilities( self::OFFERTA_PLURAL )
 			);
 			foreach ( $admin_caps as $cap ) {
 				$admin->remove_cap( $cap );
