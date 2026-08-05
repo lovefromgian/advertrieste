@@ -419,6 +419,15 @@ class ClientArea {
 			return;
 		}
 
+		// Solo le azioni inviate DA questa pagina. Senza questo controllo il
+		// gestore intercettava anche i POST della console amministratore — che
+		// usano lo stesso nome di campo ma un altro nonce — e li faceva morire
+		// con "Il link che hai seguito è scaduto", prima ancora che il gestore
+		// giusto potesse vederli.
+		if ( ! self::e_console() ) {
+			return;
+		}
+
 		// Il login è l'unica azione ammessa senza utente autenticato.
 		if ( 'login' === $azione ) {
 			self::azione_login();
