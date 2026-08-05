@@ -65,6 +65,46 @@
 	box-sizing: inherit;
 }
 
+/* ── Pagina intera ───────────────────────────────────────────────── */
+/* La console occupa il documento: nessun contenitore del tema attorno. */
+
+body.advtr-console-pagina {
+	margin: 0;
+	padding: 0;
+	background: #f3f0e9;
+}
+
+.advtr-console-pagina .advtr-console {
+	max-width: none;
+	min-height: 100vh;
+	margin: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+.advtr-console-pagina .ac-lato {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	overflow-y: auto;
+}
+
+.advtr-console-pagina .ac-corpo {
+	padding: 34px 40px 48px;
+}
+
+@media (max-width: 900px) {
+
+	.advtr-console-pagina .ac-lato {
+		position: static;
+		height: auto;
+	}
+
+	.advtr-console-pagina .ac-corpo {
+		padding: 20px 16px 26px;
+	}
+}
+
 /* ── Sidebar ─────────────────────────────────────────────────────── */
 
 .ac-lato {
@@ -576,4 +616,134 @@
 	.ac-corpo {
 		padding: 20px 16px 26px;
 	}
+}
+
+/* ── Schermata di accesso ────────────────────────────────────────── */
+/* Vive fuori da .advtr-console: è una pagina a sé, non una sezione. */
+
+.ac-accesso {
+	--ac-scuro: #1b2a3a;
+	--ac-corallo: #d9694e;
+	--ac-bordo: #e6e1d6;
+	--ac-testo: #1b2a3a;
+	--ac-tenue: #6b7280;
+	--ac-verde: #2f6b4f;
+	--ac-rosso: #b32d2e;
+
+	box-sizing: border-box;
+	display: grid;
+	place-items: center;
+	min-height: 100vh;
+	padding: 24px;
+	background: var(--ac-scuro);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	color: var(--ac-testo);
+}
+
+.ac-accesso *,
+.ac-accesso *::before,
+.ac-accesso *::after {
+	box-sizing: inherit;
+}
+
+.ac-accesso-scheda {
+	width: 100%;
+	max-width: 400px;
+	padding: 32px;
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.ac-accesso-marchio {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 22px;
+	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--ac-testo);
+}
+
+.ac-accesso-titolo {
+	margin: 0 0 4px;
+	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--ac-testo);
+}
+
+.ac-accesso-nota {
+	margin: 0 0 8px;
+	font-size: 13.5px;
+	color: var(--ac-tenue);
+}
+
+.ac-accesso label {
+	display: block;
+	margin: 16px 0 6px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.ac-accesso input[type="text"],
+.ac-accesso input[type="email"],
+.ac-accesso input[type="password"] {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid var(--ac-bordo);
+	border-radius: 7px;
+	background: #fff;
+	color: var(--ac-testo);
+	font: inherit;
+}
+
+.ac-accesso input:focus {
+	outline: 2px solid var(--ac-corallo);
+	outline-offset: 1px;
+	border-color: var(--ac-corallo);
+}
+
+.ac-accesso-ricorda {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 400 !important;
+}
+
+.ac-accesso-invia {
+	width: 100%;
+	margin-top: 22px;
+	padding: 11px 18px;
+	text-align: center;
+	font-size: 14px;
+}
+
+.ac-accesso-alt {
+	margin: 18px 0 0;
+	text-align: center;
+	font-size: 13px;
+}
+
+.ac-accesso-alt a {
+	color: var(--ac-tenue);
+}
+
+.ac-accesso-avviso {
+	margin: 0 0 16px;
+	padding: 10px 14px;
+	border-radius: 7px;
+	border-left: 4px solid var(--ac-tenue);
+	background: #f6f7f7;
+	font-size: 13px;
+}
+
+.ac-accesso-avviso.ok {
+	border-left-color: var(--ac-verde);
+}
+
+.ac-accesso-avviso.errore {
+	border-left-color: var(--ac-rosso);
 }

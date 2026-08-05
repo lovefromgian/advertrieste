@@ -115,6 +115,16 @@ class ClientArea {
 		// Alias storico, così le pagine già create continuano a funzionare.
 		add_shortcode( 'advtr_area_riservata', array( __CLASS__, 'shortcode' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'evita_cache' ), 5 );
+		add_filter( 'template_include', array( __CLASS__, 'template_pagina_intera' ) );
+		add_filter( 'show_admin_bar', array( __CLASS__, 'niente_barra' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'asset_console' ), 999 );
+		add_action( 'wp_print_styles', array( __CLASS__, 'asset_console' ), 1 );
+		add_action( 'wp_print_scripts', array( __CLASS__, 'asset_console' ), 1 );
+		// Ultima rete: alcuni plugin stampano fuori dalla coda, e togliere dalla
+		// coda non basta. Qui si interviene sul tag, subito prima dell'output.
+		add_filter( 'style_loader_tag', array( __CLASS__, 'filtra_tag' ), 10, 2 );
+		add_filter( 'script_loader_tag', array( __CLASS__, 'filtra_tag' ), 10, 2 );
+		add_action( 'wp_head', array( __CLASS__, 'niente_indicizzazione' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'gestisci_azioni' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'registra_asset' ) );
 	}
@@ -173,6 +183,128 @@ class ClientArea {
 			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
 		}
 		nocache_headers();
+	}
+
+	/**
+	 * La richiesta corrente è una pagina della console?
+	 *
+	 * @return bool
+	 */
+	public static function e_console() {
+		if ( is_admin() ) {
+			return false;
+		}
+		$post = get_queried_object();
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+		foreach ( array( 'advtr_area_clienti', 'advtr_area_riservata' ) as $tag ) {
+			if ( has_shortcode( $post->post_content, $tag ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Sostituisce il template del tema con il documento intero della console.
+	 *
+	 * La console è un'applicazione, non un articolo: intestazione, menu e piè di
+	 * pagina del sito attorno a una dashboard sono rumore, e per il cliente sono
+	 * anche una via di uscita verso pagine che non gli servono.
+	 *
+	 * @param string $template Template scelto dal tema.
+	 * @return string
+	 */
+	public static function template_pagina_intera( $template ) {
+		if ( ! self::e_console() ) {
+			return $template;
+		}
+		return ADVTR_PATH . 'templates/console/pagina-intera.php';
+	}
+
+	/**
+	 * Niente barra di amministrazione sulla console, per nessuno.
+	 *
+	 * Vale anche per l'amministratore: la console va vista com'è, non con una
+	 * barra nera di WordPress incollata sopra.
+	 *
+	 * @param bool $mostra Valore corrente.
+	 * @return bool
+	 */
+	public static function niente_barra( $mostra ) {
+		return self::e_console() ? false : $mostra;
+	}
+
+	/**
+	 * La console non va indicizzata: è un'area di lavoro privata.
+	 *
+	 * @return void
+	 */
+	public static function niente_indicizzazione() {
+		if ( self::e_console() ) {
+			echo '<meta name="robots" content="noindex, nofollow" />' . "\n";
+		}
+	}
+
+	/**
+	 * Rimuove dalla console gli asset che non le servono.
+	 *
+	 * Senza il markup del tema, i suoi fogli di stile restano comunque accodati e
+	 * possono intervenire su body e tipografia. Qui si tiene solo ciò che serve
+	 * alla console; l'elenco è filtrabile perché un tema o un plugin potrebbero
+	 * avere una dipendenza legittima.
+	 *
+	 * @return void
+	 */
+	public static function asset_console() {
+		if ( ! self::e_console() ) {
+			return;
+		}
+
+		$consentiti = self::asset_consentiti();
+
+		foreach ( wp_styles()->queue as $handle ) {
+			if ( ! in_array( $handle, $consentiti, true ) ) {
+				wp_dequeue_style( $handle );
+			}
+		}
+		foreach ( wp_scripts()->queue as $handle ) {
+			if ( ! in_array( $handle, $consentiti, true ) ) {
+				wp_dequeue_script( $handle );
+			}
+		}
+	}
+
+	/**
+	 * Sopprime il tag degli asset non consentiti sulla console.
+	 *
+	 * @param string $tag    Markup del tag.
+	 * @param string $handle Handle dell'asset.
+	 * @return string Stringa vuota se l'asset va soppresso.
+	 */
+	public static function filtra_tag( $tag, $handle ) {
+		if ( ! self::e_console() ) {
+			return $tag;
+		}
+		return in_array( $handle, self::asset_consentiti(), true ) ? $tag : '';
+	}
+
+	/**
+	 * Handle degli asset che possono restare sulla console.
+	 *
+	 * @return string[]
+	 */
+	private static function asset_consentiti() {
+		/**
+		 * Handle degli asset da conservare sulla console.
+		 *
+		 * @param string[] $consentiti Elenco di handle.
+		 */
+		return apply_filters(
+			'advtr_console_asset_consentiti',
+			array( Console::HANDLE, self::HANDLE, 'advtr-map', 'advtr-stats', 'advtr-qr-map', 'advtr-offerte', 'leaflet' )
+		);
 	}
 
 	/**
@@ -266,21 +398,21 @@ class ClientArea {
 	 */
 	private static function avvisi() {
 		return array(
-			'login_ko'     => array( 'errore', __( 'Email o password non corretti.', 'advertrieste' ) ),
-			'login_vuoto'  => array( 'errore', __( 'Inserisci email e password.', 'advertrieste' ) ),
-			'reset_ok'     => array( 'ok', __( 'Ti abbiamo inviato un\'email con le istruzioni per reimpostare la password.', 'advertrieste' ) ),
-			'reset_ko'     => array( 'errore', __( 'Non troviamo un account con questa email.', 'advertrieste' ) ),
-			'scheda_ok'    => array( 'ok', __( 'Scheda aggiornata. Le modifiche sono già online.', 'advertrieste' ) ),
-			'immagine_ok'  => array( 'ok', __( 'Immagine caricata.', 'advertrieste' ) ),
-			'immagine_ko'  => array( 'errore', __( 'Caricamento non riuscito: controlla formato e dimensione del file.', 'advertrieste' ) ),
-			'immagine_del' => array( 'ok', __( 'Immagine rimossa.', 'advertrieste' ) ),
-			'offerta_ok'   => array( 'ok', __( 'Offerta salvata.', 'advertrieste' ) ),
-			'offerta_del'  => array( 'ok', __( 'Offerta eliminata.', 'advertrieste' ) ),
-			'offerta_date' => array( 'errore', __( 'La data di scadenza deve essere successiva a quella di inizio.', 'advertrieste' ) ),
-			'account_ok'   => array( 'ok', __( 'Dati dell\'account aggiornati.', 'advertrieste' ) ),
-			'account_ko'   => array( 'errore', __( 'Controlla nome ed email inseriti.', 'advertrieste' ) ),
+			'login_ko'      => array( 'errore', __( 'Email o password non corretti.', 'advertrieste' ) ),
+			'login_vuoto'   => array( 'errore', __( 'Inserisci email e password.', 'advertrieste' ) ),
+			'reset_ok'      => array( 'ok', __( 'Ti abbiamo inviato un\'email con le istruzioni per reimpostare la password.', 'advertrieste' ) ),
+			'reset_ko'      => array( 'errore', __( 'Non troviamo un account con questa email.', 'advertrieste' ) ),
+			'scheda_ok'     => array( 'ok', __( 'Scheda aggiornata. Le modifiche sono già online.', 'advertrieste' ) ),
+			'immagine_ok'   => array( 'ok', __( 'Immagine caricata.', 'advertrieste' ) ),
+			'immagine_ko'   => array( 'errore', __( 'Caricamento non riuscito: controlla formato e dimensione del file.', 'advertrieste' ) ),
+			'immagine_del'  => array( 'ok', __( 'Immagine rimossa.', 'advertrieste' ) ),
+			'offerta_ok'    => array( 'ok', __( 'Offerta salvata.', 'advertrieste' ) ),
+			'offerta_del'   => array( 'ok', __( 'Offerta eliminata.', 'advertrieste' ) ),
+			'offerta_date'  => array( 'errore', __( 'La data di scadenza deve essere successiva a quella di inizio.', 'advertrieste' ) ),
+			'account_ok'    => array( 'ok', __( 'Dati dell\'account aggiornati.', 'advertrieste' ) ),
+			'account_ko'    => array( 'errore', __( 'Controlla nome ed email inseriti.', 'advertrieste' ) ),
 			'account_email' => array( 'errore', __( 'Questa email è già usata da un altro account.', 'advertrieste' ) ),
-			'negato'       => array( 'errore', __( 'Operazione non consentita.', 'advertrieste' ) ),
+			'negato'        => array( 'errore', __( 'Operazione non consentita.', 'advertrieste' ) ),
 		);
 	}
 
@@ -430,10 +562,7 @@ class ClientArea {
 			update_option( self::OPTION_PAGE, $corrente );
 		}
 
-		wp_enqueue_style( 'leaflet' );
-		wp_enqueue_script( 'leaflet' );
-		wp_enqueue_style( self::HANDLE );
-		wp_enqueue_script( self::HANDLE );
+		wp_enqueue_style( Console::HANDLE );
 
 		// Ricerca indirizzo del selettore di posizione. Il nonce qui è affidabile:
 		// l'area è per soli utenti autenticati, quindi non finisce in page cache.
@@ -458,7 +587,7 @@ class ClientArea {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sola scelta di vista.
 			$vista = isset( $_GET['vista'] ) ? sanitize_key( wp_unslash( $_GET['vista'] ) ) : '';
 			ob_start();
-			require ADVTR_PATH . 'templates/cliente/login.php';
+			require ADVTR_PATH . 'templates/console/accesso.php';
 			return (string) ob_get_clean();
 		}
 
@@ -468,7 +597,11 @@ class ClientArea {
 				'</div>';
 		}
 
-		wp_enqueue_style( Console::HANDLE );
+		// Asset pesanti solo dopo il cancello: la schermata di accesso non ha mappe.
+		wp_enqueue_style( 'leaflet' );
+		wp_enqueue_script( 'leaflet' );
+		wp_enqueue_style( self::HANDLE );
+		wp_enqueue_script( self::HANDLE );
 
 		$sezione = self::sezione_corrente();
 		$locale  = self::locale_utente();
@@ -598,15 +731,15 @@ class ClientArea {
 	 */
 	private static function titolo_sezione( $sezione ) {
 		$titoli = array(
-			'statistiche' => __( 'Statistiche della scheda', 'advertrieste' ),
-			'scheda'      => __( 'La mia scheda', 'advertrieste' ),
-			'immagini'    => __( 'Galleria media', 'advertrieste' ),
-			'offerte'     => __( 'Offerte & Coupon', 'advertrieste' ),
-			'coupon'      => __( 'Valida un coupon', 'advertrieste' ),
-			'evidenza'    => __( 'Piano In Evidenza', 'advertrieste' ),
-			'abbonamento' => __( 'Il tuo abbonamento', 'advertrieste' ),
+			'statistiche'  => __( 'Statistiche della scheda', 'advertrieste' ),
+			'scheda'       => __( 'La mia scheda', 'advertrieste' ),
+			'immagini'     => __( 'Galleria media', 'advertrieste' ),
+			'offerte'      => __( 'Offerte & Coupon', 'advertrieste' ),
+			'coupon'       => __( 'Valida un coupon', 'advertrieste' ),
+			'evidenza'     => __( 'Piano In Evidenza', 'advertrieste' ),
+			'abbonamento'  => __( 'Il tuo abbonamento', 'advertrieste' ),
 			'impostazioni' => __( 'Impostazioni', 'advertrieste' ),
-			'qr'          => __( 'Mappa dei punti QR', 'advertrieste' ),
+			'qr'           => __( 'Mappa dei punti QR', 'advertrieste' ),
 		);
 		return $titoli[ $sezione ] ?? '';
 	}
@@ -620,15 +753,15 @@ class ClientArea {
 	 */
 	private static function sottotitolo_sezione( $sezione, $locale ) {
 		$sottotitoli = array(
-			'statistiche' => __( 'Andamento delle visualizzazioni e interazioni', 'advertrieste' ),
-			'scheda'      => __( 'I contenuti che il pubblico vede sulla tua pagina', 'advertrieste' ),
-			'immagini'    => __( 'Logo e fotografie della tua attività', 'advertrieste' ),
-			'offerte'     => __( 'Promozioni a tempo e coupon da validare sul posto', 'advertrieste' ),
-			'coupon'      => __( 'Verifica il codice che il cliente ti mostra', 'advertrieste' ),
-			'evidenza'    => __( 'Marker dorato e priorità nei risultati', 'advertrieste' ),
-			'abbonamento' => __( 'Validità della tua presenza sulla mappa', 'advertrieste' ),
+			'statistiche'  => __( 'Andamento delle visualizzazioni e interazioni', 'advertrieste' ),
+			'scheda'       => __( 'I contenuti che il pubblico vede sulla tua pagina', 'advertrieste' ),
+			'immagini'     => __( 'Logo e fotografie della tua attività', 'advertrieste' ),
+			'offerte'      => __( 'Promozioni a tempo e coupon da validare sul posto', 'advertrieste' ),
+			'coupon'       => __( 'Verifica il codice che il cliente ti mostra', 'advertrieste' ),
+			'evidenza'     => __( 'Marker dorato e priorità nei risultati', 'advertrieste' ),
+			'abbonamento'  => __( 'Validità della tua presenza sulla mappa', 'advertrieste' ),
 			'impostazioni' => __( 'Dati del tuo account', 'advertrieste' ),
-			'qr'          => __( 'La rete di espositori sul territorio', 'advertrieste' ),
+			'qr'           => __( 'La rete di espositori sul territorio', 'advertrieste' ),
 		);
 		unset( $locale );
 		return $sottotitoli[ $sezione ] ?? '';
