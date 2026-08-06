@@ -80,6 +80,65 @@ foreach ( $advtr_lista as $advtr_v ) {
 	);
 }
 
+// La ricerca filtra la tabella, non le schede fra cui si sceglie qui: chi cerca
+// "Rossetti" per controllarne la scadenza non deve trovarsi il menu ridotto a
+// una voce quando poi vuole attivare un'altra scheda.
+$advtr_attivabili = '' !== $cerca ? AdminConsole::locali( '' ) : wp_list_pluck( $advtr_lista, 'post' );
+?>
+<div class="ac-card" style="margin-bottom:20px">
+	<h3 class="ac-card-titolo"><?php esc_html_e( 'Attiva un abbonamento', 'advertrieste' ); ?></h3>
+	<p class="ac-card-sottotitolo">
+		<?php esc_html_e( 'Fissa la finestra di validità da capo: serve alla prima attivazione o quando si riparte con un contratto nuovo. Per aggiungere tempo a un abbonamento che c\'è già, usa "Rinnova" nella riga corrispondente.', 'advertrieste' ); ?>
+	</p>
+	<form class="advtr-form" method="post" action="<?php echo esc_url( $advtr_url ); ?>"
+		data-advtr-conferma="<?php esc_attr_e( 'Confermi? Sostituisce la validità attuale', 'advertrieste' ); ?>">
+		<?php wp_nonce_field( AdminConsole::NONCE ); ?>
+		<input type="hidden" name="advtr_azione" value="attiva_abbonamento" />
+
+		<label for="ac-ab-locale"><?php esc_html_e( 'Scheda', 'advertrieste' ); ?></label>
+		<select id="ac-ab-locale" name="advtr_locale" required>
+			<option value=""><?php esc_html_e( '— scegli una scheda —', 'advertrieste' ); ?></option>
+			<?php foreach ( $advtr_attivabili as $advtr_o ) : ?>
+				<?php
+				$advtr_scad = Abbonamento::data_scadenza( $advtr_o->ID );
+				$advtr_nota = '' !== $advtr_scad
+					/* translators: %s: data di scadenza */
+					? sprintf( __( 'scade il %s', 'advertrieste' ), $advtr_scad )
+					: __( 'senza abbonamento', 'advertrieste' );
+				?>
+				<option value="<?php echo esc_attr( $advtr_o->ID ); ?>">
+					<?php echo esc_html( $advtr_o->post_title . ' — ' . $advtr_nota ); ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+
+		<div class="advtr-griglia-2">
+			<div>
+				<label for="ac-ab-dal"><?php esc_html_e( 'Decorrenza', 'advertrieste' ); ?></label>
+				<input type="date" id="ac-ab-dal" name="advtr_decorrenza"
+					value="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>" required />
+			</div>
+			<div>
+				<label for="ac-ab-durata"><?php esc_html_e( 'Durata', 'advertrieste' ); ?></label>
+				<select id="ac-ab-durata" name="advtr_durata">
+					<?php foreach ( AdminConsole::DURATE as $advtr_gg ) : ?>
+						<option value="<?php echo esc_attr( $advtr_gg ); ?>"<?php echo 365 === $advtr_gg ? ' selected' : ''; ?>>
+							<?php
+							/* translators: %d: giorni di durata */
+							echo esc_html( sprintf( _n( '%d giorno', '%d giorni', $advtr_gg, 'advertrieste' ), $advtr_gg ) );
+							?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+		</div>
+
+		<div class="advtr-form-azioni">
+			<button type="submit" class="ac-btn ac-btn-verde"><?php esc_html_e( 'Attiva', 'advertrieste' ); ?></button>
+		</div>
+	</form>
+</div>
+<?php
 $advtr_tabella = Tabella::rendi(
 	array(
 		'colonne' => array(

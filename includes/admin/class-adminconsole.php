@@ -148,6 +148,13 @@ class AdminConsole {
 	}
 
 	/**
+	 * Durate di abbonamento offerte in console, in giorni.
+	 *
+	 * @var int[]
+	 */
+	const DURATE = array( 30, 90, 180, 365 );
+
+	/**
 	 * Template di dettaglio per sezione.
 	 *
 	 * @var array<string,string>
@@ -271,6 +278,9 @@ class AdminConsole {
 			'sospeso'      => array( 'ok', __( 'Scheda sospesa: non è più visibile al pubblico.', 'advertrieste' ) ),
 			'approvato'    => array( 'ok', __( 'Evento approvato: la versione pubblica è aggiornata.', 'advertrieste' ) ),
 			'rinnovato'    => array( 'ok', __( 'Abbonamento rinnovato.', 'advertrieste' ) ),
+			'abbonamento_attivato' => array( 'ok', __( 'Abbonamento attivato. La scheda non è stata pubblicata: falla tu quando è pronta.', 'advertrieste' ) ),
+			'abbonamento_ripreso'  => array( 'ok', __( 'Abbonamento attivato e scheda rimessa online: era stata sospesa alla scadenza.', 'advertrieste' ) ),
+			'data_non_valida'      => array( 'errore', __( 'La data di decorrenza non è valida.', 'advertrieste' ) ),
 			'evidenza_on'  => array( 'ok', __( 'Piano In Evidenza attivato.', 'advertrieste' ) ),
 			'evidenza_off' => array( 'ok', __( 'Piano In Evidenza disattivato.', 'advertrieste' ) ),
 			'negato'       => array( 'errore', __( 'Operazione non consentita.', 'advertrieste' ) ),
@@ -315,7 +325,7 @@ class AdminConsole {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce già verificato.
 		$id      = isset( $_POST['advtr_id'] ) ? absint( wp_unslash( $_POST['advtr_id'] ) ) : 0;
-		$giorni  = isset( $_POST['advtr_giorni'] ) ? absint( wp_unslash( $_POST['advtr_giorni'] ) ) : 0;
+		$giorni  = isset( $_POST['advtr_giorni'] ) ? intval( wp_unslash( $_POST['advtr_giorni'] ) ) : 0;
 		$sezione = isset( $_POST['advtr_sezione'] ) ? sanitize_key( wp_unslash( $_POST['advtr_sezione'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
@@ -331,6 +341,9 @@ class AdminConsole {
 				break;
 			case 'rinnova':
 				self::redirect( $sezione, self::rinnova( $id, $giorni ) );
+				break;
+			case 'attiva_abbonamento':
+				self::redirect( 'abbonamenti', self::attiva_abbonamento() );
 				break;
 			case 'evidenza':
 				self::redirect( $sezione, self::evidenza( $id ) );
@@ -444,13 +457,75 @@ class AdminConsole {
 	 */
 	private static function rinnova( $id, $giorni ) {
 		$post = $id ? get_post( $id ) : null;
-		if ( ! $post || Locale::POST_TYPE !== $post->post_type || $giorni < 1 ) {
+		// Solo le durate che la console propone davvero: un numero arrivato da
+		// una richiesta costruita a mano non deve poter allungare la validità
+		// di quanto gli pare.
+		if ( ! $post || Locale::POST_TYPE !== $post->post_type || ! in_array( $giorni, self::DURATE, true ) ) {
 			return 'negato';
 		}
 
 		// Stessa logica del rinnovo via WooCommerce: una sola definizione.
 		\AdverTrieste\Payments\WooBridge::extend_validity( $id, $giorni );
 		return 'rinnovato';
+	}
+
+	/**
+	 * Attiva un abbonamento su una scheda.
+	 *
+	 * Non è un rinnovo con un altro nome: il rinnovo somma giorni a una
+	 * validità che esiste già, questo fissa la finestra da capo — decorrenza
+	 * e scadenza — e serve quando una scheda non ne ha mai avuta una, o
+	 * quando va rifatta dopo un contratto nuovo.
+	 *
+	 * Non pubblica la scheda: se non è mai stata online, metterla in vetrina
+	 * è una decisione separata, e una scheda a metà non deve finire sulla
+	 * mappa perché è stata pagata. Fa eccezione la scheda sospesa dal cron
+	 * per scadenza: era già pubblica, e il pagamento la rimette dov'era.
+	 *
+	 * @return string Codice di esito.
+	 */
+	private static function attiva_abbonamento() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce verificato dal controller.
+		$id     = isset( $_POST['advtr_locale'] ) ? absint( wp_unslash( $_POST['advtr_locale'] ) ) : 0;
+		$giorni = isset( $_POST['advtr_durata'] ) ? intval( wp_unslash( $_POST['advtr_durata'] ) ) : 0;
+		$inizio = isset( $_POST['advtr_decorrenza'] ) ? sanitize_text_field( wp_unslash( $_POST['advtr_decorrenza'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$post = $id ? get_post( $id ) : null;
+		if ( ! $post || Locale::POST_TYPE !== $post->post_type ) {
+			return 'negato';
+		}
+		if ( ! in_array( $giorni, self::DURATE, true ) ) {
+			return 'negato';
+		}
+
+		// Una data storta è meglio rifiutarla che interpretarla: un abbonamento
+		// che parte da un giorno inventato sballa scadenze, avvisi e sospensioni.
+		$inizio_ts = '' !== $inizio ? strtotime( $inizio . ' 00:00:00' ) : strtotime( current_time( 'Y-m-d' ) . ' 00:00:00' );
+		if ( ! $inizio_ts ) {
+			return 'data_non_valida';
+		}
+
+		$sospesa = (bool) get_post_meta( $id, 'advtr_sospesa', true );
+
+		update_post_meta( $id, 'advtr_data_inizio', gmdate( 'Y-m-d', $inizio_ts ) );
+		update_post_meta( $id, 'advtr_data_fine', gmdate( 'Y-m-d', $inizio_ts + $giorni * DAY_IN_SECONDS ) );
+
+		// Gli avvisi già inviati si riferiscono alla scadenza vecchia.
+		delete_post_meta( $id, 'advtr_sospesa' );
+		delete_post_meta( $id, 'advtr_scadenza_avvisi' );
+
+		if ( $sospesa && 'draft' === get_post_status( $id ) ) {
+			wp_update_post(
+				array(
+					'ID'          => $id,
+					'post_status' => 'publish',
+				)
+			);
+			return 'abbonamento_ripreso';
+		}
+
+		return 'abbonamento_attivato';
 	}
 
 	/**
