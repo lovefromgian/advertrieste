@@ -143,3 +143,7 @@ $advtr_e   = $advtr_eti[ $advtr_stato ] ?? array( $advtr_stato, '' );
 		<button type="submit" class="ac-btn ac-btn-verde"><?php esc_html_e( 'Salva (senza pubblicare)', 'advertrieste' ); ?></button>
 	</div>
 </form>
+<?php
+$advtr_zona = AdminConsole::zona_pericolosa( 'eventi', $id );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+echo $advtr_zona;

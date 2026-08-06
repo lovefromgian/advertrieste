@@ -967,3 +967,19 @@ body.advtr-console-pagina {
 .ac-barra-azioni .ac-azione-form {
 	display: inline-block;
 }
+
+/* Riquadro di eliminazione in fondo alle schede di dettaglio. Il bordo rosso
+   tenue lo separa dai campi senza gridare: è l'ultima cosa che si legge, non
+   la prima che si nota. */
+.ac-zona-fragile {
+	margin-top: 22px;
+	border-color: #e8c4c4;
+}
+
+.ac-zona-fragile .ac-card-titolo {
+	color: #a02020;
+}
+
+.ac-zona-fragile .ac-azioni-cella {
+	margin-top: 12px;
+}

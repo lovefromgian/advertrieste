@@ -414,6 +414,100 @@ class Salva {
 	}
 
 	/**
+	 * Sposta un elemento nel cestino.
+	 *
+	 * Cestino e non cancellazione: un clic sbagliato non deve distruggere una
+	 * scheda con anni di statistiche. Il cestino è visibile e ripristinabile
+	 * dalla console stessa, altrimenti sarebbe una cancellazione mascherata.
+	 *
+	 * @param int $id ID.
+	 * @return string Codice di esito.
+	 */
+	public static function cestina( $id ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return 'negato';
+		}
+		$post = $id ? get_post( $id ) : null;
+		if ( ! $post || ! in_array( $post->post_type, self::CREABILI, true ) ) {
+			return 'negato';
+		}
+		return wp_trash_post( $id ) ? 'cestinato' : 'negato';
+	}
+
+	/**
+	 * Ripristina dal cestino.
+	 *
+	 * Torna in bozza, non online: rimettere in pubblico qualcosa di cestinato
+	 * senza una decisione esplicita sarebbe una sorpresa sgradita.
+	 *
+	 * @param int $id ID.
+	 * @return string
+	 */
+	public static function ripristina( $id ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return 'negato';
+		}
+		$post = $id ? get_post( $id ) : null;
+		if ( ! $post || 'trash' !== $post->post_status ) {
+			return 'negato';
+		}
+		wp_untrash_post( $id );
+		wp_update_post(
+			array(
+				'ID'          => $id,
+				'post_status' => 'draft',
+			)
+		);
+		return 'ripristinato';
+	}
+
+	/**
+	 * Elimina definitivamente un elemento già nel cestino.
+	 *
+	 * Solo dal cestino: si passa sempre da due decisioni distinte.
+	 *
+	 * @param int $id ID.
+	 * @return string
+	 */
+	public static function elimina( $id ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return 'negato';
+		}
+		$post = $id ? get_post( $id ) : null;
+		if ( ! $post || 'trash' !== $post->post_status ) {
+			return 'negato';
+		}
+		return wp_delete_post( $id, true ) ? 'eliminato' : 'negato';
+	}
+
+	/**
+	 * Elimina un account cliente, riassegnandone i contenuti.
+	 *
+	 * I contenuti NON vengono cancellati insieme all'account: una scheda pagata
+	 * non deve sparire perché si chiude un accesso. Passano a chi esegue
+	 * l'operazione, che potrà riassegnarli al cliente giusto.
+	 *
+	 * @param int $id ID utente.
+	 * @return string
+	 */
+	public static function elimina_cliente( $id ) {
+		if ( ! current_user_can( 'delete_users' ) ) {
+			return 'negato';
+		}
+		$user = $id ? get_userdata( $id ) : null;
+		if ( ! $user ) {
+			return 'negato';
+		}
+		// Né amministratori né se stessi.
+		if ( user_can( $user, 'manage_options' ) || get_current_user_id() === (int) $id ) {
+			return 'negato';
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		return wp_delete_user( $id, get_current_user_id() ) ? 'cliente_eliminato' : 'negato';
+	}
+
+	/**
 	 * Salva le coordinate, se numeriche.
 	 *
 	 * @param int $post_id ID.

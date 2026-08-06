@@ -59,6 +59,7 @@ foreach ( $advtr_schede as $advtr_p ) {
 					),
 				)
 			) .
+			AdminConsole::azioni_cestino( 'approvazioni', $advtr_p->ID, false ) .
 			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'locali', array( 'id' => $advtr_p->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',
@@ -119,6 +120,7 @@ foreach ( get_posts(
 					),
 				)
 			) .
+			AdminConsole::azioni_cestino( 'approvazioni', $advtr_ev->ID, false ) .
 			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'eventi', array( 'id' => $advtr_ev->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $advtr_url  = AdminConsole::url( 'offerte' );
 $advtr_args = array(
 	'post_type'      => Offerta::POST_TYPE,
-	'post_status'    => array( 'publish', 'pending', 'draft' ),
+	'post_status'    => AdminConsole::stati_elenco( array( 'publish', 'pending', 'draft' ) ),
 	'posts_per_page' => 200,
 	'orderby'        => 'date',
 	'order'          => 'DESC',
@@ -45,7 +45,7 @@ foreach ( get_posts( $advtr_args ) as $advtr_o ) {
 			: Tabella::pill( __( 'Non attiva', 'advertrieste' ), 'attesa' ),
 		esc_html( number_format_i18n( Coupon::redemptions_count( $advtr_o->ID ) ) ),
 		'<span class="ac-azioni-cella">' .
-			Tabella::azione(
+			( AdminConsole::mostra_cestino() ? '' : Tabella::azione(
 				array(
 					'azione'    => $advtr_online ? 'sospendi' : 'pubblica',
 					'etichetta' => $advtr_online ? __( 'Ritira', 'advertrieste' ) : __( 'Pubblica', 'advertrieste' ),
@@ -58,7 +58,8 @@ foreach ( get_posts( $advtr_args ) as $advtr_o ) {
 						'advtr_sezione' => 'offerte',
 					),
 				)
-			) .
+			) ) .
+			AdminConsole::azioni_cestino( 'offerte', $advtr_o->ID, AdminConsole::mostra_cestino() ) .
 			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'offerte', array( 'id' => $advtr_o->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',
@@ -66,12 +67,12 @@ foreach ( get_posts( $advtr_args ) as $advtr_o ) {
 }
 
 ?>
-<div class="ac-barra-azioni">
-	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
-	echo AdminConsole::bottone_nuovo( 'offerte', __( 'Aggiungi un\'offerta', 'advertrieste' ) );
-	?>
-</div>
+<?php
+$advtr_barra = AdminConsole::link_cestino( 'offerte' ) .
+	AdminConsole::bottone_nuovo( 'offerte', __( 'Aggiungi un\'offerta', 'advertrieste' ) );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup dei componenti, già escapato.
+echo '<div class="ac-barra-azioni">' . $advtr_barra . '</div>';
+?>
 <?php
 $advtr_tabella = Tabella::rendi(
 	array(
@@ -84,7 +85,7 @@ $advtr_tabella = Tabella::rendi(
 			'',
 		),
 		'righe'   => $advtr_righe,
-		'vuoto'   => __( 'Nessuna offerta.', 'advertrieste' ),
+		'vuoto'   => AdminConsole::vuoto( __( 'Nessuna offerta.', 'advertrieste' ) ),
 		'ricerca' => $cerca,
 		'azione'  => AdminConsole::url(),
 		'sezione' => 'offerte',

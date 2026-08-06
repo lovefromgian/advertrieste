@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $advtr_url  = AdminConsole::url( 'eventi' );
 $advtr_args = array(
 	'post_type'      => Evento::POST_TYPE,
-	'post_status'    => array( 'publish', 'pending', 'draft' ),
+	'post_status'    => AdminConsole::stati_elenco( array( 'publish', 'pending', 'draft' ) ),
 	'posts_per_page' => 200,
 	'orderby'        => 'date',
 	'order'          => 'DESC',
@@ -49,7 +49,7 @@ foreach ( get_posts( $advtr_args ) as $advtr_e ) {
 			? esc_html__( 'sì', 'advertrieste' )
 			: '<span class="ac-cella-tenue">' . esc_html__( 'mai', 'advertrieste' ) . '</span>',
 		'<span class="ac-azioni-cella">' .
-			Tabella::azione(
+			( AdminConsole::mostra_cestino() ? '' : Tabella::azione(
 				array(
 					'azione'    => 'approva_evento',
 					'etichetta' => $advtr_pub ? __( 'Ri-approva', 'advertrieste' ) : __( 'Approva', 'advertrieste' ),
@@ -61,7 +61,8 @@ foreach ( get_posts( $advtr_args ) as $advtr_e ) {
 						'advtr_sezione' => 'eventi',
 					),
 				)
-			) .
+			) ) .
+			AdminConsole::azioni_cestino( 'eventi', $advtr_e->ID, AdminConsole::mostra_cestino() ) .
 			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'eventi', array( 'id' => $advtr_e->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',
@@ -69,12 +70,12 @@ foreach ( get_posts( $advtr_args ) as $advtr_e ) {
 }
 
 ?>
-<div class="ac-barra-azioni">
-	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
-	echo AdminConsole::bottone_nuovo( 'eventi', __( 'Aggiungi un evento', 'advertrieste' ) );
-	?>
-</div>
+<?php
+$advtr_barra = AdminConsole::link_cestino( 'eventi' ) .
+	AdminConsole::bottone_nuovo( 'eventi', __( 'Aggiungi un evento', 'advertrieste' ) );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup dei componenti, già escapato.
+echo '<div class="ac-barra-azioni">' . $advtr_barra . '</div>';
+?>
 <?php
 $advtr_tabella = Tabella::rendi(
 	array(
@@ -87,7 +88,7 @@ $advtr_tabella = Tabella::rendi(
 			'',
 		),
 		'righe'   => $advtr_righe,
-		'vuoto'   => __( 'Nessun evento.', 'advertrieste' ),
+		'vuoto'   => AdminConsole::vuoto( __( 'Nessun evento.', 'advertrieste' ) ),
 		'ricerca' => $cerca,
 		'azione'  => AdminConsole::url(),
 		'sezione' => 'eventi',

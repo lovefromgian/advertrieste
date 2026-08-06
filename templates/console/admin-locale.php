@@ -224,3 +224,7 @@ $advtr_galleria = Media::galleria( $id );
 		<?php esc_html_e( 'Il caricamento delle immagini passa dall\'area clienti, dove l\'uploader mostra a ciascuno solo i propri file.', 'advertrieste' ); ?>
 	</p>
 </div>
+<?php
+$advtr_zona = AdminConsole::zona_pericolosa( 'locali', $id );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+echo $advtr_zona;

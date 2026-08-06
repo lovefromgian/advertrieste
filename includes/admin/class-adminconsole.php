@@ -349,6 +349,18 @@ class AdminConsole {
 				}
 				self::redirect( 'clienti', $esito['esito'] );
 				break;
+			case 'cestina':
+				self::redirect( $sezione, Salva::cestina( $id ) );
+				break;
+			case 'ripristina':
+				self::redirect( $sezione, Salva::ripristina( $id ), array( 'cestino' => 1 ) );
+				break;
+			case 'elimina':
+				self::redirect( $sezione, Salva::elimina( $id ), array( 'cestino' => 1 ) );
+				break;
+			case 'elimina_cliente':
+				self::redirect( 'clienti', Salva::elimina_cliente( $id ) );
+				break;
 			case 'poi_salva':
 				self::redirect_dettaglio( 'poi', $id, Salva::poi() );
 				break;
@@ -488,12 +500,17 @@ class AdminConsole {
 	/**
 	 * Reindirizza con un esito.
 	 *
-	 * @param string $sezione Sezione.
-	 * @param string $avviso  Codice.
+	 * @param string              $sezione Sezione.
+	 * @param string              $avviso  Codice.
+	 * @param array<string,mixed> $extra   Parametri da conservare nell'URL.
 	 * @return void
 	 */
-	private static function redirect( $sezione = '', $avviso = '' ) {
-		wp_safe_redirect( self::url( $sezione, $avviso ? array( 'avviso' => $avviso ) : array() ) );
+	private static function redirect( $sezione = '', $avviso = '', $extra = array() ) {
+		$args = $extra;
+		if ( $avviso ) {
+			$args['avviso'] = $avviso;
+		}
+		wp_safe_redirect( self::url( $sezione, $args ) );
 		exit;
 	}
 
@@ -515,6 +532,175 @@ class AdminConsole {
 				'campi'     => array( 'advtr_sezione' => $sezione ),
 			)
 		);
+	}
+
+	/**
+	 * Stiamo guardando il cestino?
+	 *
+	 * @return bool
+	 */
+	public static function mostra_cestino() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sola navigazione.
+		return isset( $_GET['cestino'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['cestino'] ) );
+	}
+
+	/**
+	 * Stati dei post da mostrare nell'elenco corrente.
+	 *
+	 * @param string[] $normali Stati mostrati fuori dal cestino.
+	 * @return string[]
+	 */
+	public static function stati_elenco( array $normali ) {
+		return self::mostra_cestino() ? array( 'trash' ) : $normali;
+	}
+
+	/**
+	 * Barra con il passaggio fra elenco e cestino.
+	 *
+	 * @param string $sezione Sezione.
+	 * @return string Markup già escapato.
+	 */
+	public static function link_cestino( $sezione ) {
+		if ( self::mostra_cestino() ) {
+			return '<a class="ac-btn ac-btn-neutro" href="' . esc_url( self::url( $sezione ) ) . '">' .
+				esc_html__( '← Torna all\'elenco', 'advertrieste' ) . '</a>';
+		}
+		return '<a class="ac-btn ac-btn-neutro" href="' . esc_url( self::url( $sezione, array( 'cestino' => 1 ) ) ) . '">' .
+			esc_html__( 'Cestino', 'advertrieste' ) . '</a>';
+	}
+
+	/**
+	 * Azioni di eliminazione per una riga.
+	 *
+	 * Nel cestino si può ripristinare o eliminare per sempre; fuori si cestina.
+	 * Due decisioni distinte, mai una sola.
+	 *
+	 * @param string $sezione   Sezione.
+	 * @param int    $id        ID dell'elemento.
+	 * @param bool   $cestinato L'elemento è nel cestino.
+	 * @return string Markup già escapato.
+	 */
+	public static function azioni_cestino( $sezione, $id, $cestinato ) {
+		if ( ! $cestinato ) {
+			return Tabella::azione(
+				array(
+					'azione'    => 'cestina',
+					'etichetta' => __( 'Cestina', 'advertrieste' ),
+					'url'       => self::url( $sezione ),
+					'nonce'     => self::NONCE,
+					'classe'    => 'ac-btn ac-btn-fragile',
+					'conferma'  => __( 'Cestinare?', 'advertrieste' ),
+					'campi'     => array(
+						'advtr_id'      => $id,
+						'advtr_sezione' => $sezione,
+					),
+				)
+			);
+		}
+
+		return Tabella::azione(
+			array(
+				'azione'    => 'ripristina',
+				'etichetta' => __( 'Ripristina', 'advertrieste' ),
+				'url'       => self::url( $sezione ),
+				'nonce'     => self::NONCE,
+				'classe'    => 'ac-btn ac-btn-verde',
+				'campi'     => array(
+					'advtr_id'      => $id,
+					'advtr_sezione' => $sezione,
+				),
+			)
+		) . Tabella::azione(
+			array(
+				'azione'    => 'elimina',
+				'etichetta' => __( 'Elimina per sempre', 'advertrieste' ),
+				'url'       => self::url( $sezione ),
+				'nonce'     => self::NONCE,
+				'classe'    => 'ac-btn ac-btn-fragile',
+				'conferma'  => __( 'Definitivamente?', 'advertrieste' ),
+				'campi'     => array(
+					'advtr_id'      => $id,
+					'advtr_sezione' => $sezione,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Messaggio di elenco vuoto, consapevole della vista.
+	 *
+	 * Nel cestino "Nessuna offerta" farebbe pensare a un guasto: quello che manca
+	 * non sono le offerte, è la roba buttata via.
+	 *
+	 * @param string $normale Messaggio dell'elenco vivo.
+	 * @return string
+	 */
+	public static function vuoto( $normale ) {
+		return self::mostra_cestino() ? __( 'Il cestino è vuoto.', 'advertrieste' ) : $normale;
+	}
+
+	/**
+	 * Riquadro di eliminazione in fondo a una scheda di dettaglio.
+	 *
+	 * Sta in fondo e non fra i campi: chi apre una scheda per correggere un
+	 * orario non deve trovarsi il bottone che la cancella accanto a "Salva".
+	 *
+	 * @param string $sezione Sezione.
+	 * @param int    $id      ID dell'elemento.
+	 * @param string $nota    Testo esplicativo aggiuntivo.
+	 * @return string Markup già escapato.
+	 */
+	public static function zona_pericolosa( $sezione, $id, $nota = '' ) {
+		$post = $id ? get_post( $id ) : null;
+		if ( ! $post ) {
+			return '';
+		}
+		$cestinato = 'trash' === $post->post_status;
+
+		if ( '' === $nota ) {
+			$nota = $cestinato
+				? __( 'È nel cestino: non compare più da nessuna parte. Puoi ancora riportarlo indietro, oppure eliminarlo per sempre.', 'advertrieste' )
+				: __( 'Finisce nel cestino, da dove puoi ancora recuperarlo. Statistiche e riscatti restano collegati finché non lo elimini per sempre.', 'advertrieste' );
+		}
+
+		return '<div class="ac-card ac-zona-fragile">' .
+			'<h3 class="ac-card-titolo">' . esc_html__( 'Eliminazione', 'advertrieste' ) . '</h3>' .
+			'<p class="ac-card-sottotitolo">' . esc_html( $nota ) . '</p>' .
+			'<div class="ac-azioni-cella">' . self::azioni_cestino( $sezione, $id, $cestinato ) . '</div>' .
+			'</div>';
+	}
+
+	/**
+	 * Riquadro di eliminazione di un account cliente.
+	 *
+	 * @param int $user_id Utente.
+	 * @return string Markup già escapato.
+	 */
+	public static function zona_pericolosa_cliente( $user_id ) {
+		$utente = $user_id ? get_userdata( $user_id ) : null;
+		if ( ! $utente || user_can( $utente, 'manage_options' ) || get_current_user_id() === (int) $user_id ) {
+			return '';
+		}
+
+		return '<div class="ac-card ac-zona-fragile">' .
+			'<h3 class="ac-card-titolo">' . esc_html__( 'Eliminazione dell\'account', 'advertrieste' ) . '</h3>' .
+			'<p class="ac-card-sottotitolo">' .
+			esc_html__( 'L\'accesso viene chiuso subito. Le sue schede, offerte ed eventi non spariscono: passano a te, e potrai riassegnarli a un altro account.', 'advertrieste' ) .
+			'</p><div class="ac-azioni-cella">' .
+			Tabella::azione(
+				array(
+					'azione'    => 'elimina_cliente',
+					'etichetta' => __( 'Elimina questo account', 'advertrieste' ),
+					'url'       => self::url( 'clienti' ),
+					'nonce'     => self::NONCE,
+					'classe'    => 'ac-btn ac-btn-fragile',
+					'conferma'  => __( 'Sicuro? I contenuti passano a te', 'advertrieste' ),
+					'campi'     => array(
+						'advtr_id'      => (int) $user_id,
+						'advtr_sezione' => 'clienti',
+					),
+				)
+			) . '</div></div>';
 	}
 
 	/**
@@ -594,7 +780,7 @@ class AdminConsole {
 	public static function locali( $cerca = '' ) {
 		$args = array(
 			'post_type'      => Locale::POST_TYPE,
-			'post_status'    => array( 'publish', 'pending', 'draft' ),
+			'post_status'    => self::stati_elenco( array( 'publish', 'pending', 'draft' ) ),
 			'posts_per_page' => 200,
 			'orderby'        => 'title',
 			'order'          => 'ASC',

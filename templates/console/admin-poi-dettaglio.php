@@ -129,3 +129,7 @@ $advtr_termini = get_terms(
 		<button type="submit" class="ac-btn ac-btn-verde"><?php esc_html_e( 'Salva', 'advertrieste' ); ?></button>
 	</div>
 </form>
+<?php
+$advtr_zona = AdminConsole::zona_pericolosa( 'poi', $id );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+echo $advtr_zona;

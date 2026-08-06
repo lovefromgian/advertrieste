@@ -84,8 +84,24 @@ foreach ( get_users( $advtr_args ) as $advtr_u ) {
 			: '<span class="ac-cella-tenue">' . esc_html__( 'nessuna scheda collegata', 'advertrieste' ) . '</span>',
 		esc_html( number_format_i18n( $advtr_offerte ) ),
 		$advtr_scad,
-		'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'clienti', array( 'id' => $advtr_u->ID ) ) ) . '">' .
-			esc_html__( 'Apri', 'advertrieste' ) . '</a>',
+		'<span class="ac-azioni-cella">' .
+			Tabella::azione(
+				array(
+					'azione'    => 'elimina_cliente',
+					'etichetta' => __( 'Elimina account', 'advertrieste' ),
+					'url'       => AdminConsole::url( 'clienti' ),
+					'nonce'     => AdminConsole::NONCE,
+					'classe'    => 'ac-btn ac-btn-fragile',
+					'conferma'  => __( 'Sicuro? Le sue schede passano a te', 'advertrieste' ),
+					'campi'     => array(
+						'advtr_id'      => $advtr_u->ID,
+						'advtr_sezione' => 'clienti',
+					),
+				)
+			) .
+			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'clienti', array( 'id' => $advtr_u->ID ) ) ) . '">' .
+			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
+		'</span>',
 	);
 }
 

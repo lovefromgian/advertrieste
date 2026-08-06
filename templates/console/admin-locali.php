@@ -18,11 +18,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 $advtr_url   = AdminConsole::url( 'locali' );
 $advtr_righe = array();
 
+$advtr_cestino = AdminConsole::mostra_cestino();
+
 foreach ( AdminConsole::locali( $cerca ) as $advtr_p ) {
 	$advtr_autore = get_userdata( $advtr_p->post_author );
 	$advtr_stato  = Abbonamento::stato( $advtr_p->ID );
 	$advtr_online = 'publish' === $advtr_p->post_status;
 	$advtr_evid   = Evidenza::attiva( $advtr_p->ID );
+
+	// Su una scheda cestinata pubblicare o mettere in evidenza non ha senso:
+	// prima la si riporta in vita, poi si decide cosa farne.
+	$advtr_extra = $advtr_cestino ? '' : (
+		Tabella::azione(
+			array(
+				'azione'    => $advtr_online ? 'sospendi' : 'pubblica',
+				'etichetta' => $advtr_online ? __( 'Sospendi', 'advertrieste' ) : __( 'Pubblica', 'advertrieste' ),
+				'url'       => $advtr_url,
+				'nonce'     => AdminConsole::NONCE,
+				'classe'    => $advtr_online ? 'ac-btn ac-btn-fragile' : 'ac-btn ac-btn-verde',
+				'conferma'  => $advtr_online ? __( 'Confermi?', 'advertrieste' ) : '',
+				'campi'     => array(
+					'advtr_id'      => $advtr_p->ID,
+					'advtr_sezione' => 'locali',
+				),
+			)
+		) .
+		Tabella::azione(
+			array(
+				'azione'    => 'evidenza',
+				'etichetta' => $advtr_evid ? __( 'Togli evidenza', 'advertrieste' ) : __( 'In evidenza', 'advertrieste' ),
+				'url'       => $advtr_url,
+				'nonce'     => AdminConsole::NONCE,
+				'campi'     => array(
+					'advtr_id'      => $advtr_p->ID,
+					'advtr_sezione' => 'locali',
+				),
+			)
+		)
+	);
 
 	$advtr_righe[] = array(
 		'<strong>' . esc_html( $advtr_p->post_title ) . '</strong><br />' .
@@ -35,32 +68,8 @@ foreach ( AdminConsole::locali( $cerca ) as $advtr_p ) {
 			( Abbonamento::data_scadenza( $advtr_p->ID ) ? '<br /><span class="ac-cella-tenue">' . esc_html( Abbonamento::data_scadenza( $advtr_p->ID ) ) . '</span>' : '' ),
 		$advtr_evid ? Tabella::pill( __( 'Attivo', 'advertrieste' ), 'oro' ) : '<span class="ac-cella-tenue">—</span>',
 		'<span class="ac-azioni-cella">' .
-			Tabella::azione(
-				array(
-					'azione'    => $advtr_online ? 'sospendi' : 'pubblica',
-					'etichetta' => $advtr_online ? __( 'Sospendi', 'advertrieste' ) : __( 'Pubblica', 'advertrieste' ),
-					'url'       => $advtr_url,
-					'nonce'     => AdminConsole::NONCE,
-					'classe'    => $advtr_online ? 'ac-btn ac-btn-fragile' : 'ac-btn ac-btn-verde',
-					'conferma'  => $advtr_online ? __( 'Confermi?', 'advertrieste' ) : '',
-					'campi'     => array(
-						'advtr_id'      => $advtr_p->ID,
-						'advtr_sezione' => 'locali',
-					),
-				)
-			) .
-			Tabella::azione(
-				array(
-					'azione'    => 'evidenza',
-					'etichetta' => $advtr_evid ? __( 'Togli evidenza', 'advertrieste' ) : __( 'In evidenza', 'advertrieste' ),
-					'url'       => $advtr_url,
-					'nonce'     => AdminConsole::NONCE,
-					'campi'     => array(
-						'advtr_id'      => $advtr_p->ID,
-						'advtr_sezione' => 'locali',
-					),
-				)
-			) .
+			$advtr_extra .
+			AdminConsole::azioni_cestino( 'locali', $advtr_p->ID, $advtr_cestino ) .
 			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'locali', array( 'id' => $advtr_p->ID ) ) ) . '">' .
 			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
 		'</span>',
@@ -68,12 +77,12 @@ foreach ( AdminConsole::locali( $cerca ) as $advtr_p ) {
 }
 
 ?>
-<div class="ac-barra-azioni">
-	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
-	echo AdminConsole::bottone_nuovo( 'locali', __( 'Aggiungi un locale', 'advertrieste' ) );
-	?>
-</div>
+<?php
+$advtr_barra = AdminConsole::link_cestino( 'locali' ) .
+	AdminConsole::bottone_nuovo( 'locali', __( 'Aggiungi un locale', 'advertrieste' ) );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup dei componenti, già escapato.
+echo '<div class="ac-barra-azioni">' . $advtr_barra . '</div>';
+?>
 <?php
 $advtr_tabella = Tabella::rendi(
 	array(
@@ -88,7 +97,7 @@ $advtr_tabella = Tabella::rendi(
 		'righe'   => $advtr_righe,
 		'vuoto'   => '' !== $cerca
 			? __( 'Nessun locale corrisponde alla ricerca.', 'advertrieste' )
-			: __( 'Non ci sono ancora locali.', 'advertrieste' ),
+			: AdminConsole::vuoto( __( 'Non ci sono ancora locali.', 'advertrieste' ) ),
 		'ricerca' => $cerca,
 		'azione'  => AdminConsole::url(),
 		'sezione' => 'locali',

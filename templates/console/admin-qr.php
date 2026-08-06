@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $advtr_args = array(
 	'post_type'      => PuntoQr::POST_TYPE,
-	'post_status'    => array( 'publish', 'draft' ),
+	'post_status'    => AdminConsole::stati_elenco( array( 'publish', 'draft' ) ),
 	'posts_per_page' => 300,
 	'orderby'        => 'title',
 	'order'          => 'ASC',
@@ -41,18 +41,21 @@ foreach ( get_posts( $advtr_args ) as $advtr_q ) {
 		'attivo' === $advtr_stato
 			? Tabella::pill( __( 'Attivo', 'advertrieste' ), 'ok' )
 			: Tabella::pill( __( 'Inattivo', 'advertrieste' ), '' ),
-		'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'qr', array( 'id' => $advtr_q->ID ) ) ) . '">' .
-			esc_html__( 'Apri', 'advertrieste' ) . '</a>',
+		'<span class="ac-azioni-cella">' .
+			AdminConsole::azioni_cestino( 'qr', $advtr_q->ID, AdminConsole::mostra_cestino() ) .
+			'<a class="ac-btn ac-btn-neutro" href="' . esc_url( AdminConsole::url( 'qr', array( 'id' => $advtr_q->ID ) ) ) . '">' .
+			esc_html__( 'Apri', 'advertrieste' ) . '</a>' .
+		'</span>',
 	);
 }
 
 ?>
-<div class="ac-barra-azioni">
-	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
-	echo AdminConsole::bottone_nuovo( 'qr', __( 'Aggiungi un espositore', 'advertrieste' ) );
-	?>
-</div>
+<?php
+$advtr_barra = AdminConsole::link_cestino( 'qr' ) .
+	AdminConsole::bottone_nuovo( 'qr', __( 'Aggiungi un espositore', 'advertrieste' ) );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup dei componenti, già escapato.
+echo '<div class="ac-barra-azioni">' . $advtr_barra . '</div>';
+?>
 <?php
 $advtr_tabella = Tabella::rendi(
 	array(
@@ -64,7 +67,7 @@ $advtr_tabella = Tabella::rendi(
 			'',
 		),
 		'righe'   => $advtr_righe,
-		'vuoto'   => __( 'Nessun punto QR registrato.', 'advertrieste' ),
+		'vuoto'   => AdminConsole::vuoto( __( 'Nessun punto QR registrato.', 'advertrieste' ) ),
 		'ricerca' => $cerca,
 		'azione'  => AdminConsole::url(),
 		'sezione' => 'qr',

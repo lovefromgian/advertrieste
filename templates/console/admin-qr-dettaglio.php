@@ -95,3 +95,7 @@ $advtr_stato = (string) get_post_meta( $id, 'advtr_stato', true );
 		</div>
 	</div>
 </form>
+<?php
+$advtr_zona = AdminConsole::zona_pericolosa( 'qr', $id );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+echo $advtr_zona;

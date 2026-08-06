@@ -117,3 +117,7 @@ $advtr_schede = get_posts(
 		<?php endif; ?>
 	</div>
 </div>
+<?php
+$advtr_zona = AdminConsole::zona_pericolosa_cliente( $id );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.
+echo $advtr_zona;
