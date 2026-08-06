@@ -801,6 +801,9 @@ class AdminConsole {
 
 		if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
 			return '<div class="ac-accesso"><div class="ac-accesso-scheda">' .
+				'<div class="ac-accesso-marchio">' .
+				'<img class="ac-logo ac-logo-accesso" src="' . esc_url( ADVTR_URL . 'assets/img/logo-scuro.png' ) . '" ' .
+				'alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" width="480" height="333" /></div>' .
 				'<h1 class="ac-accesso-titolo">' . esc_html__( 'Area riservata', 'advertrieste' ) . '</h1>' .
 				'<p class="ac-accesso-nota">' . esc_html__( 'Questa console è riservata agli amministratori del sito.', 'advertrieste' ) . '</p>' .
 				'<p class="ac-accesso-alt"><a href="' . esc_url( wp_login_url( self::url() ) ) . '">' .

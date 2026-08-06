@@ -28,8 +28,8 @@ $advtr_utente = wp_parse_args(
 
 	<aside class="ac-lato">
 		<div class="ac-marchio">
-			<span class="ac-marchio-pin" aria-hidden="true"></span>
-			<?php echo esc_html( $conf['marchio'] ); ?>
+			<img class="ac-logo" src="<?php echo esc_url( ADVTR_URL . 'assets/img/logo.png' ); ?>"
+				alt="<?php echo esc_attr( $conf['marchio'] ); ?>" width="480" height="333" />
 		</div>
 
 		<nav>

@@ -23,8 +23,8 @@ $advtr_recupero = isset( $vista ) && 'password' === $vista;
 	<div class="ac-accesso-scheda">
 
 		<div class="ac-accesso-marchio">
-			<span class="ac-marchio-pin" aria-hidden="true"></span>
-			<?php echo esc_html( get_bloginfo( 'name' ) ); ?>
+			<img class="ac-logo ac-logo-accesso" src="<?php echo esc_url( ADVTR_URL . 'assets/img/logo-scuro.png' ); ?>"
+				alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="480" height="333" />
 		</div>
 
 		<?php if ( ! empty( $avviso ) ) : ?>

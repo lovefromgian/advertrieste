@@ -126,13 +126,18 @@ body.advtr-console-pagina {
 	color: #fff;
 }
 
-.ac-marchio-pin {
-	width: 18px;
-	height: 18px;
-	border-radius: 50% 50% 50% 0;
-	transform: rotate(-45deg);
-	background: var(--ac-corallo);
+/* Nella sidebar (fondo scuro) serve il logo bianco; sulla scheda di accesso,
+   che è bianca, si usa la variante scura — stesso disegno, stessa alpha. */
+.ac-logo {
+	display: block;
+	height: 56px;
+	width: auto;
 	flex: none;
+}
+
+.ac-logo-accesso {
+	height: 64px;
+	margin: 0 auto;
 }
 
 .ac-gruppo {
@@ -786,6 +791,10 @@ body.advtr-console-pagina {
 
 	.ac-marchio {
 		padding: 0 16px 14px;
+	}
+
+	.ac-logo {
+		height: 44px;
 	}
 
 	.ac-utente {

@@ -35,8 +35,8 @@ $advtr_voci = array(
 ?>
 <header class="ap-nav">
 	<a class="ap-marchio" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-		<span class="ap-pin" aria-hidden="true"></span>
-		<?php echo esc_html( get_bloginfo( 'name' ) ); ?>
+		<img class="ap-logo" src="<?php echo esc_url( ADVTR_URL . 'assets/img/logo.png' ); ?>"
+			alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="480" height="333" />
 	</a>
 
 	<nav class="ap-nav-voci">

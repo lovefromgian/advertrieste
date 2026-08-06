@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <footer class="ap-pie">
 	<span class="ap-pie-marchio">
-		<span class="ap-pin" aria-hidden="true"></span>
-		<?php echo esc_html( get_bloginfo( 'name' ) ); ?>
+		<img class="ap-logo ap-logo-pie" src="<?php echo esc_url( ADVTR_URL . 'assets/img/logo.png' ); ?>"
+			alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="480" height="333" />
 	</span>
 	<span class="ap-pie-voci">
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'advertrieste' ); ?></a>
