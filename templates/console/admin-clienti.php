@@ -109,7 +109,7 @@ foreach ( get_users( $advtr_args ) as $advtr_u ) {
 <div class="ac-card" style="margin-bottom:16px">
 	<h3 class="ac-card-titolo"><?php esc_html_e( 'Nuovo account', 'advertrieste' ); ?></h3>
 	<p class="ac-card-sottotitolo">
-		<?php esc_html_e( 'Riceverà un\'email con il link per impostare la propria password: nessuna password passa da qui.', 'advertrieste' ); ?>
+		<?php esc_html_e( 'Se lasci vuota la password riceverà un\'email con il link per impostarsela da sé — è la via consigliata. Scrivendola qui, invece, l\'account è pronto subito e le credenziali gliele consegni tu.', 'advertrieste' ); ?>
 	</p>
 	<form class="advtr-form ac-nuovo-cliente" method="post" action="<?php echo esc_url( AdminConsole::url( 'clienti' ) ); ?>">
 		<?php wp_nonce_field( AdminConsole::NONCE ); ?>
@@ -124,6 +124,20 @@ foreach ( get_users( $advtr_args ) as $advtr_u ) {
 				<input type="email" id="ac-nc-mail" name="advtr_email" required />
 			</div>
 		</div>
+		<label for="ac-nc-pass"><?php esc_html_e( 'Password (facoltativa)', 'advertrieste' ); ?></label>
+		<input type="text" id="ac-nc-pass" name="advtr_password" autocomplete="new-password" spellcheck="false"
+			minlength="<?php echo esc_attr( \AdverTrieste\Admin\Salva::PASSWORD_MIN ); ?>"
+			data-advtr-genera="<?php esc_attr_e( 'Genera', 'advertrieste' ); ?>" />
+		<p class="advtr-aiuto">
+			<?php
+			printf(
+				/* translators: %d: numero minimo di caratteri */
+				esc_html__( 'Almeno %d caratteri, in chiaro perché tu possa leggerla. Lasciala vuota per far arrivare al cliente il link via email.', 'advertrieste' ),
+				(int) \AdverTrieste\Admin\Salva::PASSWORD_MIN
+			);
+			?>
+		</p>
+
 		<label for="ac-nc-ruolo"><?php esc_html_e( 'Ruolo', 'advertrieste' ); ?></label>
 		<select id="ac-nc-ruolo" name="advtr_ruolo">
 			<option value="<?php echo esc_attr( Roles::CLIENTE ); ?>"><?php esc_html_e( 'Cliente (locale)', 'advertrieste' ); ?></option>

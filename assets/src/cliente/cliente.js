@@ -184,13 +184,47 @@
 		} );
 	}
 
+	/**
+	 * Pulsante "Genera" accanto ai campi password.
+	 *
+	 * Serve a chi crea account per altri: dover inventare una password ogni
+	 * volta porta a riusare sempre la stessa. Il valore resta visibile perché
+	 * va dettato al cliente, e non viene mai inviato altrove.
+	 */
+	function initGeneraPassword() {
+		var ALFABETO = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+		document.querySelectorAll( 'input[data-advtr-genera]' ).forEach( function ( campo ) {
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.className = 'ac-btn ac-btn-neutro advtr-genera';
+			btn.textContent = campo.getAttribute( 'data-advtr-genera' );
+
+			btn.addEventListener( 'click', function () {
+				var valori = new Uint32Array( 14 );
+				window.crypto.getRandomValues( valori );
+				var pass = '';
+				for ( var i = 0; i < valori.length; i++ ) {
+					pass += ALFABETO.charAt( valori[ i ] % ALFABETO.length );
+				}
+				campo.value = pass;
+				campo.focus();
+				campo.select();
+			} );
+
+			campo.insertAdjacentElement( 'afterend', btn );
+		} );
+	}
+
 	if ( 'loading' === document.readyState ) {
 		document.addEventListener( 'DOMContentLoaded', function () {
 			initPicker();
 			initConferme();
+			initGeneraPassword();
 		} );
 	} else {
 		initPicker();
 		initConferme();
+		initGeneraPassword();
 	}
 } )();

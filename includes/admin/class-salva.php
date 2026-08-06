@@ -266,6 +266,74 @@ class Salva {
 	}
 
 	/**
+	 * Lunghezza minima accettata per una password impostata a mano.
+	 *
+	 * @var int
+	 */
+	const PASSWORD_MIN = 8;
+
+	/**
+	 * Imposta la password di un account cliente.
+	 *
+	 * Il flusso normale resta l'email con il link: così la password non passa
+	 * da nessuno all'infuori del suo proprietario. Ma quando l'email non parte
+	 * — sviluppo in locale, casella sbagliata, cliente al telefono — senza
+	 * questa via l'account resta inutilizzabile. È una scorciatoia dichiarata,
+	 * non il percorso principale.
+	 *
+	 * @return string Codice di esito.
+	 */
+	public static function password() {
+		$id   = absint( self::testo( 'advtr_id' ) );
+		$user = $id ? get_userdata( $id ) : null;
+		if ( ! current_user_can( 'edit_users' ) || ! $user ) {
+			return 'negato';
+		}
+		// Né altri amministratori né se stessi: cambiare la propria password da
+		// qui butterebbe fuori chi la sta cambiando, e gli account con pieni
+		// poteri restano dove ci sono tutte le tutele del core.
+		if ( user_can( $user, 'manage_options' ) || get_current_user_id() === (int) $id ) {
+			return 'negato';
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nonce verificato dal controller; una password non si sanifica, o se ne salva un'altra.
+		$pass = isset( $_POST['advtr_password'] ) ? (string) wp_unslash( $_POST['advtr_password'] ) : '';
+		if ( strlen( $pass ) < self::PASSWORD_MIN ) {
+			return 'password_corta';
+		}
+
+		// Non sanitizzata di proposito: una password è una sequenza di byte, e
+		// ripulirla significherebbe salvarne una diversa da quella digitata.
+		wp_set_password( $pass, $id );
+
+		// wp_set_password() da sola non chiude le sessioni: chi era dentro con
+		// la vecchia password ci resterebbe. Se la password si cambia perché
+		// qualcuno non doveva averla, lasciarlo collegato vanifica il cambio.
+		\WP_Session_Tokens::get_instance( $id )->destroy_all();
+
+		return 'password_ok';
+	}
+
+	/**
+	 * Invia all'account il link per impostare la password da sé.
+	 *
+	 * @return string Codice di esito.
+	 */
+	public static function password_link() {
+		$id   = absint( self::testo( 'advtr_id' ) );
+		$user = $id ? get_userdata( $id ) : null;
+		if ( ! current_user_can( 'edit_users' ) || ! $user ) {
+			return 'negato';
+		}
+		if ( user_can( $user, 'manage_options' ) ) {
+			return 'negato';
+		}
+
+		$esito = retrieve_password( $user->user_login );
+		return is_wp_error( $esito ) ? 'password_link_ko' : 'password_link_ok';
+	}
+
+	/**
 	 * Tipi creabili dalla console: sezione => post type.
 	 *
 	 * @var array<string,string>
@@ -387,11 +455,23 @@ class Salva {
 			$login = $base . $n;
 		}
 
+		// Password facoltativa: se l'amministratore la scrive, l'account è
+		// utilizzabile subito e le credenziali le consegna lui; se la lascia
+		// vuota si resta al percorso normale, cioè il link via email.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nonce verificato dal controller; una password non si sanifica, o se ne salva un'altra.
+		$scelta = isset( $_POST['advtr_password'] ) ? (string) wp_unslash( $_POST['advtr_password'] ) : '';
+		if ( '' !== $scelta && strlen( $scelta ) < self::PASSWORD_MIN ) {
+			return array(
+				'esito' => 'password_corta',
+				'id'    => 0,
+			);
+		}
+
 		$id = wp_insert_user(
 			array(
 				'user_login'   => $login,
 				'user_email'   => $email,
-				'user_pass'    => wp_generate_password( 24, true, true ),
+				'user_pass'    => '' !== $scelta ? $scelta : wp_generate_password( 24, true, true ),
 				'display_name' => $nome,
 				'role'         => $ruolo,
 			)
@@ -404,11 +484,13 @@ class Salva {
 			);
 		}
 
-		// Email al nuovo utente con il link per impostare la password.
-		wp_new_user_notification( $id, null, 'user' );
+		if ( '' === $scelta ) {
+			// Email al nuovo utente con il link per impostare la password.
+			wp_new_user_notification( $id, null, 'user' );
+		}
 
 		return array(
-			'esito' => 'creato_cliente',
+			'esito' => '' !== $scelta ? 'creato_cliente_pass' : 'creato_cliente',
 			'id'    => (int) $id,
 		);
 	}

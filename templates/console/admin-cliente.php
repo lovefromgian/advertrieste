@@ -65,6 +65,10 @@ $advtr_schede = get_posts(
 				<input type="hidden" name="advtr_azione" value="cliente_salva" />
 				<input type="hidden" name="advtr_id" value="<?php echo esc_attr( $id ); ?>" />
 
+				<label for="ac-cl-login"><?php esc_html_e( 'Nome utente', 'advertrieste' ); ?></label>
+				<input type="text" id="ac-cl-login" value="<?php echo esc_attr( $advtr_u->user_login ); ?>" readonly />
+				<p class="advtr-aiuto"><?php esc_html_e( 'È ciò che il cliente scrive per accedere, insieme alla password. Non si cambia: WordPress lo fissa alla creazione.', 'advertrieste' ); ?></p>
+
 				<label for="ac-cl-nome"><?php esc_html_e( 'Nome visualizzato', 'advertrieste' ); ?></label>
 				<input type="text" id="ac-cl-nome" name="advtr_nome" required value="<?php echo esc_attr( $advtr_u->display_name ); ?>" />
 
@@ -117,6 +121,58 @@ $advtr_schede = get_posts(
 		<?php endif; ?>
 	</div>
 </div>
+<?php if ( ! $advtr_admin ) : ?>
+<div class="ac-card" style="margin-top:20px">
+	<h3 class="ac-card-titolo"><?php esc_html_e( 'Accesso', 'advertrieste' ); ?></h3>
+	<p class="ac-card-sottotitolo">
+		<?php esc_html_e( 'Il cliente entra dall\'area clienti con il proprio nome utente e la password. La via consigliata è la prima: così la password la conosce solo lui.', 'advertrieste' ); ?>
+	</p>
+
+	<form class="advtr-form" method="post" action="<?php echo esc_url( AdminConsole::url( 'clienti', array( 'id' => $id ) ) ); ?>"
+		style="margin-bottom:18px">
+		<?php wp_nonce_field( AdminConsole::NONCE ); ?>
+		<input type="hidden" name="advtr_azione" value="password_link" />
+		<input type="hidden" name="advtr_id" value="<?php echo esc_attr( $id ); ?>" />
+		<div class="advtr-form-azioni" style="margin-top:0">
+			<button type="submit" class="ac-btn ac-btn-verde"><?php esc_html_e( 'Invia il link per impostare la password', 'advertrieste' ); ?></button>
+		</div>
+		<p class="advtr-aiuto" style="margin-top:8px">
+			<?php
+			printf(
+				/* translators: %s: indirizzo email del cliente */
+				esc_html__( 'Arriva a %s. Se la posta del sito non funziona, usa il campo qui sotto.', 'advertrieste' ),
+				esc_html( $advtr_u->user_email )
+			);
+			?>
+		</p>
+	</form>
+
+	<form class="advtr-form" method="post" action="<?php echo esc_url( AdminConsole::url( 'clienti', array( 'id' => $id ) ) ); ?>"
+		data-advtr-conferma="<?php esc_attr_e( 'Confermi? Scollega le sue sessioni', 'advertrieste' ); ?>">
+		<?php wp_nonce_field( AdminConsole::NONCE ); ?>
+		<input type="hidden" name="advtr_azione" value="password_cliente" />
+		<input type="hidden" name="advtr_id" value="<?php echo esc_attr( $id ); ?>" />
+
+		<label for="ac-cl-pass"><?php esc_html_e( 'Oppure imposta tu una password', 'advertrieste' ); ?></label>
+		<input type="text" id="ac-cl-pass" name="advtr_password" autocomplete="new-password" spellcheck="false"
+			minlength="<?php echo esc_attr( \AdverTrieste\Admin\Salva::PASSWORD_MIN ); ?>"
+			data-advtr-genera="<?php esc_attr_e( 'Genera', 'advertrieste' ); ?>" />
+		<p class="advtr-aiuto">
+			<?php
+			printf(
+				/* translators: %d: numero minimo di caratteri */
+				esc_html__( 'Almeno %d caratteri. Il campo è in chiaro apposta: devi poterla leggere per dettarla. Dopo il salvataggio non è più recuperabile da nessuna parte, nemmeno da qui, e le sessioni aperte del cliente decadono.', 'advertrieste' ),
+				(int) \AdverTrieste\Admin\Salva::PASSWORD_MIN
+			);
+			?>
+		</p>
+
+		<div class="advtr-form-azioni">
+			<button type="submit" class="ac-btn ac-btn-neutro"><?php esc_html_e( 'Imposta la password', 'advertrieste' ); ?></button>
+		</div>
+	</form>
+</div>
+<?php endif; ?>
 <?php
 $advtr_zona = AdminConsole::zona_pericolosa_cliente( $id );
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup del componente, già escapato.

@@ -283,6 +283,18 @@ class AdminConsole {
 			'data_non_valida'      => array( 'errore', __( 'La data di decorrenza non è valida.', 'advertrieste' ) ),
 			'evidenza_on'  => array( 'ok', __( 'Piano In Evidenza attivato.', 'advertrieste' ) ),
 			'evidenza_off' => array( 'ok', __( 'Piano In Evidenza disattivato.', 'advertrieste' ) ),
+			'password_ok'  => array( 'ok', __( 'Password impostata. Comunicala al cliente: da qui non è più leggibile.', 'advertrieste' ) ),
+			'password_corta' => array(
+				'errore',
+				sprintf(
+					/* translators: %d: numero minimo di caratteri */
+					__( 'La password deve avere almeno %d caratteri.', 'advertrieste' ),
+					Salva::PASSWORD_MIN
+				),
+			),
+			'password_link_ok' => array( 'ok', __( 'Email inviata: il cliente trova nella posta il link per impostarsi la password.', 'advertrieste' ) ),
+			'password_link_ko' => array( 'errore', __( 'Non è stato possibile inviare l\'email. Imposta tu una password e comunicagliela.', 'advertrieste' ) ),
+			'creato_cliente_pass' => array( 'ok', __( 'Account creato con la password che hai scelto: nessuna email inviata, le credenziali le consegni tu.', 'advertrieste' ) ),
 			'negato'       => array( 'errore', __( 'Operazione non consentita.', 'advertrieste' ) ),
 		);
 	}
@@ -385,6 +397,12 @@ class AdminConsole {
 				break;
 			case 'evento_salva':
 				self::redirect_dettaglio( 'eventi', $id, Salva::evento() );
+				break;
+			case 'password_cliente':
+				self::redirect_dettaglio( 'clienti', $id, Salva::password() );
+				break;
+			case 'password_link':
+				self::redirect_dettaglio( 'clienti', $id, Salva::password_link() );
 				break;
 			case 'cliente_salva':
 				self::redirect_dettaglio( 'clienti', $id, Salva::cliente() );
