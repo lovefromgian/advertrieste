@@ -20,6 +20,11 @@
 	"scripts": {
 		"lint": "phpcs",
 		"lint:fix": "phpcbf",
-		"test:integration": "wp eval-file tests/integration/run.php"
+		"test:integration": "wp eval-file tests/integration/run.php",
+		"test:console": "tests/console/run.sh",
+		"test": [
+			"@test:integration",
+			"@test:console"
+		]
 	}
 }

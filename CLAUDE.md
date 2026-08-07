@@ -14,7 +14,7 @@ Ambiente MAMP (WP-CLI non nel PATH: usare la PHP di MAMP + `wp-cli.phar`).
 - PHP di MAMP: `/Applications/MAMP/bin/php/php8.3.28/bin/php`
 - Lint PHP (sintassi): `php -l <file>`
 - **Lint PHPCS** (WordPress Coding Standards): `composer lint` (= `vendor/bin/phpcs`); autofix: `composer lint:fix`
-- Suite di integrazione: `wp eval-file tests/integration/run.php` (o `composer test:integration`) — vedi `tests/README.md`
+- Test: `composer test` (integrazione + console). Singolarmente `composer test:integration` e `composer test:console` — vedi `tests/README.md`
 - Attivazione: `wp plugin activate advertrieste` (riattivare dopo modifiche a capability/rewrite)
 - **Niente build asset**: JS/CSS in `assets/src/` sono serviti direttamente (nessun bundler); Leaflet è in `assets/vendor/`.
 - **IMPORTANT**: dopo ogni modifica a PHP esegui `composer lint` (PHPCS) prima di considerare il task concluso.
@@ -88,3 +88,5 @@ advertrieste/
 - @docs/architettura.md — schema dati, endpoint REST, cron, sicurezza
 - @docs/deploy.md — ambienti, requisiti, segreti, attivazione, rilascio
 - @docs/manuale-utilizzo.md — manuale d'uso (pagine, profili, accessi, shortcode)
+- @docs/diario-di-bordo.md — decisioni prese e perché, più gli inciampi già pagati
+- @docs/da-fare.md — cosa resta aperto e cosa aspetta una decisione
