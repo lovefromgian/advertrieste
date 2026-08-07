@@ -57,6 +57,28 @@
 	width: 100%;
 }
 
+/* Stile proprio, senza variabili: questo modulo compare sia su una pagina
+   pubblica col tema attorno, sia dentro la console dove il CSS del tema è
+   soppresso. Con `class="button"` nel secondo caso restava il bottone grezzo
+   del browser. */
+.advtr-valida-btn {
+	display: inline-block;
+	padding: 9px 18px;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	background: #2271b1;
+	color: #fff;
+	font: inherit;
+	font-size: 14px;
+	line-height: 1.4;
+	cursor: pointer;
+}
+
+.advtr-valida-btn:hover {
+	background: #185a8c;
+	color: #fff;
+}
+
 .advtr-valida-esito {
 	font-weight: 600;
 }

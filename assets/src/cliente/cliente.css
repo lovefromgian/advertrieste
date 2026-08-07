@@ -7,7 +7,15 @@
  * (è lo stesso inciampo dei filtri della mappa: sfondo dichiarato e testo no).
  */
 
-.advtr-cliente {
+/* Le variabili stanno su entrambi i contenitori possibili.
+   Da quando le sezioni dell'area clienti vengono montate nel guscio della
+   console, attorno non c'è più `.advtr-cliente`: le variabili restavano
+   indefinite e ogni `var(--advtr-…)` decadeva. Il caso peggiore era il
+   bottone primario — `background: var(--advtr-accento)` non risolto diventa
+   trasparente, e con `color: #fff` "Salva modifiche" spariva nel bianco
+   della scheda. C'era, si poteva perfino cliccare: solo, non si vedeva. */
+.advtr-cliente,
+.advtr-console {
 	--advtr-testo: #1d2327;
 	--advtr-tenue: #646970;
 	--advtr-bordo: #dcdcde;
@@ -17,7 +25,9 @@
 	--advtr-ok: #00844a;
 	--advtr-errore: #b32d2e;
 	--advtr-attesa: #996800;
+}
 
+.advtr-cliente {
 	box-sizing: border-box;
 	max-width: 900px;
 	margin: 0 auto;
@@ -37,18 +47,22 @@
 }
 
 .advtr-cliente h2,
-.advtr-cliente h3 {
+.advtr-cliente h3,
+.advtr-console h2,
+.advtr-console h3 {
 	color: var(--advtr-testo);
 	margin: 0 0 12px;
 	line-height: 1.3;
 }
 
-.advtr-cliente h3 {
+.advtr-cliente h3,
+.advtr-console h3 {
 	font-size: 18px;
 	margin-top: 28px;
 }
 
-.advtr-cliente h3:first-child {
+.advtr-cliente h3:first-child,
+.advtr-console h3:first-child {
 	margin-top: 0;
 }
 

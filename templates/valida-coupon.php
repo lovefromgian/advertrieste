@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<input type="text" id="advtr-valida-codice" data-advtr-valida-codice="1" />
 	</p>
 	<p>
-		<button type="button" class="button" data-advtr-valida-btn="1"><?php esc_html_e( 'Valida coupon', 'advertrieste' ); ?></button>
+		<button type="button" class="advtr-valida-btn" data-advtr-valida-btn="1"><?php esc_html_e( 'Valida coupon', 'advertrieste' ); ?></button>
 	</p>
 	<p class="advtr-valida-esito" data-advtr-valida-esito="1" role="status"></p>
 </div>
